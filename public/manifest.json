@@ -1,0 +1,18 @@
+{
+  "manifest_version": 3,
+  "name": "Margin | Markdown editor",
+  "version": "0.1.0",
+  "description": "Čtěte a upravujte lokální Markdown soubory. Text a živý náhled vedle sebe, bez serveru.",
+  "minimum_chrome_version": "120",
+  "action": { "default_title": "Otevřít Margin" },
+  "background": { "service_worker": "background.js", "type": "module" },
+  "host_permissions": ["file:///*"],
+  "content_scripts": [{
+    "matches": ["file:///*"],
+    "js": ["content.js"],
+    "run_at": "document_start"
+  }],
+  "content_security_policy": {
+    "extension_pages": "default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self'; font-src 'self'; connect-src file:; object-src 'none'; base-uri 'none'; form-action 'none'"
+  }
+}
