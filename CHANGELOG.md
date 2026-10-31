@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.1 | 2026-10-31
+
+* Replace the solid icon badge with a transparent corner-bracket mark.
+* Update browser icons, favicon and in-app marks while preserving light and dark contrast.
+
 ## 1.0.0 | 2026-10-31
 
 * First stable release of the local Markdown editor and live preview.

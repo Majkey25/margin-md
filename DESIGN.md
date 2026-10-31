@@ -38,7 +38,7 @@ Phone, 390 px (one pane, `Vedle sebe` hidden, pane heads hidden):
 
 ## Signature
 
-One mark: two corner brackets (crop marks) that frame a page's margin, white on a solid badge. It is drawn on a 16-unit grid in `public/icon.svg` (black badge, white glyph, so it shows on light and dark browser chrome) and repeated inline in the toolbar. In the toolbar the badge uses `--mark-bg` (ink in Minimal and Glass, sage in Material) and the glyph uses `--mark-fg`. Nothing else is decorative.
+One mark: two corner brackets that frame a page's margin on a transparent background. The 16-unit vector in `public/icon.svg` uses dark ink and a thin white keyline for contrast on browser chrome. The inline toolbar and drop marks use `--mark-ink`, which follows the current theme. PNG icons at 16, 32, 48 and 128 px retain alpha transparency.
 
 ## Surfaces
 
@@ -68,7 +68,7 @@ Core roles (light / dark):
 | `--focus` | ink | `#0a5cc2` / `#6aacff` | `#2f6b57` / `#9dd3bb` |
 | `--danger` | `#b42318` / `#ff8a80` | `#b42318` / `#ff8a80` | `#ba1a1a` / `#ffb4ab` |
 
-Other roles: `--chrome`, `--raised`, `--field`, `--sunken`, `--hover`, `--press`, `--track`, `--seg-active`, `--selection`, `--edit-select`, `--caret`, `--active-line`, `--code-bg`, `--quote-rule` / `--quote-bg`, `--backdrop`, `--shadow-pop`, `--mark-bg` / `--mark-fg` and the four `--syntax-*` colours that `main.ts` reads for CodeMirror highlighting. The text tiers were chosen to target 4.5:1 or better on their surfaces. I estimated those ratios by hand; axe has not measured them yet.
+Other roles: `--chrome`, `--raised`, `--field`, `--sunken`, `--hover`, `--press`, `--track`, `--seg-active`, `--selection`, `--edit-select`, `--caret`, `--active-line`, `--code-bg`, `--quote-rule` / `--quote-bg`, `--backdrop`, `--shadow-pop`, `--mark-ink` and the four `--syntax-*` colours that `main.ts` reads for CodeMirror highlighting. Validation results are recorded in `QA.md`.
 
 Shape and size tokens: `--r-control`, `--r-field`, `--r-dialog`, `--r-code`, `--r-sheet`, `--h-control` (40 px), `--gutter-w` (56 px), `--code-lh` (23 px), `--source-max` (52rem), `--measure` (40rem), `--read-pad`, `--pane-head-h` (36 px).
 

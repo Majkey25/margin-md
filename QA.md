@@ -1,4 +1,14 @@
-# Validation | 1.0.0
+# Validation
+
+## Icon update | 1.0.1
+
+The corner-bracket icon now has a transparent background. SVG, favicon, toolbar icons and inline app marks share the same geometry. PNG alpha was checked at 16, 32, 48 and 128 px; each image has clear background pixels and zero alpha at its corner. Light and dark desktop and mobile checks found no opaque icon backdrop, accessibility violations or browser errors.
+
+`npm run test:browser` passed, including TypeScript and the production build. The 190,807-byte release ZIP was extracted and loaded as an extension. Its manifest reports 1.0.1, and its mapped 16 px toolbar icon decoded with transparent corner pixels.
+
+Archive SHA-256: `26d45fec2420464335f0d2891d8ded79422d706bfe7464f6873ad4814fac9409`.
+
+The complete 1.0.0 validation record follows. Its performance and disk-write measurements were not repeated for this icon-only update.
 
 Checked on 31 October 2026, Windows, Chromium 156.0.8078.4. Measurements below are local laboratory observations.
 

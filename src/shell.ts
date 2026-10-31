@@ -1,7 +1,7 @@
 export const shell = String.raw`
 <header class="toolbar" aria-label="Hlavní panel nástrojů">
   <div class="brand">
-    <svg class="brand-mark" viewBox="0 0 16 16" width="24" height="24" aria-hidden="true"><rect width="16" height="16" rx="3.5" fill="currentColor"/><path class="brand-mark-glyph" shape-rendering="crispEdges" d="M3 3h6v2H5v5H3zM13 13H7v-2h4V6h2z"/></svg>
+    <svg class="brand-mark" viewBox="0 0 16 16" width="24" height="24" aria-hidden="true"><path fill="currentColor" d="M2 2h7v2H4v6H2zM14 14H7v-2h5V6h2z"/></svg>
     <span class="brand-name">Margin</span>
   </div>
 
@@ -58,7 +58,7 @@ export const shell = String.raw`
 
 <div id="drop-overlay" class="drop-overlay" hidden>
   <div class="drop-frame">
-    <svg class="drop-mark" viewBox="0 0 16 16" width="32" height="32" aria-hidden="true"><rect width="16" height="16" rx="3.5" fill="currentColor"/><path class="brand-mark-glyph" shape-rendering="crispEdges" d="M3 3h6v2H5v5H3zM13 13H7v-2h4V6h2z"/></svg>
+    <svg class="drop-mark" viewBox="0 0 16 16" width="32" height="32" aria-hidden="true"><path fill="currentColor" d="M2 2h7v2H4v6H2zM14 14H7v-2h5V6h2z"/></svg>
     <span class="drop-label">Pusťte Markdown soubor sem</span>
     <span class="drop-hint">Přípona .md nebo .markdown, nejvýše 5 MiB</span>
   </div>

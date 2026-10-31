@@ -85,8 +85,7 @@
   --code-ink: #1a1a1a;
   --quote-rule: #cfcfcf;
   --quote-bg: transparent;
-  --mark-bg: #000000;
-  --mark-fg: #ffffff;
+  --mark-ink: #000000;
 
   --syntax-heading: #000000;
   --syntax-mark: #6b6b6b;
@@ -145,8 +144,7 @@
   --code-ink: #e8e8e8;
   --quote-rule: #3a3a3a;
   --quote-bg: transparent;
-  --mark-bg: #ffffff;
-  --mark-fg: #000000;
+  --mark-ink: #ffffff;
 
   --syntax-heading: #ffffff;
   --syntax-mark: #8f8f8f;
@@ -220,8 +218,7 @@
   --code-ink: #1b222a;
   --quote-rule: #b9c6d4;
   --quote-bg: transparent;
-  --mark-bg: #0c1116;
-  --mark-fg: #ffffff;
+  --mark-ink: #0c1116;
 
   --syntax-heading: #0a4ea6;
   --syntax-mark: #5b6673;
@@ -283,8 +280,7 @@
   --code-ink: #e1e6ec;
   --quote-rule: #3d4a58;
   --quote-bg: transparent;
-  --mark-bg: #f3f6f9;
-  --mark-fg: #0b0e12;
+  --mark-ink: #f3f6f9;
 
   --syntax-heading: #8cc2ff;
   --syntax-mark: #8d99a7;
@@ -368,8 +364,7 @@
   --code-ink: #1b211e;
   --quote-rule: transparent;
   --quote-bg: #e6efe9;
-  --mark-bg: #2f6b57;
-  --mark-fg: #ffffff;
+  --mark-ink: #2f6b57;
 
   --syntax-heading: #2f6b57;
   --syntax-mark: #56605a;
@@ -426,8 +421,7 @@
   --code-ink: #d9e0db;
   --quote-rule: transparent;
   --quote-bg: #1b2520;
-  --mark-bg: #9dd3bb;
-  --mark-fg: #00382a;
+  --mark-ink: #9dd3bb;
 
   --syntax-heading: #9dd3bb;
   --syntax-mark: #9aa49e;
@@ -684,11 +678,7 @@ select {
 .drop-mark {
   display: block;
   flex: none;
-  color: var(--mark-bg);
-}
-
-.brand-mark-glyph {
-  fill: var(--mark-fg);
+  color: var(--mark-ink);
 }
 
 .brand-name {
