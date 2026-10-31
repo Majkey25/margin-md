@@ -1,0 +1,797 @@
+/* Margin: Markdown preview presets.
+   Loaded after styles.css. The single home for how rendered Markdown looks.
+
+   html[data-preview-theme] = github (default) | vscode | reading
+   html[data-theme]         = light | dark
+
+   Presets are inspired by GitHub's README rendering (primer/css) and the
+   VS Code built-in Markdown preview. They reproduce scale and character,
+   not the original stylesheets. Every token is scoped to #preview-pane, so
+   the toolbar, source, footer and dialogs keep the application palette and
+   the application surface (minimal / glass / material) never reaches here.
+
+   User overrides are read, never redefined here:
+   --preview-font, --preview-size (unset = preset default). */
+
+/* ── GitHub-inspired, light (also the fallback before JS runs) ─────── */
+
+#preview-pane {
+  --pv-font: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
+  --pv-code-font: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  --pv-measure: calc(52 * var(--preview-size, 16px));
+  --pv-pad: clamp(16px, 4vw, 40px);
+  --pv-lh: 1.5;
+
+  --pv-h-weight: 600;
+  --pv-h-lh: 1.25;
+  --pv-h-mt: 24px;
+  --pv-h-mb: 16px;
+  --pv-h1: 2em;
+  --pv-h2: 1.5em;
+  --pv-h3: 1.25em;
+  --pv-h4: 1em;
+  --pv-h5: 0.875em;
+  --pv-h6: 0.85em;
+  --pv-h-rule: 1px;
+  --pv-block: 16px;
+
+  --pv-code-size: 85%;
+  --pv-code-pad: 0.2em 0.4em;
+  --pv-code-radius: 6px;
+  --pv-pre-size: 85%;
+  --pv-pre-lh: 1.45;
+  --pv-pre-pad: 16px;
+  --pv-pre-radius: 6px;
+  --pv-pre-border-w: 0px;
+  --pv-quote-w: 0.25em;
+  --pv-quote-pad: 0 1em;
+  --pv-quote-radius: 0px;
+
+  --pv-bg: #ffffff;
+  --pv-fg: #1f2328;
+  --pv-heading: #1f2328;
+  --pv-muted: #59636e;
+  --pv-rule: #d1d9e0;
+  --pv-rule-soft: #dfe4e9;
+  --pv-rule-strong: #d1d9e0;
+  --pv-link: #0969da;
+  --pv-focus: #0969da;
+  --pv-code-bg: rgba(129, 139, 152, 0.12);
+  --pv-code-fg: #1f2328;
+  --pv-pre-bg: #f6f8fa;
+  --pv-pre-fg: #1f2328;
+  --pv-pre-border: transparent;
+  --pv-quote-bar: #d1d9e0;
+  --pv-quote-bg: transparent;
+  --pv-quote-fg: #59636e;
+  --pv-row-alt: #f6f8fa;
+  --pv-selection: rgba(9, 105, 218, 0.2);
+
+  --tk-keyword: #cf222e;
+  --tk-atom: #0550ae;
+  --tk-string: #0a3069;
+  --tk-comment: #59636e;
+  --tk-variable: #953800;
+  --tk-property: #0550ae;
+  --tk-type: #8250df;
+  --tk-operator: #cf222e;
+  --tk-punct: #1f2328;
+  --tk-tag: #116329;
+  --tk-attr: #0550ae;
+  --tk-meta: #59636e;
+  --tk-invalid: #82071e;
+}
+
+/* GitHub-inspired, dark: neutral blue-grey canvas, not true black. */
+:root[data-theme="dark"] #preview-pane {
+  --pv-bg: #0d1117;
+  --pv-fg: #e6edf3;
+  --pv-heading: #f0f6fc;
+  --pv-muted: #9198a1;
+  --pv-rule: #3d444d;
+  --pv-rule-soft: #2f353d;
+  --pv-rule-strong: #3d444d;
+  --pv-link: #4493f8;
+  --pv-focus: #4493f8;
+  --pv-code-bg: rgba(101, 108, 118, 0.2);
+  --pv-code-fg: #e6edf3;
+  --pv-pre-bg: #151b23;
+  --pv-pre-fg: #e6edf3;
+  --pv-pre-border: transparent;
+  --pv-quote-bar: #3d444d;
+  --pv-quote-bg: transparent;
+  --pv-quote-fg: #9198a1;
+  --pv-row-alt: #151b23;
+  --pv-selection: rgba(68, 147, 248, 0.3);
+
+  --tk-keyword: #ff7b72;
+  --tk-atom: #79c0ff;
+  --tk-string: #a5d6ff;
+  --tk-comment: #9198a1;
+  --tk-variable: #ffa657;
+  --tk-property: #79c0ff;
+  --tk-type: #d2a8ff;
+  --tk-operator: #ff7b72;
+  --tk-punct: #e6edf3;
+  --tk-tag: #7ee787;
+  --tk-attr: #79c0ff;
+  --tk-meta: #9198a1;
+  --tk-invalid: #ffa198;
+}
+
+/* ── VS Code-inspired, light ───────────────────────────────────────── */
+
+:root[data-preview-theme="vscode"] #preview-pane {
+  --pv-font: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", system-ui, Ubuntu, "Droid Sans", sans-serif;
+  --pv-code-font: "SF Mono", Monaco, Menlo, Consolas, "Ubuntu Mono", "Liberation Mono", "DejaVu Sans Mono", "Courier New", monospace;
+  --pv-measure: calc(60 * var(--preview-size, 14px));
+  --pv-pad: clamp(16px, 3vw, 26px);
+  --pv-lh: 1.572; /* 22px at 14px */
+
+  --pv-h-weight: 600;
+  --pv-h-lh: 1.25;
+  --pv-h-mt: 24px;
+  --pv-h-mb: 16px;
+  --pv-h1: 2em;
+  --pv-h2: 1.5em;
+  --pv-h3: 1.25em;
+  --pv-h4: 1em;
+  --pv-h5: 0.875em;
+  --pv-h6: 0.85em;
+  --pv-h-rule: 1px;
+  --pv-block: 16px;
+
+  --pv-code-size: 1em;
+  --pv-code-pad: 0.1em 0.3em;
+  --pv-code-radius: 3px;
+  --pv-pre-size: 1em;
+  --pv-pre-lh: 1.357;
+  --pv-pre-pad: 16px;
+  --pv-pre-radius: 3px;
+  --pv-pre-border-w: 1px;
+  --pv-quote-w: 5px;
+  --pv-quote-pad: 8px 16px 8px 10px;
+  --pv-quote-radius: 2px;
+
+  --pv-bg: #ffffff;
+  --pv-fg: #3b3b3b;
+  --pv-heading: #1f1f1f;
+  --pv-muted: #616161;
+  --pv-rule: #d1d1d1;
+  --pv-rule-soft: #d1d1d1;
+  --pv-rule-strong: #5a5a5a;
+  --pv-link: #005fb8;
+  --pv-focus: #005fb8;
+  --pv-code-bg: rgba(0, 0, 0, 0.07);
+  --pv-code-fg: #3b3b3b;
+  --pv-pre-bg: #f5f5f5;
+  --pv-pre-fg: #1f1f1f;
+  --pv-pre-border: #e5e5e5;
+  --pv-quote-bar: #d5d5d5;
+  --pv-quote-bg: #f5f5f5;
+  --pv-quote-fg: #3b3b3b;
+  --pv-row-alt: transparent;
+  --pv-selection: rgba(0, 95, 184, 0.2);
+
+  --tk-keyword: #0000ff;
+  --tk-atom: #0000ff;
+  --tk-string: #a31515;
+  --tk-comment: #008000;
+  --tk-variable: #001080;
+  --tk-property: #001080;
+  --tk-type: #1f7085;
+  --tk-operator: #1f1f1f;
+  --tk-punct: #3b3b3b;
+  --tk-tag: #800000;
+  --tk-attr: #cd3131;
+  --tk-meta: #795e26;
+  --tk-invalid: #cd3131;
+}
+
+/* VS Code-inspired, dark: the neutral grey of the default dark theme. */
+:root[data-preview-theme="vscode"][data-theme="dark"] #preview-pane {
+  --pv-bg: #1f1f1f;
+  --pv-fg: #cccccc;
+  --pv-heading: #e7e7e7;
+  --pv-muted: #9d9d9d;
+  --pv-rule: #474747;
+  --pv-rule-soft: #474747;
+  --pv-rule-strong: #b0b0b0;
+  --pv-link: #4daafc;
+  --pv-focus: #4daafc;
+  --pv-code-bg: #333333;
+  --pv-code-fg: #d7d7d7;
+  --pv-pre-bg: #2b2b2b;
+  --pv-pre-fg: #d4d4d4;
+  --pv-pre-border: #3c3c3c;
+  --pv-quote-bar: #616161;
+  --pv-quote-bg: #2b2b2b;
+  --pv-quote-fg: #cccccc;
+  --pv-row-alt: transparent;
+  --pv-selection: rgba(77, 170, 252, 0.28);
+
+  --tk-keyword: #569cd6;
+  --tk-atom: #569cd6;
+  --tk-string: #ce9178;
+  --tk-comment: #78a862;
+  --tk-variable: #9cdcfe;
+  --tk-property: #9cdcfe;
+  --tk-type: #4ec9b0;
+  --tk-operator: #d4d4d4;
+  --tk-punct: #cccccc;
+  --tk-tag: #569cd6;
+  --tk-attr: #9cdcfe;
+  --tk-meta: #dcdcaa;
+  --tk-invalid: #f48771;
+}
+
+/* ── Reading (Čtení), light: calm serif column ─────────────────────── */
+
+:root[data-preview-theme="reading"] #preview-pane {
+  --pv-font: var(--font-read);
+  --pv-code-font: var(--font-mono);
+  --pv-measure: calc(38 * var(--preview-size, 17px));
+  --pv-pad: clamp(20px, 4vw, 48px);
+  --pv-lh: 1.65;
+
+  --pv-h-weight: 700;
+  --pv-h-lh: 1.25;
+  --pv-h-mt: 1.75em;
+  --pv-h-mb: 0.5em;
+  --pv-h1: 1.85em;
+  --pv-h2: 1.4em;
+  --pv-h3: 1.17em;
+  --pv-h4: 1em;
+  --pv-h5: 0.94em;
+  --pv-h6: 0.94em;
+  --pv-h-rule: 0px;
+  --pv-block: 1em;
+
+  --pv-code-size: 0.84em;
+  --pv-code-pad: 0.12em 0.36em;
+  --pv-code-radius: 4px;
+  --pv-pre-size: 0.8em;
+  --pv-pre-lh: 1.6;
+  --pv-pre-pad: 14px 16px;
+  --pv-pre-radius: 6px;
+  --pv-pre-border-w: 1px;
+  --pv-quote-w: 2px;
+  --pv-quote-pad: 0.1em 0 0.1em 1.1em;
+  --pv-quote-radius: 0px;
+
+  --pv-bg: #fbfbfa;
+  --pv-fg: #1d1d1b;
+  --pv-heading: #111110;
+  --pv-muted: #5d5c57;
+  --pv-rule: #e2e1dc;
+  --pv-rule-soft: #e2e1dc;
+  --pv-rule-strong: #c9c8c2;
+  --pv-link: #1d1d1b;
+  --pv-focus: #1d1d1b;
+  --pv-code-bg: #efefec;
+  --pv-code-fg: #1d1d1b;
+  --pv-pre-bg: #f2f2ef;
+  --pv-pre-fg: #1d1d1b;
+  --pv-pre-border: #e2e1dc;
+  --pv-quote-bar: #c9c8c2;
+  --pv-quote-bg: transparent;
+  --pv-quote-fg: #5d5c57;
+  --pv-row-alt: transparent;
+  --pv-selection: rgba(0, 0, 0, 0.12);
+
+  --tk-keyword: #7a2e57;
+  --tk-atom: #8a4a00;
+  --tk-string: #2f5f2f;
+  --tk-comment: #6b6a63;
+  --tk-variable: #1d1d1b;
+  --tk-property: #3b4f86;
+  --tk-type: #1f5a7a;
+  --tk-operator: #4a4945;
+  --tk-punct: #4a4945;
+  --tk-tag: #7a2e57;
+  --tk-attr: #8a4a00;
+  --tk-meta: #6b6a63;
+  --tk-invalid: #a1261b;
+}
+
+/* Reading, dark: soft charcoal, warm grey ink. */
+:root[data-preview-theme="reading"][data-theme="dark"] #preview-pane {
+  --pv-bg: #161615;
+  --pv-fg: #e4e3df;
+  --pv-heading: #f3f2ee;
+  --pv-muted: #a5a49e;
+  --pv-rule: #2f2f2c;
+  --pv-rule-soft: #2f2f2c;
+  --pv-rule-strong: #46453f;
+  --pv-link: #e4e3df;
+  --pv-focus: #e4e3df;
+  --pv-code-bg: #252523;
+  --pv-code-fg: #e4e3df;
+  --pv-pre-bg: #21211f;
+  --pv-pre-fg: #e4e3df;
+  --pv-pre-border: #2f2f2c;
+  --pv-quote-bar: #46453f;
+  --pv-quote-bg: transparent;
+  --pv-quote-fg: #a5a49e;
+  --pv-row-alt: transparent;
+  --pv-selection: rgba(255, 255, 255, 0.2);
+
+  --tk-keyword: #e3a3c4;
+  --tk-atom: #e0b273;
+  --tk-string: #a8cc94;
+  --tk-comment: #9a998f;
+  --tk-variable: #e4e3df;
+  --tk-property: #b3bfe8;
+  --tk-type: #8ec2dd;
+  --tk-operator: #c9c8c2;
+  --tk-punct: #c9c8c2;
+  --tk-tag: #e3a3c4;
+  --tk-attr: #e0b273;
+  --tk-meta: #9a998f;
+  --tk-invalid: #ff9b8f;
+}
+
+/* ── Pane: the preset fills the whole pane, no inner card ──────────── */
+
+#preview-pane {
+  background: var(--pv-bg);
+  color: var(--pv-fg);
+}
+
+#preview-pane:focus-visible {
+  outline-color: var(--pv-focus);
+}
+
+#preview-pane .preview-head {
+  border-bottom-color: var(--pv-rule-soft);
+  background: var(--pv-bg);
+}
+
+#preview-pane .pane-title {
+  color: var(--pv-muted);
+}
+
+#preview-pane .pane-title::before {
+  box-shadow: inset 0 0 0 1.5px var(--pv-rule-strong);
+}
+
+#preview-pane:focus-visible .pane-title {
+  color: var(--pv-heading);
+}
+
+#preview-pane:focus-visible .pane-title::before {
+  background: var(--pv-focus);
+  box-shadow: none;
+}
+
+#preview-pane ::selection {
+  background: var(--pv-selection);
+}
+
+/* ── Document ──────────────────────────────────────────────────────── */
+
+.preview {
+  box-sizing: content-box;
+  min-width: 0;
+  max-width: var(--pv-measure);
+  margin: 0 auto;
+  padding: 28px var(--pv-pad) 96px;
+  font-family: var(--preview-font, var(--pv-font));
+  font-size: var(--preview-size, 16px);
+  line-height: var(--pv-lh);
+  color: var(--pv-fg);
+  overflow-wrap: break-word;
+  font-kerning: normal;
+  text-rendering: optimizeLegibility;
+}
+
+:root[data-preview-theme="vscode"] .preview {
+  font-size: var(--preview-size, 14px);
+}
+
+:root[data-preview-theme="reading"] .preview {
+  font-size: var(--preview-size, 17px);
+}
+
+.preview:empty::before {
+  content: "Náhled se zobrazí, jakmile začnete psát.";
+  font-family: var(--font-ui);
+  font-size: var(--fs-md);
+  color: var(--pv-muted);
+}
+
+/* Block edges stay flush whatever the first or last block is. */
+.preview > :first-child {
+  margin-top: 0 !important;
+}
+
+.preview > :last-child {
+  margin-bottom: 0 !important;
+}
+
+.preview :is(p, blockquote, ul, ol, table, pre) {
+  margin-top: 0;
+  margin-bottom: var(--pv-block);
+}
+
+/* Headings */
+
+.preview :is(h1, h2, h3, h4, h5, h6) {
+  margin: var(--pv-h-mt) 0 var(--pv-h-mb);
+  font-family: inherit;
+  font-weight: var(--pv-h-weight);
+  line-height: var(--pv-h-lh);
+  color: var(--pv-heading);
+  text-wrap: balance;
+}
+
+.preview h1 {
+  font-size: var(--pv-h1);
+}
+
+.preview h2 {
+  font-size: var(--pv-h2);
+}
+
+.preview :is(h1, h2) {
+  padding-bottom: 0.3em;
+  border-bottom: var(--pv-h-rule) solid var(--pv-rule-soft);
+}
+
+.preview h3 {
+  font-size: var(--pv-h3);
+}
+
+.preview h4 {
+  font-size: var(--pv-h4);
+}
+
+.preview h5 {
+  font-size: var(--pv-h5);
+}
+
+.preview h6 {
+  font-size: var(--pv-h6);
+  color: var(--pv-muted);
+}
+
+.preview :is(h1, h2, h3, h4, h5, h6) code {
+  padding: 0 0.2em;
+  font-size: inherit;
+}
+
+/* Reading keeps its own tighter heading rhythm. */
+:root[data-preview-theme="reading"] .preview h1 {
+  margin-bottom: 0.55em;
+  padding-bottom: 0;
+  line-height: 1.15;
+  letter-spacing: -0.015em;
+}
+
+:root[data-preview-theme="reading"] .preview h2 {
+  padding-bottom: 0;
+  letter-spacing: -0.01em;
+}
+
+:root[data-preview-theme="reading"] .preview h4 {
+  margin-top: 1.5em;
+}
+
+:root[data-preview-theme="reading"] .preview :is(h5, h6) {
+  margin-top: 1.4em;
+}
+
+:root[data-preview-theme="reading"] .preview :is(h1, h2, h3, h4, h5, h6) + :is(h1, h2, h3, h4, h5, h6) {
+  margin-top: 0.6em;
+}
+
+:root[data-preview-theme="reading"] .preview p {
+  text-wrap: pretty;
+}
+
+/* Inline */
+
+.preview a {
+  color: var(--pv-link);
+  text-decoration-line: underline;
+  text-decoration-thickness: 1px;
+  text-decoration-color: color-mix(in srgb, var(--pv-link) 40%, transparent);
+  text-underline-offset: 0.2em;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+}
+
+@media (hover: hover) {
+  .preview a:hover {
+    text-decoration-color: var(--pv-link);
+  }
+}
+
+.preview a:focus-visible {
+  outline: 2px solid var(--pv-focus);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.preview strong {
+  font-weight: var(--pv-h-weight);
+}
+
+.preview em {
+  font-style: italic;
+}
+
+.preview s {
+  text-decoration-thickness: 1px;
+}
+
+:root[data-preview-theme="reading"] .preview s {
+  color: var(--pv-muted);
+}
+
+.preview code {
+  padding: var(--pv-code-pad);
+  border-radius: var(--pv-code-radius);
+  background: var(--pv-code-bg);
+  color: var(--pv-code-fg);
+  font-family: var(--pv-code-font);
+  font-size: var(--pv-code-size);
+  font-variant-ligatures: none;
+  overflow-wrap: anywhere;
+}
+
+/* Lists */
+
+.preview :is(ul, ol) {
+  padding-left: 2em;
+}
+
+.preview ul {
+  list-style-type: disc;
+}
+
+.preview :is(ul, ol) ul {
+  list-style-type: circle;
+}
+
+.preview :is(ul, ol) :is(ul, ol) ul {
+  list-style-type: square;
+}
+
+.preview ol {
+  list-style-type: decimal;
+}
+
+.preview :is(ul, ol) ol {
+  list-style-type: lower-roman;
+}
+
+.preview :is(ul, ol) :is(ul, ol) ol {
+  list-style-type: lower-alpha;
+}
+
+.preview li + li {
+  margin-top: 0.25em;
+}
+
+.preview li > :is(ul, ol) {
+  margin-top: 0.25em;
+  margin-bottom: 0;
+}
+
+.preview li > p {
+  margin-top: var(--pv-block);
+  margin-bottom: 0;
+}
+
+.preview li > p:first-child {
+  margin-top: 0;
+}
+
+.preview li::marker {
+  color: var(--pv-muted);
+}
+
+.preview ol > li::marker {
+  font-variant-numeric: tabular-nums;
+}
+
+/* GitHub task lists, when the renderer emits them: the box takes the bullet's place. */
+.preview .task-list-item {
+  list-style-type: none;
+}
+
+.preview .task-list-checkbox {
+  width: 1em;
+  height: 1em;
+  margin: 0 0.35em 0.2em -1.4em;
+  vertical-align: middle;
+  accent-color: var(--pv-link);
+}
+
+.preview .task-list-checkbox:disabled {
+  opacity: 1;
+  cursor: default;
+}
+
+/* Blocks */
+
+.preview blockquote {
+  margin-inline: 0;
+  padding: var(--pv-quote-pad);
+  border-left: var(--pv-quote-w) solid var(--pv-quote-bar);
+  border-radius: var(--pv-quote-radius);
+  background: var(--pv-quote-bg);
+  color: var(--pv-quote-fg);
+}
+
+.preview blockquote > :first-child {
+  margin-top: 0;
+}
+
+.preview blockquote > :last-child {
+  margin-bottom: 0;
+}
+
+.preview hr {
+  height: 1px;
+  margin: 24px 0;
+  padding: 0;
+  border: 0;
+  background: var(--pv-rule);
+}
+
+:root[data-preview-theme="reading"] .preview hr {
+  margin: 2.2em 0;
+  background: var(--pv-rule-strong);
+}
+
+.preview pre {
+  max-width: 100%;
+  padding: var(--pv-pre-pad);
+  overflow-x: auto;
+  border: var(--pv-pre-border-w) solid var(--pv-pre-border);
+  border-radius: var(--pv-pre-radius);
+  background: var(--pv-pre-bg);
+  color: var(--pv-pre-fg);
+  font-family: var(--pv-code-font);
+  font-size: var(--pv-pre-size);
+  line-height: var(--pv-pre-lh);
+  tab-size: 4;
+  scrollbar-width: thin;
+}
+
+.preview pre code {
+  display: block;
+  padding: 0;
+  border-radius: 0;
+  background: none;
+  color: inherit;
+  font-size: inherit;
+  white-space: pre;
+  overflow-wrap: normal;
+}
+
+.preview :is(pre, table):focus-visible {
+  outline: 2px solid var(--pv-focus);
+  outline-offset: 2px;
+}
+
+/* Fence highlighting: @lezer/highlight classHighlighter names. */
+.preview pre .tok-keyword { color: var(--tk-keyword); }
+.preview pre :is(.tok-atom, .tok-bool, .tok-number, .tok-literal) { color: var(--tk-atom); }
+.preview pre :is(.tok-string, .tok-string2) { color: var(--tk-string); }
+.preview pre .tok-comment { color: var(--tk-comment); font-style: italic; }
+.preview pre :is(.tok-variableName, .tok-variableName2, .tok-definition, .tok-local, .tok-labelName) { color: var(--tk-variable); }
+.preview pre .tok-propertyName { color: var(--tk-property); }
+.preview pre .tok-typeName { color: var(--tk-type); }
+.preview pre .tok-operator { color: var(--tk-operator); }
+.preview pre .tok-punctuation { color: var(--tk-punct); }
+.preview pre .tok-tagName { color: var(--tk-tag); }
+.preview pre .tok-attributeName { color: var(--tk-attr); }
+.preview pre .tok-meta { color: var(--tk-meta); }
+.preview pre .tok-invalid { color: var(--tk-invalid); }
+
+:root:not([data-preview-theme="reading"]) .preview pre .tok-comment {
+  font-style: normal;
+}
+
+/* Tables size to content and scroll inside themselves, never the pane. */
+.preview table {
+  display: block;
+  width: max-content;
+  max-width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+  border-spacing: 0;
+  font-variant-numeric: tabular-nums;
+  scrollbar-width: thin;
+}
+
+.preview :is(th, td) {
+  padding: 6px 13px;
+  border: 1px solid var(--pv-rule);
+  text-align: start;
+  vertical-align: top;
+}
+
+.preview th {
+  font-weight: var(--pv-h-weight);
+  color: var(--pv-heading);
+}
+
+.preview tbody tr:nth-child(2n) {
+  background: var(--pv-row-alt);
+}
+
+/* VS Code: open table, strong header rule, light row rules. */
+:root[data-preview-theme="vscode"] .preview :is(th, td) {
+  padding: 5px 10px;
+  border: 0;
+}
+
+:root[data-preview-theme="vscode"] .preview th {
+  border-bottom: 1px solid var(--pv-rule-strong);
+}
+
+:root[data-preview-theme="vscode"] .preview tbody tr + tr > td {
+  border-top: 1px solid var(--pv-rule);
+}
+
+/* Reading: horizontal rules only, quieter UI figures. */
+:root[data-preview-theme="reading"] .preview table {
+  font-size: 0.88em;
+  line-height: 1.45;
+}
+
+:root[data-preview-theme="reading"] .preview :is(th, td) {
+  padding: 9px 14px;
+  border: 0;
+  border-bottom: 1px solid var(--pv-rule);
+}
+
+:root[data-preview-theme="reading"] .preview th {
+  border-bottom-color: var(--pv-rule-strong);
+}
+
+:root[data-preview-theme="reading"] .preview :is(th, td):first-child {
+  padding-left: 0;
+}
+
+:root[data-preview-theme="reading"] .preview :is(th, td):last-child {
+  padding-right: 0;
+}
+
+.preview .align-left {
+  text-align: left;
+}
+
+.preview .align-center {
+  text-align: center;
+}
+
+.preview .align-right {
+  text-align: right;
+}
+
+/* Images stay blocked; the placeholder names what was skipped. */
+.preview .blocked-image {
+  display: inline-block;
+  max-width: 100%;
+  padding: 0.15em 0.6em;
+  border: 1px dashed var(--pv-rule-strong);
+  border-radius: 6px;
+  background: var(--pv-pre-bg);
+  color: var(--pv-muted);
+  font: 500 var(--fs-sm) / 1.45 var(--font-ui);
+  vertical-align: baseline;
+  overflow-wrap: anywhere;
+}
+
+/* Phone: less vertical air only. The chosen text size is kept. */
+@media (max-width: 560px) {
+  .preview {
+    padding-top: 20px;
+    padding-bottom: 64px;
+  }
+}

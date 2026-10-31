@@ -48,7 +48,6 @@ export const shell = String.raw`
     <div class="pane-head preview-head">
       <div class="pane-head-inner">
         <h2 id="preview-title" class="pane-title">Náhled</h2>
-        <span class="pane-note">HTML a obrázky se nevykreslují</span>
       </div>
     </div>
     <article id="preview" class="preview"></article>
@@ -103,39 +102,116 @@ export const shell = String.raw`
 </dialog>
 
 <dialog id="preferences-dialog" class="dialog dialog-prefs" aria-labelledby="preferences-title">
-  <div class="dialog-body">
-    <div class="dialog-head">
-      <h2 id="preferences-title" class="dialog-title">Vzhled</h2>
-      <button id="preferences-close" type="button" class="icon-btn" aria-label="Zavřít nastavení" title="Zavřít"><svg class="icon" viewBox="0 0 20 20" aria-hidden="true"><path d="M5.5 5.5l9 9M14.5 5.5l-9 9"/></svg></button>
-    </div>
+  <div class="prefs-head">
+    <h2 id="preferences-title" class="dialog-title">Vzhled</h2>
+    <button id="preferences-close" type="button" class="icon-btn" aria-label="Zavřít nastavení" title="Zavřít"><svg class="icon" viewBox="0 0 20 20" aria-hidden="true"><path d="M5.5 5.5l9 9M14.5 5.5l-9 9"/></svg></button>
+  </div>
 
-    <div class="pref-row">
-      <label class="pref-label" for="theme-setting">Režim</label>
-      <span class="select">
-        <select id="theme-setting" aria-describedby="theme-hint">
-          <option value="system">Podle zařízení</option>
-          <option value="light">Světlý</option>
-          <option value="dark">Tmavý</option>
-        </select>
-      </span>
-      <p id="theme-hint" class="pref-hint">Podle zařízení sleduje nastavení systému. Tlačítko v liště volbu přepne na světlý nebo tmavý.</p>
-    </div>
+  <div class="prefs-body">
+    <section class="pref-section" aria-labelledby="pref-app-title">
+      <h3 id="pref-app-title" class="pref-section-title">Aplikace</h3>
 
-    <div class="pref-row">
-      <label class="pref-label" for="surface-setting">Styl rozhraní</label>
-      <span class="select">
-        <select id="surface-setting">
-          <option value="minimal">Minimal</option>
-          <option value="glass">Glass</option>
-          <option value="material">Material You</option>
-        </select>
-      </span>
-      <p class="pref-hint surface-note" data-for="minimal">Černá a bílá, tenké linky, nic navíc.</p>
-      <p class="pref-hint surface-note" data-for="glass">Průsvitná lišta a dialogy s jemným rozostřením, panely jako listy.</p>
-      <p class="pref-hint surface-note" data-for="material">Měkké tvary a tlumené zelené tóny.</p>
-    </div>
+      <div class="pref-row">
+        <label class="pref-label" for="theme-setting">Režim</label>
+        <span class="select">
+          <select id="theme-setting" aria-describedby="theme-hint">
+            <option value="system">Podle zařízení</option>
+            <option value="light">Světlý</option>
+            <option value="dark">Tmavý</option>
+          </select>
+        </span>
+        <p id="theme-hint" class="pref-hint">Podle zařízení sleduje nastavení systému. Tlačítko v liště volbu přepne na světlý nebo tmavý.</p>
+      </div>
 
-    <p class="pref-note">Nastavení se ukládá jen v tomto prohlížeči.</p>
+      <div class="pref-row">
+        <label class="pref-label" for="surface-setting">Styl rozhraní</label>
+        <span class="select">
+          <select id="surface-setting">
+            <option value="minimal">Minimal</option>
+            <option value="glass">Glass</option>
+            <option value="material">Material You</option>
+          </select>
+        </span>
+        <p class="pref-hint surface-note" data-for="minimal">Černá a bílá, tenké linky, nic navíc.</p>
+        <p class="pref-hint surface-note" data-for="glass">Průsvitná lišta a dialogy s jemným rozostřením, panely jako listy.</p>
+        <p class="pref-hint surface-note" data-for="material">Měkké tvary a tlumené zelené tóny.</p>
+      </div>
+    </section>
+
+    <section class="pref-section" aria-labelledby="pref-preview-title">
+      <h3 id="pref-preview-title" class="pref-section-title">Náhled Markdownu</h3>
+
+      <div class="pref-row">
+        <label class="pref-label" for="preview-theme-setting">Styl náhledu</label>
+        <span class="select">
+          <select id="preview-theme-setting" aria-describedby="preview-theme-hint">
+            <option value="github">GitHub</option>
+            <option value="vscode">VS Code</option>
+            <option value="reading">Čtení</option>
+          </select>
+        </span>
+        <p id="preview-theme-hint" class="pref-hint">Platí jen pro náhled, nezávisle na stylu rozhraní.</p>
+      </div>
+
+      <div class="pref-row">
+        <label class="pref-label" for="preview-font-setting">Písmo<span class="sr-only"> náhledu</span></label>
+        <span class="select">
+          <select id="preview-font-setting">
+            <option value="default">Podle stylu</option>
+            <option value="sans">Bezpatkové</option>
+            <option value="serif">Patkové</option>
+            <option value="mono">Neproporcionální</option>
+          </select>
+        </span>
+      </div>
+
+      <div class="pref-row">
+        <label class="pref-label" for="preview-size-setting">Velikost<span class="sr-only"> písma náhledu</span></label>
+        <span class="select">
+          <select id="preview-size-setting">
+            <option value="default">Podle stylu</option>
+            <option value="14">14 px</option>
+            <option value="16">16 px</option>
+            <option value="18">18 px</option>
+            <option value="20">20 px</option>
+            <option value="22">22 px</option>
+            <option value="24">24 px</option>
+          </select>
+        </span>
+      </div>
+    </section>
+
+    <section class="pref-section" aria-labelledby="pref-editor-title">
+      <h3 id="pref-editor-title" class="pref-section-title">Editor</h3>
+
+      <div class="pref-row">
+        <label class="pref-label" for="editor-font-setting">Písmo<span class="sr-only"> editoru</span></label>
+        <span class="select">
+          <select id="editor-font-setting">
+            <option value="system">Systémové</option>
+            <option value="cascadia">Cascadia</option>
+            <option value="consolas">Consolas</option>
+          </select>
+        </span>
+      </div>
+
+      <div class="pref-row">
+        <label class="pref-label" for="editor-size-setting">Velikost<span class="sr-only"> písma editoru</span></label>
+        <span class="select">
+          <select id="editor-size-setting">
+            <option value="12">12 px</option>
+            <option value="13">13 px</option>
+            <option value="14">14 px</option>
+            <option value="15">15 px</option>
+            <option value="16">16 px</option>
+            <option value="18">18 px</option>
+            <option value="20">20 px</option>
+          </select>
+        </span>
+      </div>
+    </section>
+
+    <p class="pref-note">Používají se písma nainstalovaná v zařízení; chybějící nahradí podobné dostupné písmo. Nastavení se ukládá jen v tomto prohlížeči.</p>
   </div>
 </dialog>
 `;

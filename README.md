@@ -3,7 +3,7 @@
 A local Markdown editor for Chrome. Write the source, see a live preview, and save the file on your computer.
 
 [![Checks](https://github.com/Majkey25/margin-md/actions/workflows/ci.yml/badge.svg)](https://github.com/Majkey25/margin-md/actions/workflows/ci.yml)
-[![Stable release](https://img.shields.io/badge/release-v1.0.1-black?style=flat-square&logo=github&logoColor=white)](https://github.com/Majkey25/margin-md/releases/latest)
+[![Stable release](https://img.shields.io/badge/release-v1.1.0-black?style=flat-square&logo=github&logoColor=white)](https://github.com/Majkey25/margin-md/releases/latest)
 ![Chrome Manifest V3](https://img.shields.io/badge/Chrome-Manifest_V3-black?style=flat-square&logo=googlechrome&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-strict-black?style=flat-square&logo=typescript&logoColor=white)
 ![Local files](https://img.shields.io/badge/files-local_only-black?style=flat-square)
@@ -32,6 +32,18 @@ Open a `.md` or `.markdown` file with **Otevřít**, or drop it into the editor.
 **Uložit** writes to the opened file. **Uložit jako** asks for a filename and destination folder, then asks before replacing an existing file. Choosing a destination does not empty an existing file. Save is manual; text remains in the editor if a write fails.
 
 The theme button shows the current light or dark appearance. First open follows your device; clicking the button switches it with the circular reveal used on Init. Reduced motion disables the reveal. **Nastavení** offers System, Light and Dark appearance, plus **Minimal**, **Glass** and **Material You** visual styles. These preferences stay on this device; document contents are not stored with them. Material You uses a bundled tonal palette, not wallpaper colors from the operating system.
+
+Choose the Markdown preview separately in **Náhled Markdownu**:
+
+| Preview | Default typography | Appearance |
+| :--- | :--- | :--- |
+| **GitHub** | System sans, 16 px | README-style headings, blue links, code chips and striped tables |
+| **VS Code** | System sans, 14 px | Compact editor preview, bordered code and open tables |
+| **Čtení** | Serif, 17 px | A quiet reading column with softer contrast |
+
+All three follow the current light or dark mode. They are inspired by these products, not exact copies. Set the preview font and size independently from the source editor; **Podle stylu** restores the preset defaults. The editor offers system monospace, Cascadia and Consolas stacks at 12–20 px. Missing fonts use installed fallbacks; nothing is downloaded. Changes apply immediately and preserve the document and undo history.
+
+Markdown supports headings, emphasis, links, quotes, nested lists, tables and disabled task checkboxes. Fenced JavaScript, TypeScript, JSX, TSX, JSON, CSS and HTML receive syntax colors. Highlighting is limited to 20,000 code characters per render; larger or unknown fences remain readable plain code. The preview does not edit task checkboxes; change their `[ ]` or `[x]` markers in the source.
 
 | Shortcut | Action |
 | :--- | :--- |

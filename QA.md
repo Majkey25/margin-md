@@ -1,5 +1,38 @@
 # Validation
 
+## Preview and typography | 1.1.0
+
+Checked on 31 October 2026 in Chromium 156.0.8078.4 on Windows. `npm test` passed all 16 file tests. `npm run test:browser` passed the TypeScript check, production build and loaded-extension regression scenario. `npm audit --omit=dev` reported zero vulnerabilities.
+
+The browser scenario verifies default and persisted preview/font/size settings, rejection of invalid stored and DOM values, preset independence from application appearance, unchanged document and dirty state, undo and the existing safe-save failure cases. Renderer checks cover nested and loose tasks, escaped markers, reference links, literal HTML inside colored fences, unknown language names, exact code text and the aggregate 20,000-character highlighting budget. No document-triggered HTTP(S) request or browser error was observed.
+
+Fresh screenshots and axe audits covered GitHub, VS Code and reading presets in light and dark mode at 1440 × 900 and 390 × 844. Settings were checked in all six application appearances, at 390 × 844 and at 390 × 460. The close control stays visible while the settings body scrolls; Escape closes the dialog. Large 24 px monospace preview and 20 px source checks passed without outer horizontal overflow. All seven source sizes have matching code and gutter line heights. Typing and undo returned the document to its clean state after font changes.
+
+Twenty-four axe checks reported zero violations. A separate numerical check of all 78 syntax token/background pairs found a minimum contrast ratio of 4.71:1. These checks cover the rendered fixtures, not every possible document or assistive-technology combination. Astra's independent screenshot review found no material clipping or legibility issue. Sol's source review found no confirmed P1/P2 defect in renderer escaping, checkbox creation, setting allowlists or the editor measurement callback. Claude Opus 5.5 authored the settings layout and Markdown styles; the primary agent integrated and verified them.
+
+### Local performance comparison
+
+The published 1.0.1 ZIP and the new build ran on the same browser and machine at 1440 × 900 without throttling. Both imported the same 102,400-byte Markdown fixture. Timings include browser automation, file input and two animation frames after insertion.
+
+| Check | 1.0.1 | 1.1.0 |
+| :--- | ---: | ---: |
+| Local load event | 297.1 ms | 251.8 ms |
+| Largest contentful paint | 348 ms | 312 ms |
+| Cumulative layout shift | 0 | 0 |
+| Import and preview, median of 5 | 298.8 ms | 333.4 ms |
+| Main JavaScript bytes | 475,594 | 616,833 |
+| Main JavaScript gzip bytes, Node zlib defaults | 164,822 | 218,508 |
+
+The new import runs were 338.5, 340.9, 319.2, 333.4 and 312.5 ms. Syntax parsers add bundle weight; their per-render color budget is bounded and larger fences fall back to plain code. These few local runs do not establish a statistically significant startup improvement or a universal latency guarantee. Field INP, physical mobile GPU behavior and worst-case 5 MiB rendering remain unmeasured.
+
+Real-disk save behavior was verified for 1.0.0 as recorded below. This update leaves file handling unchanged and repeats browser-backed OPFS save regressions; it does not repeat native Windows chooser automation.
+
+### Release archive
+
+The 247,242-byte 1.1.0 ZIP was extracted into a separate folder and loaded as an unpacked extension. Its manifest reports 1.1.0 and its JavaScript matches the production build byte for byte. The extracted extension rendered colored code and disabled tasks, applied independent preview and application styles, retained font/size preferences after reload and passed an additional axe audit with no browser errors.
+
+Archive SHA-256: `dbae340f0681392fe84260310de953ec024b77b3da33759d3ced3c794d9896da`.
+
 ## Icon update | 1.0.1
 
 The corner-bracket icon now has a transparent background. SVG, favicon, toolbar icons and inline app marks share the same geometry. PNG alpha was checked at 16, 32, 48 and 128 px; each image has clear background pixels and zero alpha at its corner. Light and dark desktop and mobile checks found no opaque icon backdrop, accessibility violations or browser errors.

@@ -11,6 +11,7 @@ import { sample } from './sample';
 import { shell } from './shell';
 import { setupPreferences } from './preferences';
 import './styles.css';
+import './preview.css';
 
 function element<T extends HTMLElement>(id: string): T {
   const node = document.getElementById(id);
@@ -24,7 +25,10 @@ const preview = element('preview');
 const fileInput = element<HTMLInputElement>('file-input');
 const discardDialog = element<HTMLDialogElement>('discard-dialog');
 const modeButtons = document.querySelectorAll<HTMLButtonElement>('button[data-mode]');
-const preferencesDialog = setupPreferences(() => say('Nastavení je změněné. Prohlížeč jej nedovolil zapamatovat.'));
+const preferencesDialog = setupPreferences(
+  () => say('Nastavení je změněné. Prohlížeč jej nedovolil zapamatovat.'),
+  () => editor.requestMeasure(),
+);
 const wordCounter = new Intl.Segmenter('cs', { granularity: 'word' });
 const format = { newline: '\n', bom: false } as const;
 let current: LoadedFile = { name: 'Vítejte.md', source: sample, format, bytes: encodeMarkdown(sample, format) };

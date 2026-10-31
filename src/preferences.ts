@@ -1,7 +1,7 @@
 type Theme = 'system' | 'light' | 'dark';
 type Surface = 'minimal' | 'glass' | 'material';
 
-export function setupPreferences(onStorageError: () => void): HTMLDialogElement {
+export function setupPreferences(onStorageError: () => void, onEditorTypographyChange: () => void): HTMLDialogElement {
   const root = document.documentElement;
   const dialog = document.getElementById('preferences-dialog') as HTMLDialogElement;
   const themeSetting = document.getElementById('theme-setting') as HTMLSelectElement;
@@ -32,6 +32,24 @@ export function setupPreferences(onStorageError: () => void): HTMLDialogElement 
   const save = (key: string, value: string): void => {
     try { localStorage.setItem(key, value); } catch { onStorageError(); }
   };
+  const setting = <T extends string>(
+    id: string, key: string, values: readonly T[], fallback: T, apply: (value: T) => void, onChange?: () => void,
+  ): void => {
+    const select = document.getElementById(id) as HTMLSelectElement;
+    let stored: string | null = null;
+    try { stored = localStorage.getItem(key); } catch { /* Use the default when storage is unavailable. */ }
+    let selected = values.find((value) => value === stored) ?? fallback;
+    select.value = selected;
+    apply(selected);
+    select.addEventListener('change', () => {
+      const next = values.find((value) => value === select.value);
+      if (!next) { select.value = selected; return; }
+      selected = next;
+      apply(selected);
+      save(key, selected);
+      onChange?.();
+    });
+  };
   const stopTransition = (): void => {
     revision++;
     transition?.skipTransition();
@@ -41,6 +59,36 @@ export function setupPreferences(onStorageError: () => void): HTMLDialogElement 
   applyTheme();
   root.dataset.surface = surface;
   surfaceSetting.value = surface;
+
+  const previewFonts = {
+    sans: '"Segoe UI", Arial, sans-serif',
+    serif: 'Georgia, "Times New Roman", serif',
+    mono: 'Consolas, "Courier New", monospace',
+  };
+  const editorFonts = {
+    system: 'ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace',
+    cascadia: '"Cascadia Code", "Cascadia Mono", Consolas, monospace',
+    consolas: 'Consolas, "Courier New", monospace',
+  };
+  setting('preview-theme-setting', 'margin.previewTheme', ['github', 'vscode', 'reading'] as const, 'github',
+    (value) => { root.dataset.previewTheme = value; });
+  setting('preview-font-setting', 'margin.previewFont', ['default', 'sans', 'serif', 'mono'] as const, 'default',
+    (value) => {
+      if (value === 'default') root.style.removeProperty('--preview-font');
+      else root.style.setProperty('--preview-font', previewFonts[value]);
+    });
+  setting('preview-size-setting', 'margin.previewSize', ['default', '14', '16', '18', '20', '22', '24'] as const, 'default',
+    (value) => {
+      if (value === 'default') root.style.removeProperty('--preview-size');
+      else root.style.setProperty('--preview-size', `${value}px`);
+    });
+  setting('editor-font-setting', 'margin.editorFont', ['system', 'cascadia', 'consolas'] as const, 'system',
+    (value) => root.style.setProperty('--editor-font', editorFonts[value]), onEditorTypographyChange);
+  setting('editor-size-setting', 'margin.editorSize', ['12', '13', '14', '15', '16', '18', '20'] as const, '14',
+    (value) => {
+      root.style.setProperty('--editor-size', `${value}px`);
+      root.style.setProperty('--code-lh', `${Math.round(Number(value) * 1.65)}px`);
+    }, onEditorTypographyChange);
 
   document.getElementById('preferences-open')!.addEventListener('click', () => dialog.showModal());
   document.getElementById('preferences-close')!.addEventListener('click', () => dialog.close());

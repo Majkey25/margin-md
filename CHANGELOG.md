@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.1.0 | 2026-10-31
+
+* Add independent GitHub, VS Code and reading presets for the Markdown preview, each in light and dark mode.
+* Add separate preview and source font and size settings, with local persistence and installed-font fallbacks.
+* Group appearance settings in a scrollable dialog that keeps its close control visible in small windows.
+* Highlight common fenced code languages with a bounded rendering budget and display Markdown task checkboxes.
+* Preserve document content, undo history and existing safe-save behavior when appearance changes.
+
 ## 1.0.1 | 2026-10-31
 
 * Replace the solid icon badge with a transparent corner-bracket mark.

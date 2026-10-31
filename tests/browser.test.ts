@@ -33,6 +33,72 @@ test('extension editing, safe rendering and file-save regressions', { timeout: 6
     assert.equal(await page.locator('html').getAttribute('data-theme'), 'dark');
     assert.equal(await toggle.getAttribute('aria-pressed'), 'true');
     const sampleText = await page.locator('.cm-content').innerText();
+    const previewTheme = page.locator('#preview-theme-setting');
+    const previewFont = page.locator('#preview-font-setting');
+    const previewSize = page.locator('#preview-size-setting');
+    const editorFont = page.locator('#editor-font-setting');
+    const editorSize = page.locator('#editor-size-setting');
+    for (const [control, value] of [[previewTheme, 'github'], [previewFont, 'default'], [previewSize, 'default'], [editorFont, 'system'], [editorSize, '14']] as const) {
+      assert.equal(await control.inputValue(), value);
+    }
+    assert.equal(await page.locator('html').getAttribute('data-preview-theme'), 'github');
+    await page.evaluate(() => {
+      for (const key of ['previewTheme', 'previewFont', 'previewSize', 'editorFont', 'editorSize']) {
+        localStorage.setItem(`margin.${key}`, 'invalid; color: red');
+      }
+    });
+    await page.reload();
+    await openPreferences();
+    for (const [control, value] of [[previewTheme, 'github'], [previewFont, 'default'], [previewSize, 'default'], [editorFont, 'system'], [editorSize, '14']] as const) {
+      assert.equal(await control.inputValue(), value);
+    }
+    assert.equal(await page.locator('html').getAttribute('data-preview-theme'), 'github');
+    assert.equal(await page.locator('html').evaluate((root) => root.style.getPropertyValue('--preview-size')), '');
+    assert.equal(await page.locator('html').evaluate((root) => root.style.getPropertyValue('--editor-size')), '14px');
+    await previewTheme.selectOption('vscode');
+    await previewFont.selectOption('serif');
+    await previewSize.selectOption('18');
+    await editorFont.selectOption('cascadia');
+    await editorSize.selectOption('16');
+    assert.equal(await page.locator('html').getAttribute('data-theme'), 'dark');
+    assert.equal(await page.locator('html').getAttribute('data-surface'), 'minimal');
+    assert.equal(await page.locator('html').getAttribute('data-preview-theme'), 'vscode');
+    assert.match(await page.locator('html').evaluate((root) => root.style.getPropertyValue('--preview-font')), /Georgia/);
+    assert.equal(await page.locator('html').evaluate((root) => root.style.getPropertyValue('--preview-size')), '18px');
+    assert.match(await page.locator('html').evaluate((root) => root.style.getPropertyValue('--editor-font')), /Cascadia/);
+    assert.equal(await page.locator('html').evaluate((root) => root.style.getPropertyValue('--code-lh')), '26px');
+    assert.equal(await page.locator('#preview').evaluate((node) => getComputedStyle(node).fontSize), '18px');
+    assert.equal(await page.locator('#editor .cm-scroller').evaluate((node) => getComputedStyle(node).fontSize), '16px');
+    await page.reload();
+    await openPreferences();
+    for (const [control, value] of [[previewTheme, 'vscode'], [previewFont, 'serif'], [previewSize, '18'], [editorFont, 'cascadia'], [editorSize, '16']] as const) {
+      assert.equal(await control.inputValue(), value);
+    }
+    for (const value of ['reading', 'github']) {
+      await previewTheme.selectOption(value);
+      assert.equal(await page.locator('html').getAttribute('data-preview-theme'), value);
+      assert.equal(await page.locator('html').getAttribute('data-theme'), 'dark');
+      assert.equal(await page.locator('html').getAttribute('data-surface'), 'minimal');
+    }
+    await previewFont.selectOption('default');
+    await previewSize.selectOption('default');
+    await editorFont.selectOption('system');
+    await editorSize.selectOption('14');
+    assert.equal(await page.locator('html').evaluate((root) => root.style.getPropertyValue('--preview-font')), '');
+    assert.equal(await page.locator('html').evaluate((root) => root.style.getPropertyValue('--preview-size')), '');
+    await page.evaluate(() => {
+      for (const id of ['preview-theme-setting', 'preview-font-setting', 'preview-size-setting', 'editor-font-setting', 'editor-size-setting']) {
+        const select = document.getElementById(id) as HTMLSelectElement;
+        select.add(new Option('Invalid', 'invalid; color: red'));
+        select.value = 'invalid; color: red';
+        select.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+    });
+    for (const [control, value] of [[previewTheme, 'github'], [previewFont, 'default'], [previewSize, 'default'], [editorFont, 'system'], [editorSize, '14']] as const) {
+      assert.equal(await control.inputValue(), value);
+    }
+    assert.equal(await page.locator('html').getAttribute('data-preview-theme'), 'github');
+    assert.equal(await page.locator('html').evaluate((root) => root.style.getPropertyValue('--editor-size')), '14px');
     await page.keyboard.press('Control+s');
     assert.equal(await page.locator('#save-dialog').evaluate((dialog) => (dialog as HTMLDialogElement).open), false);
     assert.equal(await page.locator('.cm-content').innerText(), sampleText);
@@ -158,6 +224,18 @@ test('extension editing, safe rendering and file-save regressions', { timeout: 6
       assert.equal(await editor.innerText(), '# Changed');
       assert.equal(await page.locator('#dirty-state').innerText(), 'Neuložené změny');
     }
+    await previewTheme.selectOption('reading');
+    await previewFont.selectOption('mono');
+    await previewSize.selectOption('20');
+    await editorFont.selectOption('consolas');
+    await editorSize.selectOption('18');
+    assert.equal(await editor.innerText(), '# Changed');
+    assert.equal(await page.locator('#dirty-state').innerText(), 'Neuložené změny');
+    await previewTheme.selectOption('github');
+    await previewFont.selectOption('default');
+    await previewSize.selectOption('default');
+    await editorFont.selectOption('system');
+    await editorSize.selectOption('14');
     await page.locator('#preferences-close').click();
     await page.locator('#save-file').click();
     await editor.press('Control+z');
@@ -252,10 +330,48 @@ test('extension editing, safe rendering and file-save regressions', { timeout: 6
     assert.equal(await page.locator('#preview s').innerText(), 'removed');
     assert.equal(await page.locator('#preview ul ul li').innerText(), 'Child');
     assert.equal(await page.locator('#preview pre code').innerText(), 'const value = 1;\n');
+    assert.ok(await page.locator('#preview pre .tok-keyword').count() > 0);
     for (const alignment of ['left', 'center', 'right']) {
       assert.equal(await page.locator(`#preview th.align-${alignment}, #preview td.align-${alignment}`).count(), 2);
     }
     assert.equal(await page.locator('#preview [style]').count(), 0);
+
+    const taskSource = '# Tasks\n\n- [ ] Parent\n  - [X] Child\n- \\[x] Escaped\n- `[x] Code`\n- [x][reference] Link\n\n---\n\n- [x] Loose task\n\n  Later paragraph [x] stays text.\n\n[reference]: https://example.com/\n\n';
+    const htmlCode = '<img src="https://example.com/tracker.png" onerror="alert(1)">\n<script>alert(1)</script>\n';
+    const unknownCode = '<script>literal unknown fence</script>\n';
+    await page.locator('#file-input').setInputFiles({
+      name: 'tasks-and-code.md', mimeType: 'text/markdown',
+      buffer: Buffer.from(taskSource + '```html\n' + htmlCode + '```\n\n```constructor\n' + unknownCode + '```\n'),
+    });
+    await page.waitForFunction(() => document.querySelector('#preview h1')?.textContent === 'Tasks');
+    const checkboxes = page.locator('#preview .task-list-checkbox');
+    assert.equal(await checkboxes.count(), 3);
+    assert.deepEqual(await checkboxes.evaluateAll((nodes) => nodes.map((node) => ({
+      checked: (node as HTMLInputElement).checked, disabled: (node as HTMLInputElement).disabled, label: node.getAttribute('aria-label'),
+    }))), [
+      { checked: false, disabled: true, label: 'Parent' },
+      { checked: true, disabled: true, label: 'Child' },
+      { checked: true, disabled: true, label: 'Loose task' },
+    ]);
+    assert.match(await page.locator('#preview').innerText(), /\[x\] Escaped/);
+    assert.match(await page.locator('#preview').innerText(), /Later paragraph \[x\] stays text/);
+    assert.equal(await page.locator('#preview pre code').nth(0).textContent(), htmlCode);
+    assert.ok(await page.locator('#preview pre').nth(0).locator('span').count() > 0);
+    assert.equal(await page.locator('#preview pre code').nth(1).textContent(), unknownCode);
+    assert.equal(await page.locator('#preview pre').nth(1).locator('span').count(), 0);
+    assert.equal(await page.locator('#preview script, #preview img, #preview iframe').count(), 0);
+    assert.deepEqual(network, []);
+
+    const largeCode = 'const value = 1;\n'.repeat(800);
+    await page.locator('#file-input').setInputFiles({
+      name: 'highlight-budget.md', mimeType: 'text/markdown',
+      buffer: Buffer.from('# Highlight budget\n\n```js\n' + largeCode + '```\n\n```js\n' + largeCode + '```\n'),
+    });
+    await page.waitForFunction(() => document.querySelector('#preview h1')?.textContent === 'Highlight budget');
+    const fences = page.locator('#preview pre');
+    assert.ok(await fences.nth(0).locator('span').count() > 0);
+    assert.equal(await fences.nth(1).locator('span').count(), 0);
+    assert.equal(await fences.nth(1).locator('code').textContent(), largeCode);
 
     await page.locator('[data-mode="source"]').click();
     assert.equal(await page.locator('#preview-pane').isVisible(), false);
