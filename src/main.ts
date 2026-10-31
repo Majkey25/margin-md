@@ -5,10 +5,11 @@ import { markdownLanguage, markdownKeymap } from '@codemirror/lang-markdown';
 import { HighlightStyle, syntaxHighlighting } from '@codemirror/language';
 import { tags } from '@lezer/highlight';
 import { decodeMarkdown, encodeMarkdown, FileConflictError, getLocalMarkdownUrl, MAX_FILE_BYTES,
-  readMarkdown, writeMarkdown, type LoadedFile } from './files';
+  createSaveTarget, prepareSaveTarget, readMarkdown, validateMarkdownName, writeMarkdown, type LoadedFile } from './files';
 import { renderMarkdown } from './render';
 import { sample } from './sample';
 import { shell } from './shell';
+import { setupPreferences } from './preferences';
 import './styles.css';
 
 function element<T extends HTMLElement>(id: string): T {
@@ -23,6 +24,8 @@ const preview = element('preview');
 const fileInput = element<HTMLInputElement>('file-input');
 const discardDialog = element<HTMLDialogElement>('discard-dialog');
 const modeButtons = document.querySelectorAll<HTMLButtonElement>('button[data-mode]');
+const preferencesDialog = setupPreferences(() => say('Nastavení je změněné. Prohlížeč jej nedovolil zapamatovat.'));
+const wordCounter = new Intl.Segmenter('cs', { granularity: 'word' });
 const format = { newline: '\n', bom: false } as const;
 let current: LoadedFile = { name: 'Vítejte.md', source: sample, format, bytes: encodeMarkdown(sample, format) };
 let locationLabel = 'Ukázkový dokument';
@@ -45,7 +48,7 @@ function editorState(source: string): EditorState {
     doc: source,
     extensions: [lineNumbers(), highlightActiveLineGutter(), history(), drawSelection(), highlightActiveLine(),
       keymap.of([...markdownKeymap, ...defaultKeymap, ...historyKeymap]), markdownLanguage, syntaxHighlighting(highlighting),
-      EditorView.lineWrapping, EditorView.contentAttributes.of({ 'aria-label': 'Zdrojový Markdown', spellcheck: 'false' }),
+      EditorView.lineWrapping, EditorView.contentAttributes.of({ 'aria-label': 'Zdrojový Markdown', spellcheck: 'false', tabindex: '0' }),
       EditorView.updateListener.of((update) => {
         if (update.docChanged) {
           previewStale = true;
@@ -88,11 +91,13 @@ function updateStatus(): void {
 
 function updatePreview(): void {
   if (!previewStale) return;
-  const text = editor.state.doc.toString().trim();
-  element('word-count').textContent = `${text ? text.split(/\s+/u).length.toLocaleString('cs') : 0} slov`;
+  const source = editor.state.doc.toString();
+  let words = 0;
+  for (const segment of wordCounter.segment(source)) if (segment.isWordLike) words++;
+  element('word-count').textContent = `${words.toLocaleString('cs')} slov`;
   if (mode === 'source') return;
   try {
-    preview.replaceChildren(renderMarkdown(editor.state.doc.toString()));
+    preview.replaceChildren(renderMarkdown(source));
   } catch {
     say('Náhled nelze vytvořit. Text zůstává v editoru.', true);
     return;
@@ -110,14 +115,21 @@ function setMode(value: string): void {
   editor.requestMeasure();
 }
 
-async function confirmDiscard(): Promise<boolean> {
-  if (!dirty()) return true;
+function confirmAction(title: string, description: string, action: string): Promise<boolean> {
+  element('discard-title').textContent = title;
+  element('discard-description').textContent = description;
+  element('discard-confirm').textContent = action;
   return new Promise((resolve) => {
     discardDialog.returnValue = '';
     discardDialog.addEventListener('close', () => resolve(discardDialog.returnValue === 'discard'), { once: true });
     discardDialog.showModal();
     element('discard-cancel').focus();
   });
+}
+
+async function confirmDiscard(): Promise<boolean> {
+  return !dirty() || await confirmAction('Zahodit neuložené změny?',
+    'Změny v aktuálním dokumentu budou ztraceny.', 'Zahodit');
 }
 
 async function run(action: () => Promise<void>): Promise<void> {
@@ -171,6 +183,52 @@ async function openFile(): Promise<void> {
   });
 }
 
+function selectSaveDestination(): Promise<{ directory: FileSystemDirectoryHandle; name: string } | undefined> {
+  const dialog = element<HTMLDialogElement>('save-dialog');
+  const form = element<HTMLFormElement>('save-form');
+  const nameInput = element<HTMLInputElement>('save-name');
+  const submit = element<HTMLButtonElement>('save-select');
+  const errorText = element('save-error');
+  nameInput.value = current.name;
+  submit.disabled = false;
+  errorText.hidden = true;
+  let selected: { directory: FileSystemDirectoryHandle; name: string } | undefined;
+  let settled = false;
+  const onSubmit = async (event: SubmitEvent): Promise<void> => {
+    event.preventDefault();
+    if (submit.disabled) return;
+    try {
+      validateMarkdownName(nameInput.value);
+      submit.disabled = true;
+      errorText.hidden = true;
+      const directory = await pickOrCancel(window.showDirectoryPicker({ mode: 'readwrite' }));
+      if (!directory || settled) return;
+      selected = { directory, name: nameInput.value };
+      dialog.close();
+    } catch (error) {
+      if (!settled) {
+        errorText.textContent = error instanceof DOMException
+          ? 'Složku nelze otevřít. Ověřte oprávnění nebo vyberte jinou.'
+          : error instanceof Error ? error.message : 'Složku nelze otevřít.';
+        errorText.hidden = false;
+      }
+    } finally {
+      if (!settled) submit.disabled = false;
+    }
+  };
+  return new Promise((resolve) => {
+    form.addEventListener('submit', onSubmit);
+    dialog.addEventListener('close', () => {
+      settled = true;
+      form.removeEventListener('submit', onSubmit);
+      resolve(selected);
+    }, { once: true });
+    dialog.showModal();
+    nameInput.focus();
+    nameInput.select();
+  });
+}
+
 async function saveFile(saveAs = false): Promise<void> {
   await run(async () => {
     const snapshot = editor.state.doc;
@@ -178,12 +236,22 @@ async function saveFile(saveAs = false): Promise<void> {
     if (encodeMarkdown(source, current.format).length > MAX_FILE_BYTES) {
       throw new Error('Text překračuje limit 5 MiB. Před uložením jej zkraťte.');
     }
-    const usePicker = saveAs || !current.handle;
-    const handle = usePicker
-      ? await pickOrCancel(window.showSaveFilePicker({ suggestedName: current.name, types: pickerTypes })) : current.handle;
-    if (!handle) return;
-    // Save picker authorizes replacement and can truncate the selected file before returning.
-    const bytes = await writeMarkdown(handle, source, current.format, usePicker ? undefined : current.bytes);
+    let handle = current.handle;
+    let baseline = current.bytes;
+    if (saveAs || !handle) {
+      const destination = await selectSaveDestination();
+      if (!destination) return;
+      const target = await prepareSaveTarget(destination.directory, destination.name);
+      if (target.existed) {
+        if (!await confirmAction('Nahradit existující soubor?',
+          `${destination.directory.name}/${destination.name} bude nahrazen aktuálním textem.`, 'Nahradit soubor')) return;
+        handle = target.handle;
+        baseline = target.baseline;
+      } else {
+        ({ handle, baseline } = await createSaveTarget(destination.directory, destination.name));
+      }
+    }
+    const bytes = await writeMarkdown(handle, source, current.format, baseline);
     current = { ...current, name: handle.name, source, bytes, handle };
     savedDocument = snapshot;
     locationLabel = 'Lokální soubor';
@@ -199,6 +267,7 @@ element('new-file').addEventListener('click', () => void run(async () => {
 }));
 element('discard-cancel').addEventListener('click', () => discardDialog.close('cancel'));
 element('discard-confirm').addEventListener('click', () => discardDialog.close('discard'));
+element('save-cancel').addEventListener('click', () => element<HTMLDialogElement>('save-dialog').close());
 for (const button of modeButtons) button.addEventListener('click', () => setMode(button.dataset.mode!));
 matchMedia('(max-width: 700px)').addEventListener('change', (event) => {
   if (event.matches && mode === 'split') setMode('preview');
@@ -244,11 +313,6 @@ document.addEventListener('drop', (event) => {
   });
 });
 
-element('theme-toggle').addEventListener('click', () => {
-  const dark = document.documentElement.dataset.theme !== 'dark';
-  document.documentElement.dataset.theme = dark ? 'dark' : 'light';
-  element('theme-toggle').setAttribute('aria-pressed', String(dark));
-});
 element('fullscreen').addEventListener('click', () => {
   const action = document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
   void action.catch(() => say('Celou obrazovku nelze zapnout. Zkuste klávesu F11.', true));
@@ -259,7 +323,7 @@ document.addEventListener('fullscreenchange', () => {
 document.addEventListener('keydown', (event) => {
   if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 's') {
     event.preventDefault();
-    if (!discardDialog.open) void saveFile(event.shiftKey);
+    if (!discardDialog.open && !preferencesDialog.open && !element<HTMLDialogElement>('save-dialog').open) void saveFile(event.shiftKey);
   }
 });
 window.addEventListener('beforeunload', (event) => {

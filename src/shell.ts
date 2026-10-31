@@ -1,68 +1,141 @@
 export const shell = String.raw`
 <header class="toolbar" aria-label="Hlavní panel nástrojů">
-  <div class="toolbar-left">
-    <span class="margin-mark" aria-hidden="true">⌜M⌝</span>
-    <div class="doc-info">
-      <span id="doc-name" class="doc-name">Bez názvu.md</span>
-      <span id="doc-location" class="doc-location">Nový dokument</span>
-      <span id="dirty-state" class="dirty-state" data-dirty="false">Beze změn</span>
-    </div>
+  <div class="brand">
+    <svg class="brand-mark" viewBox="0 0 16 16" width="24" height="24" aria-hidden="true"><rect width="16" height="16" rx="3.5" fill="currentColor"/><path class="brand-mark-glyph" shape-rendering="crispEdges" d="M3 3h6v2H5v5H3zM13 13H7v-2h4V6h2z"/></svg>
+    <span class="brand-name">Margin</span>
   </div>
 
-  <div class="toolbar-actions">
-    <button id="new-file" type="button" title="Nový soubor">Nový</button>
-    <button id="open-file" type="button" title="Otevřít soubor">Otevřít</button>
-    <button id="save-file" type="button" title="Uložit soubor">Uložit<kbd class="kbd-hint">Ctrl+S</kbd></button>
-    <button id="save-as" type="button" title="Uložit jako">Uložit jako<kbd class="kbd-hint">Ctrl+Shift+S</kbd></button>
+  <div class="doc-info">
+    <h1 id="doc-name" class="doc-name">Bez názvu.md</h1>
+    <p class="doc-meta">
+      <span id="doc-location" class="doc-location">Nový dokument</span>
+      <span id="dirty-state" class="dirty-state" data-dirty="false">Beze změn</span>
+    </p>
+  </div>
+
+  <div class="toolbar-actions" role="group" aria-label="Soubor">
+    <button id="new-file" type="button" class="btn" title="Nový dokument">Nový</button>
+    <button id="open-file" type="button" class="btn" title="Otevřít soubor Markdown">Otevřít</button>
+    <button id="save-file" type="button" class="btn btn-outline" title="Uložit (Ctrl+S)" aria-keyshortcuts="Control+S">Uložit<kbd class="kbd" aria-hidden="true">Ctrl+S</kbd></button>
+    <button id="save-as" type="button" class="btn" title="Uložit jako (Ctrl+Shift+S)" aria-keyshortcuts="Control+Shift+S">Uložit jako<kbd class="kbd" aria-hidden="true">Ctrl+Shift+S</kbd></button>
   </div>
 
   <div class="toolbar-modes" role="group" aria-label="Režim zobrazení">
-    <button type="button" data-mode="source" aria-pressed="false" title="Jen zdrojový text">Text</button>
-    <button type="button" data-mode="split" aria-pressed="true" title="Zdrojový text a náhled vedle sebe">Vedle sebe</button>
-    <button type="button" data-mode="preview" aria-pressed="false" title="Jen náhled">Náhled</button>
+    <button type="button" class="seg" data-mode="source" aria-pressed="false" title="Jen zdrojový text">Text</button>
+    <button type="button" class="seg" data-mode="split" aria-pressed="true" title="Zdrojový text a náhled vedle sebe">Vedle sebe</button>
+    <button type="button" class="seg" data-mode="preview" aria-pressed="false" title="Jen náhled">Náhled</button>
   </div>
 
   <div class="toolbar-utils">
-    <button id="theme-toggle" type="button" aria-pressed="false" aria-label="Přepnout tmavý režim" title="Světlý / tmavý režim"><svg class="icon" width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="9" r="4"/><path d="M9 1.5v2M9 14.5v2M3.7 3.7l1.4 1.4M12.9 12.9l1.4 1.4M1.5 9h2M14.5 9h2M3.7 14.3l1.4-1.4M12.9 5.1l1.4-1.4"/></svg></button>
-    <button id="fullscreen" type="button" aria-pressed="false" aria-label="Celá obrazovka" title="Celá obrazovka"><svg class="icon" width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11.5 1.5H16.5V6.5M6.5 16.5H1.5V11.5M16.5 11.5V16.5H11.5M1.5 6.5V1.5H6.5"/></svg></button>
+    <button id="theme-toggle" type="button" class="icon-btn" aria-pressed="false" aria-label="Tmavý režim" title="Přepnout světlý a tmavý režim"><svg class="icon icon-sun" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="3.25"/><path d="M10 2.5V4M10 16v1.5M2.5 10H4M16 10h1.5M4.7 4.7l1.06 1.06M14.24 14.24l1.06 1.06M4.7 15.3l1.06-1.06M14.24 5.76l1.06-1.06"/></svg><svg class="icon icon-moon" viewBox="0 0 20 20" aria-hidden="true"><path d="M16.5 11.6A6.75 6.75 0 0 1 8.4 3.5a6.75 6.75 0 1 0 8.1 8.1Z"/></svg></button>
+    <button id="preferences-open" type="button" class="icon-btn" aria-haspopup="dialog" aria-label="Nastavení vzhledu" title="Nastavení vzhledu"><svg class="icon" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 6.5h8M14.5 6.5H17M3 13.5h2.5M9 13.5h8"/><circle cx="12.75" cy="6.5" r="1.75"/><circle cx="7.25" cy="13.5" r="1.75"/></svg></button>
+    <button id="fullscreen" type="button" class="icon-btn" aria-pressed="false" aria-label="Celá obrazovka" title="Celá obrazovka"><svg class="icon icon-expand" viewBox="0 0 20 20" aria-hidden="true"><path d="M3.5 7.5v-4h4M12.5 3.5h4v4M16.5 12.5v4h-4M7.5 16.5h-4v-4"/></svg><svg class="icon icon-collapse" viewBox="0 0 20 20" aria-hidden="true"><path d="M7.5 3.5v4h-4M16.5 7.5h-4v-4M12.5 16.5v-4h4M3.5 12.5h4v4"/></svg></button>
   </div>
 </header>
 
-<main>
+<main class="main">
 <div id="workspace" class="workspace" data-mode="split">
-  <section id="source-pane" class="source-pane" role="region" aria-label="Zdrojový kód">
+  <section id="source-pane" class="source-pane" role="region" aria-labelledby="source-title">
+    <div class="pane-head source-head">
+      <div class="pane-head-inner">
+        <h2 id="source-title" class="pane-title">Markdown</h2>
+      </div>
+    </div>
     <div id="editor"></div>
   </section>
 
-  <section id="preview-pane" class="preview-pane" role="region" aria-label="Náhled dokumentu" tabindex="0">
+  <section id="preview-pane" class="preview-pane" role="region" aria-labelledby="preview-title" tabindex="0">
+    <div class="pane-head preview-head">
+      <div class="pane-head-inner">
+        <h2 id="preview-title" class="pane-title">Náhled</h2>
+        <span class="pane-note">HTML a obrázky se nevykreslují</span>
+      </div>
+    </div>
     <article id="preview" class="preview"></article>
   </section>
 </div>
 </main>
 
 <div id="drop-overlay" class="drop-overlay" hidden>
-  <span class="drop-label">Přetáhněte Markdown soubor</span>
+  <div class="drop-frame">
+    <svg class="drop-mark" viewBox="0 0 16 16" width="32" height="32" aria-hidden="true"><rect width="16" height="16" rx="3.5" fill="currentColor"/><path class="brand-mark-glyph" shape-rendering="crispEdges" d="M3 3h6v2H5v5H3zM13 13H7v-2h4V6h2z"/></svg>
+    <span class="drop-label">Pusťte Markdown soubor sem</span>
+    <span class="drop-hint">Přípona .md nebo .markdown, nejvýše 5 MiB</span>
+  </div>
 </div>
 
 <footer class="footer">
   <span id="status-message" class="status-message" role="status" aria-live="polite"></span>
   <div class="footer-right">
-    <span id="word-count">0 slov</span>
-    <span id="line-count">0 ř.</span>
-    <span id="cursor-position">Ř 1, sl 1</span>
-    <span class="footer-separator" aria-hidden="true">|</span>
+    <span id="word-count" class="footer-count">0 slov</span>
+    <span id="line-count" class="footer-count">0 ř.</span>
+    <span id="cursor-position" class="footer-count">Ř 1, sl 1</span>
     <span class="footer-local">Jen lokálně</span>
   </div>
 </footer>
 
 <input id="file-input" type="file" accept=".md,.markdown,text/markdown,text/plain" hidden>
 
-<dialog id="discard-dialog" class="discard-dialog" aria-labelledby="discard-title">
-  <h2 id="discard-title" class="dialog-title">Zahodit neuložené změny?</h2>
-  <p class="dialog-text">Změny v aktuálním dokumentu budou ztraceny.</p>
-  <div class="dialog-actions">
-    <button id="discard-cancel" type="button" class="btn-cancel">Zrušit</button>
-    <button id="discard-confirm" type="button" class="btn-discard">Zahodit</button>
+<dialog id="save-dialog" class="dialog" aria-labelledby="save-title" aria-describedby="save-description">
+  <form id="save-form" class="dialog-body">
+    <h2 id="save-title" class="dialog-title">Uložit jako</h2>
+    <p id="save-description" class="dialog-text">Zadejte název a potom vyberte složku. Chrome Marginu povolí přístup k vybrané složce, Margin v ní ale zapíše jen soubor s tímto názvem.</p>
+    <label class="field-label" for="save-name">Název souboru</label>
+    <input id="save-name" class="field" type="text" required maxlength="255" autocomplete="off" spellcheck="false" aria-describedby="save-hint">
+    <p id="save-hint" class="field-hint">Přípona .md nebo .markdown.</p>
+    <p id="save-error" class="field-error" role="alert" hidden></p>
+    <div class="dialog-actions">
+      <button id="save-cancel" type="button" class="btn btn-outline">Zrušit</button>
+      <button id="save-select" type="submit" class="btn btn-primary">Vybrat složku a uložit</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="discard-dialog" class="dialog dialog-confirm" aria-labelledby="discard-title" aria-describedby="discard-description">
+  <div class="dialog-body">
+    <h2 id="discard-title" class="dialog-title">Zahodit neuložené změny?</h2>
+    <p id="discard-description" class="dialog-text">Změny v aktuálním dokumentu budou ztraceny.</p>
+    <div class="dialog-actions">
+      <button id="discard-cancel" type="button" class="btn btn-outline">Zrušit</button>
+      <button id="discard-confirm" type="button" class="btn btn-danger">Zahodit</button>
+    </div>
+  </div>
+</dialog>
+
+<dialog id="preferences-dialog" class="dialog dialog-prefs" aria-labelledby="preferences-title">
+  <div class="dialog-body">
+    <div class="dialog-head">
+      <h2 id="preferences-title" class="dialog-title">Vzhled</h2>
+      <button id="preferences-close" type="button" class="icon-btn" aria-label="Zavřít nastavení" title="Zavřít"><svg class="icon" viewBox="0 0 20 20" aria-hidden="true"><path d="M5.5 5.5l9 9M14.5 5.5l-9 9"/></svg></button>
+    </div>
+
+    <div class="pref-row">
+      <label class="pref-label" for="theme-setting">Režim</label>
+      <span class="select">
+        <select id="theme-setting" aria-describedby="theme-hint">
+          <option value="system">Podle zařízení</option>
+          <option value="light">Světlý</option>
+          <option value="dark">Tmavý</option>
+        </select>
+      </span>
+      <p id="theme-hint" class="pref-hint">Podle zařízení sleduje nastavení systému. Tlačítko v liště volbu přepne na světlý nebo tmavý.</p>
+    </div>
+
+    <div class="pref-row">
+      <label class="pref-label" for="surface-setting">Styl rozhraní</label>
+      <span class="select">
+        <select id="surface-setting">
+          <option value="minimal">Minimal</option>
+          <option value="glass">Glass</option>
+          <option value="material">Material You</option>
+        </select>
+      </span>
+      <p class="pref-hint surface-note" data-for="minimal">Černá a bílá, tenké linky, nic navíc.</p>
+      <p class="pref-hint surface-note" data-for="glass">Průsvitná lišta a dialogy s jemným rozostřením, panely jako listy.</p>
+      <p class="pref-hint surface-note" data-for="material">Měkké tvary a tlumené zelené tóny.</p>
+    </div>
+
+    <p class="pref-note">Nastavení se ukládá jen v tomto prohlížeči.</p>
   </div>
 </dialog>
 `;

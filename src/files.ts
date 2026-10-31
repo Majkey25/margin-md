@@ -43,24 +43,72 @@ export class FileConflictError extends Error {
   }
 }
 
+export type SaveTarget =
+  | { existed: false }
+  | { existed: true; handle: FileSystemFileHandle; baseline: Uint8Array };
+
+export function validateMarkdownName(name: string): void {
+  if (
+    !name || name !== name.trim() || /[<>:"/\\|?*\u0000-\u001f]/.test(name) ||
+    name.endsWith('.') || /^(con|prn|aux|nul|com[1-9]|lpt[1-9])(?:\.|$)/i.test(name) ||
+    !/\.(md|markdown)$/i.test(name)
+  ) {
+    throw new Error('Zadejte platný název souboru s příponou .md nebo .markdown.');
+  }
+}
+
+export async function prepareSaveTarget(directory: FileSystemDirectoryHandle, name: string): Promise<SaveTarget> {
+  validateMarkdownName(name);
+  let handle: FileSystemFileHandle;
+  try {
+    handle = await directory.getFileHandle(name);
+  } catch (error) {
+    if (error instanceof DOMException && error.name === 'NotFoundError') return { existed: false };
+    throw error;
+  }
+  const file = await handle.getFile();
+  if (file.size > MAX_FILE_BYTES) throw new Error('Soubor překračuje limit 5 MiB.');
+  const baseline = new Uint8Array(await file.arrayBuffer());
+  if (baseline.length > MAX_FILE_BYTES) throw new Error('Soubor překračuje limit 5 MiB.');
+  return { existed: true, handle, baseline };
+}
+
+export async function createSaveTarget(
+  directory: FileSystemDirectoryHandle,
+  name: string,
+): Promise<{ handle: FileSystemFileHandle; baseline: Uint8Array }> {
+  validateMarkdownName(name);
+  try {
+    await directory.getFileHandle(name);
+  } catch (error) {
+    if (!(error instanceof DOMException) || error.name !== 'NotFoundError') throw error;
+    const handle = await directory.getFileHandle(name, { create: true });
+    return { handle, baseline: new Uint8Array() };
+  }
+  throw new FileConflictError();
+}
+
+async function checkBaseline(handle: FileSystemFileHandle, baseline: Uint8Array): Promise<void> {
+  const file = await handle.getFile();
+  if (file.size !== baseline.length) throw new FileConflictError();
+  const current = new Uint8Array(await file.arrayBuffer());
+  if (current.length !== baseline.length || current.some((byte, index) => byte !== baseline[index])) {
+    throw new FileConflictError();
+  }
+}
+
 export async function writeMarkdown(
   handle: FileSystemFileHandle,
   source: string,
   format: TextFormat,
   baseline?: Uint8Array,
 ): Promise<Uint8Array> {
-  if (baseline) {
-    const file = await handle.getFile();
-    if (file.size !== baseline.length) throw new FileConflictError();
-    const current = new Uint8Array(await file.arrayBuffer());
-    if (current.length !== baseline.length || current.some((byte, index) => byte !== baseline[index])) {
-      throw new FileConflictError();
-    }
-  }
   const bytes = encodeMarkdown(source, format);
   if (bytes.length > MAX_FILE_BYTES) throw new Error('Text překračuje limit 5 MiB. Před uložením jej zkraťte.');
+  if (baseline) await checkBaseline(handle, baseline);
   const writable = await handle.createWritable();
   try {
+    if (baseline) await checkBaseline(handle, baseline);
     await writable.write(bytes);
     await writable.close();
   } catch (error) {

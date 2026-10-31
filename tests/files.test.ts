@@ -1,12 +1,15 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
+  createSaveTarget,
   decodeMarkdown,
   encodeMarkdown,
   FileConflictError,
   getLocalMarkdownUrl,
   MAX_FILE_BYTES,
+  prepareSaveTarget,
   readMarkdown,
+  validateMarkdownName,
   writeMarkdown,
 } from '../src/files';
 
@@ -57,14 +60,112 @@ function fakeHandle(initial: Uint8Array, failure?: 'write' | 'close') {
       };
     },
   } as unknown as FileSystemFileHandle;
-  return { handle, error, contents: () => contents, created: () => created, aborted: () => aborted };
+  return { handle, error, contents: () => contents, replace: (bytes: Uint8Array) => { contents = bytes; }, created: () => created, aborted: () => aborted };
 }
+
+test('accepts ordinary Markdown names and rejects unsafe Windows names', () => {
+  for (const name of ['české poznámky %#.md', 'A.MARKDOWN']) assert.doesNotThrow(() => validateMarkdownName(name));
+  for (const name of ['', '.', '..', ' notes.md', 'notes.md ', 'a/b.md', 'a\\b.md', 'a:b.md', 'a?.md', 'a\u0000.md', 'CON.md', 'notes.txt']) {
+    assert.throws(() => validateMarkdownName(name));
+  }
+});
+
+test('preparing a missing target does not create it and creation follows confirmation', async () => {
+  const fake = fakeHandle(new Uint8Array());
+  let existing = false;
+  let creations = 0;
+  const directory = {
+    async getFileHandle(_name: string, options?: { create?: boolean }) {
+      if (options?.create) { existing = true; creations++; return fake.handle; }
+      if (!existing) throw new DOMException('missing', 'NotFoundError');
+      return fake.handle;
+    },
+  } as unknown as FileSystemDirectoryHandle;
+  assert.deepEqual(await prepareSaveTarget(directory, 'new.md'), { existed: false });
+  assert.equal(creations, 0);
+  const target = await createSaveTarget(directory, 'new.md');
+  assert.equal(creations, 1);
+  assert.deepEqual(target.baseline, new Uint8Array());
+  await writeMarkdown(target.handle, 'nový', { bom: false, newline: '\n' }, target.baseline);
+  assert.deepEqual(fake.contents(), encoder.encode('nový'));
+  await assert.rejects(createSaveTarget(directory, 'new.md'), FileConflictError);
+  assert.equal(creations, 1);
+});
+
+test('a target appearing during creation is checked before writing', async () => {
+  const fake = fakeHandle(encoder.encode('another app'));
+  const directory = {
+    async getFileHandle(_name: string, options?: { create?: boolean }) {
+      if (!options?.create) throw new DOMException('missing', 'NotFoundError');
+      return fake.handle;
+    },
+  } as unknown as FileSystemDirectoryHandle;
+  const target = await createSaveTarget(directory, 'new.md');
+  await assert.rejects(writeMarkdown(target.handle, 'new', { bom: false, newline: '\n' }, target.baseline), FileConflictError);
+  assert.equal(fake.created(), 0);
+  assert.deepEqual(fake.contents(), encoder.encode('another app'));
+});
+
+test('preparing an existing target preserves bytes and detects later changes', async () => {
+  const original = encoder.encode('original');
+  const fake = fakeHandle(original);
+  const directory = { async getFileHandle() { return fake.handle; } } as unknown as FileSystemDirectoryHandle;
+  const target = await prepareSaveTarget(directory, 'existing.md');
+  assert.equal(target.existed, true);
+  if (!target.existed) return;
+  assert.deepEqual(target.baseline, original);
+  assert.equal(fake.created(), 0);
+  fake.replace(encoder.encode('external'));
+  await assert.rejects(writeMarkdown(target.handle, 'new', { bom: false, newline: '\n' }, target.baseline), FileConflictError);
+  assert.equal(fake.created(), 0);
+  assert.deepEqual(fake.contents(), encoder.encode('external'));
+});
+
+test('preparing an existing target preserves its bytes when writing fails', async () => {
+  const original = encoder.encode('original');
+  const fake = fakeHandle(original, 'close');
+  const directory = { async getFileHandle() { return fake.handle; } } as unknown as FileSystemDirectoryHandle;
+  const target = await prepareSaveTarget(directory, 'existing.md');
+  assert.equal(target.existed, true);
+  if (!target.existed) return;
+  await assert.rejects(writeMarkdown(target.handle, 'new', { bom: false, newline: '\n' }, target.baseline), (error) => error === fake.error);
+  assert.equal(fake.aborted(), true);
+  assert.deepEqual(fake.contents(), original);
+});
+
+test('lookup propagates permission errors and rejects oversized targets', async () => {
+  const denied = new DOMException('denied', 'NotAllowedError');
+  const deniedDirectory = { async getFileHandle() { throw denied; } } as unknown as FileSystemDirectoryHandle;
+  await assert.rejects(prepareSaveTarget(deniedDirectory, 'file.md'), (error) => error === denied);
+  await assert.rejects(createSaveTarget(deniedDirectory, 'file.md'), (error) => error === denied);
+  const large = { async getFile() { return { size: MAX_FILE_BYTES + 1 }; } };
+  const directory = { async getFileHandle() { return large; } } as unknown as FileSystemDirectoryHandle;
+  await assert.rejects(prepareSaveTarget(directory, 'large.md'), /limit/);
+});
 
 test('detects same-length changes before opening a writer', async () => {
   const fake = fakeHandle(encoder.encode('new'));
   await assert.rejects(writeMarkdown(fake.handle, 'edited', { bom: false, newline: '\n' }, encoder.encode('old')), FileConflictError);
   assert.equal(fake.created(), 0);
   assert.deepEqual(fake.contents(), encoder.encode('new'));
+});
+
+test('aborts when the file changes while opening a writer', async () => {
+  const original = encoder.encode('old');
+  const external = encoder.encode('new');
+  const fake = fakeHandle(original);
+  const handle = {
+    getFile: () => fake.handle.getFile(),
+    async createWritable() {
+      const writable = await fake.handle.createWritable();
+      fake.replace(external);
+      return writable;
+    },
+  } as unknown as FileSystemFileHandle;
+  await assert.rejects(writeMarkdown(handle, 'edit', { bom: false, newline: '\n' }, original), FileConflictError);
+  assert.equal(fake.created(), 1);
+  assert.equal(fake.aborted(), true);
+  assert.deepEqual(fake.contents(), external);
 });
 
 test('rejects a size conflict without reading the file or opening a writer', async () => {

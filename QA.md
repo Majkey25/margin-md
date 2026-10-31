@@ -1,53 +1,69 @@
-# Validation
+# Validation | 1.0.0
 
-Checked on 31 October 2026, Windows, Chromium 156.0.0.0. Measurements are local laboratory observations without CPU or network throttling.
+Checked on 31 October 2026, Windows, Chromium 156.0.8078.4. Measurements below are local laboratory observations.
 
 ## Execution
 
-* `npm test`: 9 file-core tests passed.
+* `npm test`: 16 file-handling tests passed.
 * `npm run test:browser`: TypeScript check, production build and the loaded-extension browser scenario passed.
 * `npm audit --omit=dev`: 0 vulnerabilities reported.
-* `git diff --cached --check`: checked before commit.
 
-The browser scenario covers live preview, source/split/preview modes, dark theme, fullscreen, mobile overflow, discard cancellation, a real browser close warning and dismissal, blocked Markdown HTML/images, and zero document-triggered HTTP(S) requests. It checks the file-drop fallback with a synthetic DataTransfer, actual OPFS file bytes after writes, a Save As picker that truncates the existing destination, an aborted write, and edits/undo during a pending save.
+The browser scenario checks editing, undo during a pending save, all view modes, fullscreen, discard cancellation, a real browser close warning, blocked active Markdown, table alignment and zero document-triggered HTTP(S) requests. Save tests inspect genuine OPFS bytes after successful writes, cancelled overwrites, failed writes and failed closes. An assertion forbids the old truncating save-file picker.
 
-A genuine disk file named `český test % #.Md` was opened through a `file:///` URL and automatically displayed by the extension. Czech text, UTF-8 BOM and CRLF input were read correctly.
+Appearance checks cover the initial device theme, live device changes, explicit overrides, reload persistence, all three visual styles, rapid theme clicks, the circular reveal and reduced motion. Opening settings and changing styles preserves the document. Ctrl+S inside settings does not open a save dialog. System changes use browser media emulation; Windows settings are not changed.
 
-The final ZIP was extracted and loaded as a separate unpacked extension. Its editor and Markdown preview loaded successfully.
+## Actual disk files
 
-## Interface and performance
+The final build opened a real `final-real.md` through Chromium's native file-drop path, edited it and saved it through a genuine external file handle. The real Chrome write-permission prompt was approved. Exact bytes matched the expected UTF-8 BOM and CRLF content. Reloading and reopening the disk file displayed the saved text.
 
-| Check | Observed result |
-| :--- | :--- |
-| axe, light desktop 1440 × 900 | 0 violations |
-| axe, dark desktop 1440 × 900 | 0 violations |
-| axe, mobile 390 × 844 | 0 violations |
-| Initial local load event | 88.8 ms |
-| Largest contentful paint | 100 ms |
-| Cumulative layout shift | 0 |
-| Sample typing event durations | 16 ms, browser-rounded values |
-| Import and preview of 102,503 UTF-8 bytes | Median 206.7 ms across 5 runs |
-| Import and preview runs | 316.2, 208.9, 206.7, 193.8, 194.0 ms |
-| Main JavaScript bundle | 467.42 kB, 164.00 kB gzip |
-| Main JavaScript before removing unused HTML language support | 652.95 kB, 234.95 kB gzip |
+Save As was tested against real external files using a genuine directory handle obtained from a native directory drop. The test supplied only the directory-picker result; reads, buffered writable streams, aborts and commits used Chromium's actual disk implementation. The real folder write-permission prompt was approved.
 
-The import measurement includes browser automation, file input, parsing and preview insertion. The typing probe is not a field INP measurement. No field Core Web Vitals or 5 MiB worst-case latency claim is made.
+* `final-target.md` kept its exact original bytes before overwrite confirmation and after cancellation.
+* Injected `write()` and `close()` failures preserved those bytes and the unsaved editor state.
+* Confirmed overwrite produced the exact expected bytes, including BOM and CRLF, while the original source file stayed unchanged.
+* Creating `final-new.md` produced the same expected bytes.
 
-Fresh desktop, dark and mobile screenshots were visually inspected. The Impeccable detector reported one warning for the Markdown blockquote's 3px border. This is the conventional quote marker, not a decorative card accent; it was retained.
+These injected failures do not simulate power loss or hardware failure. Earlier checks also covered Czech filenames containing spaces, `%` and `#`, and automatic rendering of a real Markdown `file:///` URL.
+
+## Interface
+
+Fresh screenshots were inspected at 1440 × 900 and 390 × 844 for Minimal, Glass and Material You, each in light and dark mode. Forty axe and layout checks passed with zero violations and zero outer horizontal overflow: the six appearances at desktop and mobile widths, their settings and save-validation dialogs, and long-content checks at 390, 700, 1024 and 1920 px.
+
+The audit found a CodeMirror scroll region without an explicit keyboard entry point. Adding `tabindex="0"` to its editable content resolved the finding; the complete matrix was rerun. Wide tables and code scroll inside their own regions.
+
+Source-only mode was tested with a short file and 10,001 lines. Typing, undo and cursor visibility passed. At 1440 px, the content starts at x=332 with 16 px line padding; its heading starts at x=348. The gutter remained 56 px wide in both cases.
+
+## Performance
+
+No network or CPU throttling was used except for the separately labelled animation probe. Import timings include browser automation, file input, parsing and preview insertion. They are observations, not a performance guarantee.
+
+| Check | Before redesign | Final |
+| :--- | ---: | ---: |
+| Local load event | 400.2 ms | 369.9 ms |
+| Largest contentful paint | 548 ms | 504 ms |
+| Cumulative layout shift | 0 | 0 |
+| 102,400-byte import and preview, median of 5 | 410.7 ms | 384.0 ms |
+| Main JavaScript bytes | 469,846 | 475,780 |
+| Main JavaScript gzip bytes, Node zlib defaults | 163,127 | 164,857 |
+
+Final import runs: 402.7, 339.2, 401.9, 384.0 and 372.9 ms. A small difference between two local runs does not establish a statistically significant speed improvement.
+
+During the theme reveal, requestAnimationFrame intervals on this 144 Hz test setup had a 6.9 ms median and 13.9 ms maximum. With 4× CPU throttling, the median stayed 6.9 ms and the maximum was 34.7 ms; one interval exceeded 34 ms. This does not measure a physical mobile GPU. Field INP, field Core Web Vitals and worst-case 5 MiB rendering latency were not measured.
+
+## Release archive
+
+The 191,573-byte `margin-md.zip` was extracted into a separate folder and loaded as an unpacked extension. Version 1.0.0 opened the real Markdown fixture, rendered its heading, and applied Glass and dark appearance. Its JavaScript matched the production build byte for byte. The archive contains the extension, icons and third-party notices; no source workspace, dependencies or test profiles are included.
+
+SHA-256: `3be4e8345bc96e50423c6bc05839c4730416c0b02d2441d163a7bc78238d42f2`.
 
 ## Independent review
 
-* Opus 4.6 through Antigravity created `src/shell.ts`, `src/styles.css` and the initial design document using frontend-design, Taste, Impeccable and Emil guidance. Claude Code's Opus 5.5 probe had reached its subscription limit; the separately authenticated Antigravity Opus probe succeeded.
-* GPT-6 Astra at xhigh checked architecture and local-file permission boundaries, then inspected screenshots. Its dark gutter finding was fixed and scored resolved on a fresh screenshot.
-* GPT-6.1 Terra at xhigh implemented the file helpers and focused tests. The main agent inspected the files and reran checks.
-* GPT-6.1 Sol at max reviewed save and rendering risks. Its three confirmed save-state findings were fixed, independently rechecked and covered by browser regressions.
+Claude Opus 5.5 created the final shell, styles, design document and vector icon using frontend-design, Taste, Impeccable and Emil guidance. GPT-6 Astra at xhigh reviewed architecture, permission boundaries and screenshots. GPT-6.1 Terra at xhigh implemented file helpers, preference behavior and focused regressions. GPT-6.1 Sol at max reviewed saving and transition cancellation. The main agent inspected their output and ran the checks above. Model agreement was not treated as proof.
 
-Model responses were treated as advice. Checked code, execution and rendered output determine the claims above.
+## Limits
 
-## Verification limits
+Native Windows file and folder chooser selection remains unverified. Computer Use captured the chooser but rejected clicks with `point ... is over margin-test.exe "Cancel", not target window ...`. Real disk read and write were verified through native drop handles. This proves disk write-back, not automated OS chooser selection.
 
-Native Windows picker automation failed in both Computer Use routes with `window id 1641926 no longer belongs to Chrome; current owner is Chrome`. Therefore native picker selection and write-back to a user-selected OS file were not completed in this run. The fallback evidence is actual extension execution with genuine OPFS handles and a genuine disk-file read. OPFS writes do not prove native disk write-back.
+Byte comparisons before and after opening the temporary writer do not lock out another application writing afterward. Save As avoids the native save-file picker's early truncation. A failed save to a new destination may leave a new empty file. There is no autosave or crash recovery.
 
-Save conflict detection is a byte comparison before writing, not an atomic lock against another application. Native Save As can truncate an existing confirmed destination before a later write fails. Text remains in the editor on a failed save. There is no crash recovery or autosave.
-
-Chrome Web Store publication, a signed CRX, other Chrome versions and physical mobile devices were not tested or published.
+Chrome Web Store publication, signed CRX installation, other Chrome versions and physical mobile devices were not tested or published.
