@@ -6,8 +6,8 @@ import { HighlightStyle, syntaxHighlighting } from '@codemirror/language';
 import { tags } from '@lezer/highlight';
 import { decodeMarkdown, encodeMarkdown, FileConflictError, getLocalMarkdownUrl, MAX_FILE_BYTES,
   createSaveTarget, prepareSaveTarget, readMarkdown, validateMarkdownName, writeMarkdown, type LoadedFile } from './files';
-import { renderMarkdown } from './render';
-import { initialSample } from './sample';
+import { renderMarkdown, resetPreview } from './render';
+import { githubSample, initialSample } from './sample';
 import { shell } from './shell';
 import { setupPreferences, type EditorType } from './preferences';
 import { getLocale, isMessageKey, setupLanguage, t, type MessageKey } from './i18n';
@@ -35,12 +35,13 @@ const preferencesDialog = setupPreferences(
     editor.dispatch({ effects: editorProfile.reconfigure(profileExtensions(value)) });
     editor.requestMeasure();
   },
+  () => { previewStale = true; updatePreview(); },
 );
 let wordCounter = new Intl.Segmenter(getLocale(), { granularity: 'word' });
 let pluralRules = new Intl.PluralRules(getLocale());
 let numberFormat = new Intl.NumberFormat(getLocale());
 const format = { newline: '\n', bom: false } as const;
-const sample = initialSample(getLocale());
+const sample = document.documentElement.dataset.markdownFormat === 'strict' ? initialSample(getLocale()) : githubSample(getLocale());
 let current: LoadedFile = { name: t('Vítejte.md'), source: sample, format, bytes: encodeMarkdown(sample, format) };
 let locationLabel: MessageKey = 'Ukázkový dokument';
 let busy = false;
@@ -150,7 +151,7 @@ function updatePreview(): void {
   element('word-count').textContent = countText(words, '{count} slovo', '{count} slova', '{count} slov');
   if (mode === 'source') return;
   try {
-    renderMarkdown(source, preview);
+    renderMarkdown(source, preview, document.documentElement.dataset.markdownFormat === 'strict' ? 'strict' : 'github');
   } catch {
     say('Náhled nelze vytvořit. Text zůstává v editoru.', true);
     return;
@@ -206,6 +207,7 @@ async function run(action: () => Promise<void>): Promise<void> {
 
 async function replaceDocument(file: LoadedFile, label: MessageKey): Promise<void> {
   if (!await confirmDiscard()) return;
+  resetPreview();
   current = file;
   locationLabel = label;
   editor.setState(editorState(file.source));
@@ -391,7 +393,16 @@ preview.addEventListener('click', (event) => {
   if (!anchor) return;
   event.preventDefault();
   const href = anchor.getAttribute('href') || '';
-  if (/^https?:\/\//i.test(href) || /^mailto:/i.test(href)) {
+  if (href.startsWith('#')) {
+    let id: string;
+    try { id = decodeURIComponent(href.slice(1)); } catch { return; }
+    const target = Array.from(preview.querySelectorAll<HTMLElement>('[id]')).find((node) => node.id === id);
+    if (target) {
+      target.scrollIntoView({ block: 'start' });
+      target.tabIndex = -1;
+      target.focus({ preventScroll: true });
+    }
+  } else if (/^https?:\/\//i.test(href) || /^mailto:/i.test(href)) {
     window.open(href, '_blank', 'noopener,noreferrer');
   } else {
     say('Odkazy na místní soubory otevřete tlačítkem Otevřít.');

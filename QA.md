@@ -1,5 +1,41 @@
 # Validation
 
+## GitHub formatting and welcome showcase | 1.4.0
+
+GitHub formatting is the new default, independent of preview appearance. Strict Markdown retains the previous renderer and exact original welcome source on new editor pages. The new English, Czech and German showcase covers the supported Markdown and safe HTML features. Format changes rerender only; they preserve raw text, cursor, dirty state and undo. The supplied profile README was also rendered locally with its aligned header, mixed HTML/Markdown tables, image placeholders and three alerts.
+
+`npm test` passed 19 tests. TypeScript, the production build and all five loaded-extension browser scenarios passed. The new scenario verifies the complete welcome saved to genuine OPFS bytes, the unchanged Strict welcome, setting persistence and invalid-value fallback, format switching, keyboard details and image actions, heading/footnote links and duplicate-ID isolation. It also checks HTML-to-plain replacement, image-state reset between files, cancelled and stale directory pickers, and actual OPFS image decoding. Existing save conflict, overwrite cancellation and failure tests remain intact. The production dependency audit reported zero vulnerabilities; the two added Markdown plugins are bundled with their MIT notices.
+
+### HTML and image boundaries
+
+Raw HTML and footnotes render and sanitize as a complete tree because their tags can span Markdown token groups. Ordinary Markdown keeps the existing prefix/suffix block update path. DOMPurify retains its clobbering protection; document IDs/names and matching fragment links are isolated from application IDs. Arbitrary authored classes, styles, handlers, controls, embeds, SVG markup and resource attributes are removed. GPT-6 Astra at xhigh independently reviewed the HTML/image trust boundaries and asynchronous state transitions. That source review found and the primary agent fixed two cache-transition defects and a namespace collision; the final source review found no remaining confirmed P1/P2 issue. The primary agent executed the browser checks rather than treating model agreement as proof.
+
+Images are neutralized in an inert template before sanitization/import and recreated only from fixed bundled aliases or explicit image consent. The adversarial browser fixture triggered no automatic HTTP(S) requests and did not execute its scripts or handlers. One clicked HTTPS image used an intercepted real browser image request; the read-only folder flow decoded genuine OPFS SVG bytes. A script and external-image reference inside that SVG did not execute or issue another request. Folder cancellation leaves a usable control, and a folder result arriving after a new document cannot populate the new document's image state. Local blobs are capped at 10 MiB each and 64 MiB total, with 128 approved sources, and revoked on document replacement or non-cached page exit.
+
+Chromium 156 reports enforced inline-handler CSP rejections while parsing even an inert template, detached HTML document or DOMParser document. A focused native-browser probe established this before the test was adjusted. The malicious-fixture test accepts only that specific enforced rejection during parsing; other console errors still fail. It separately requires no handler attributes, no execution marker and zero automatic document HTTP(S) requests. Benign showcase/profile checks reported zero browser errors. Script policy and host permissions are unchanged; `img-src` additionally permits `blob:` and HTTPS for explicit image display. Remote images use no referrer and normal browser image/cookie policy.
+
+### Appearance and performance
+
+Twenty-four axe checks passed without violations: the main window and settings in EN/CS/DE, light/dark, at 1440 × 900 and 390 × 844. No outer horizontal overflow was found. Fresh screenshots of the showcase, safe HTML, alerts, settings and supplied profile were inspected. At 390 × 460, the settings close button and focused last control remain visible; Escape restores focus. No main-window redesign or new theme palette is included in this release.
+
+The extracted 1.3.1 release and new build opened the same real 100 KiB/1 MiB Markdown fixtures three times each in isolated Chromium 156.0.8078.4 at 1440 × 900, without throttling. Timings start at file-input change or typing and end two frames after preview mutation; typing includes the existing 120 ms debounce. Undo's preview was flushed before the next import. Medians follow; host variation prevents a universal speed claim.
+
+| Check | 1.3.1 | 1.4.0 preflight |
+| :--- | ---: | ---: |
+| 100 KiB open and preview | 444.3 ms | 412.9 ms |
+| 100 KiB edit and preview | 230.1 ms | 253.3 ms |
+| 1 MiB open and preview | 2,354.7 ms | 2,401.6 ms |
+| 1 MiB edit and preview | 628.2 ms | 665.5 ms |
+| Local load event | 322.2 ms | 298.1 ms |
+| Largest contentful paint | 408 ms | 540 ms |
+| Cumulative layout shift | 0 | 0 |
+
+The final main JavaScript is 711,160 bytes, gzip 252,648 bytes using Node defaults, compared with 1.3.1's 643,316/225,684 bytes. The new welcome is substantially longer than the previous sample, and the extended parser adds bundle weight. This is not an across-the-board speed improvement. Large mixed-HTML documents use a full-tree update and can be slower than plain Markdown. Field INP, worst-case 5 MiB latency and physical mobile behavior remain unmeasured. The native image-folder chooser remains unverified. The new file/image checks use genuine OPFS handles, not a new external-disk/native-chooser validation. Earlier external-disk evidence and its limits remain below.
+
+### Release archive
+
+The 287,406-byte archive was extracted separately. All 18 files match the final build, the manifest reports 1.4.0, and its three bundled images decoded successfully. The extracted extension opened a real local Czech Markdown file, rendered safe HTML, edited it and saved exact BOM/CRLF bytes to genuine OPFS; the original disk fixture stayed unchanged. It reported no browser errors or HTTP(S) requests. SHA-256: `2e8297086d135d3536f5c319d883384d990178ff2d841c78dbe76936fde59da1`.
+
 ## Pinned action startup | 1.3.1
 
 The toolbar action now runs a small launcher directly instead of dispatching its opening through the background service worker. It activates an existing editor without navigating or rebuilding its document, preferring the current window and matching its private-browsing mode. It creates a new editor only when none is open. Successful activation closes the launcher; failure keeps a native link available. No permission, keepalive, polling or document persistence was added. The worker retains the existing validated local-file message handler.

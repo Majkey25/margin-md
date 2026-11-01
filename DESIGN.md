@@ -1,6 +1,10 @@
-# Margin design (1.3.1)
+# Margin design (1.4.0)
 
 A precise writing instrument. The filename is the title, the document sits on its own sheet inside a quiet window frame, and the chrome only holds what you act on.
+
+Formatting uses the existing settings row grammar. A native GitHub/Strict Markdown select changes syntax independently of preview appearance and never edits the open source. New welcome pages use the selected format; Strict retains the original short sample.
+
+The showcase demonstrates the document language rather than introducing another application layout. Details, footnotes, keyboard keys and alerts inherit preview typography and surface tokens. Alert labels carry their meaning in text; their five restrained border accents follow light/dark appearance. Images stay behind an explicit action unless they are fixed bundled demo assets. Image controls show the remote host or the relative local path.
 
 ## Design plan
 

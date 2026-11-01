@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="126" height="26" viewBox="0 0 126 26">
+  <rect width="126" height="26" rx="5" fill="#1f2328"/>
+  <path d="M61 0h60q5 0 5 5v16q0 5-5 5H61z" fill="#1a7f37"/>
+  <g fill="#fff" font-family="system-ui,sans-serif" font-size="11" font-weight="600" text-anchor="middle">
+    <text x="31" y="17">Margin</text><text x="94" y="17">local</text>
+  </g>
+</svg>

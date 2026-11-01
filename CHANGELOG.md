@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.4.0 | 2026-11-01
+
+* Add GitHub and Strict Markdown formatting independently of preview appearance; preserve open text, cursor, saved state and undo when switching.
+* Expand the localized welcome into a formatting showcase, keeping the original short welcome for new Strict Markdown pages.
+* Support safe HTML layouts, alignment, collapsible details, keyboard keys, subscripts, superscripts and text highlighting.
+* Add GitHub alerts, footnotes, emoji shortcodes, automatic links, heading anchors and bounded diff highlighting.
+* Display bundled sample images offline; load HTTPS images only after a click and local images through a selected read-only document folder.
+* Bound retained image sources and local image bytes, clear image consent on document replacement, and reject stale picker results.
+* Preserve the fast block-update path for ordinary Markdown; sanitize mixed HTML as a complete tree with isolated document IDs and no active content.
+
 ## 1.3.1 | 2026-11-01
 
 * Refine the original transparent corner-bracket icon with stronger vector geometry and fresh PNG exports.

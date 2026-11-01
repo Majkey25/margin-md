@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="200" viewBox="0 0 800 200">
+  <rect width="800" height="200" rx="16" fill="#f6f8fa"/>
+  <path d="M48 48h64v20H68v44H48zM152 152H88v-20h44V88h20z" fill="#1f2328"/>
+  <text x="200" y="93" fill="#1f2328" font-family="system-ui,sans-serif" font-size="38" font-weight="600">Markdown, on your terms.</text>
+  <text x="202" y="132" fill="#59636e" font-family="system-ui,sans-serif" font-size="20">Write locally. See every detail.</text>
+</svg>

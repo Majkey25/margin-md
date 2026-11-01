@@ -3,7 +3,7 @@
 A local Markdown editor for Chrome. Write the source, see a live preview, and save the file on your computer.
 
 [![Checks](https://github.com/Majkey25/margin-md/actions/workflows/ci.yml/badge.svg)](https://github.com/Majkey25/margin-md/actions/workflows/ci.yml)
-[![Stable release](https://img.shields.io/badge/release-v1.3.1-black?style=flat-square&logo=github&logoColor=white)](https://github.com/Majkey25/margin-md/releases/latest)
+[![Stable release](https://img.shields.io/badge/release-v1.4.0-black?style=flat-square&logo=github&logoColor=white)](https://github.com/Majkey25/margin-md/releases/latest)
 ![Chrome Manifest V3](https://img.shields.io/badge/Chrome-Manifest_V3-black?style=flat-square&logo=googlechrome&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-strict-black?style=flat-square&logo=typescript&logoColor=white)
 ![Local files](https://img.shields.io/badge/files-local_only-black?style=flat-square)
@@ -32,6 +32,14 @@ Updates are manual. Save open documents, replace the extracted extension files w
 The interface follows your device's preferred browser language. English, Czech and German are available; unsupported languages fall back to English. Choose an explicit language in **Appearance → Language** to override the device setting. Changing language preserves the open file, text and undo history.
 
 Open a `.md` or `.markdown` file with **Open**, or drop it into the editor. Choose **Text**, **Side by side**, or **Preview**. Preview-only mode gives the document the full application area, and the fullscreen control expands the browser view.
+
+**Markdown format** is independent of the preview's visual style. **GitHub**, the default, supports tables, tasks, strikethrough, automatic links, emoji shortcodes, heading links, footnotes and the five GitHub alert types. Safe HTML includes alignment, layout tables, collapsible details, keyboard keys, subscript, superscript, inserted/deleted text and highlighting. The expanded welcome document demonstrates these features in English, Czech and German, with bundled images and badges that work offline.
+
+Choose **Strict Markdown** to use the previous renderer, with HTML shown as text and the original short welcome on newly opened editor pages. Changing format updates the preview and preserves the current raw text, cursor, saved state and undo history. It does not replace an open welcome document. This is a GitHub-inspired renderer, not a complete GitHub implementation; Mermaid, mathematical typesetting, repository mentions and issue references are not interpreted.
+
+Images from your documents start as labelled placeholders. **Load image** requests an HTTPS image only after your click and shows its host first. Relative images use **Choose document folder**; select the document's root folder, and Margin reads only the referenced paths without listing or writing the folder. The choice lasts for the current document. Local images are limited to 10 MiB each and 64 MiB in total, with up to 128 approved image sources. Single-URL `<picture>` sources follow their media queries. Scripts, forms, embeds, custom CSS and active SVG markup are removed; SVG files can be displayed as images.
+
+![Welcome showcase with safe HTML, image variants and collapsible content](docs/images/formatting.png)
 
 **Save** writes to the opened file. **Save As** asks for a filename and destination folder, then asks before replacing an existing file. Choosing a destination does not empty an existing file. Save is manual; text remains in the editor if a write fails.
 
@@ -68,9 +76,10 @@ To render Markdown opened directly through a `file:///` URL, enable **Allow acce
 
 * Documents stay on your computer. There is no account, server, telemetry, or document upload.
 * Dependencies, styles and icons are bundled. The extension loads no remote code or fonts.
-* Markdown HTML is shown as text. Images are labelled placeholders, so opening a document does not contact image servers.
+* Safe HTML is sanitized in GitHub format; Strict Markdown shows HTML as text. Untrusted image URLs are removed before the preview is attached.
+* Images are labelled placeholders. An HTTPS image is requested only after a click, without a referrer. Local images require a selected folder; the welcome's fixed bundled assets work offline.
 * HTTP(S) and email links open only after a click. Relative file links and images are not loaded.
-* The `file:///*` permission supports directly opened local Markdown. The extension requests no access to HTTP(S) pages.
+* The `file:///*` permission supports directly opened local Markdown. The extension requests no host permission for HTTP(S) pages; explicitly loaded images use the browser's normal image requests.
 * Save As asks Chrome for access to the folder you select. Margin uses only the named target and does not enumerate the folder.
 
 ## File handling

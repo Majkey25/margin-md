@@ -1,8 +1,14 @@
 type Theme = 'system' | 'light' | 'dark';
 type Surface = 'minimal' | 'glass' | 'material' | 'fluent' | 'nord';
 export type EditorType = 'code' | 'prose' | 'plain';
+export type MarkdownFormat = 'github' | 'strict';
 
-export function setupPreferences(onStorageError: () => void, onEditorTypographyChange: () => void, onEditorTypeChange: (value: EditorType) => void): HTMLDialogElement {
+export function setupPreferences(
+  onStorageError: () => void,
+  onEditorTypographyChange: () => void,
+  onEditorTypeChange: (value: EditorType) => void,
+  onMarkdownFormatChange: (value: MarkdownFormat) => void,
+): HTMLDialogElement {
   const root = document.documentElement;
   const dialog = document.getElementById('preferences-dialog') as HTMLDialogElement;
   const themeSetting = document.getElementById('theme-setting') as HTMLSelectElement;
@@ -75,6 +81,8 @@ export function setupPreferences(onStorageError: () => void, onEditorTypographyC
   };
   setting('editor-type-setting', 'margin.editorType', ['code', 'prose', 'plain'] as const, 'code',
     (value) => { root.dataset.editorType = value; }, onEditorTypeChange);
+  setting('markdown-format-setting', 'margin.markdownFormat', ['github', 'strict'] as const, 'github',
+    (value) => { root.dataset.markdownFormat = value; }, onMarkdownFormatChange);
   setting('preview-theme-setting', 'margin.previewTheme', ['github', 'vscode', 'reading', 'nord'] as const, 'github',
     (value) => { root.dataset.previewTheme = value; });
   setting('preview-font-setting', 'margin.previewFont', ['default', 'sans', 'serif', 'mono'] as const, 'default',

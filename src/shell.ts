@@ -182,6 +182,17 @@ export const shell = String.raw`
       <div class="pref-group">
         <div class="pref-row">
           <div class="pref-text">
+            <label class="pref-label" for="markdown-format-setting" data-i18n="Formát Markdownu">Formát Markdownu</label>
+            <p id="markdown-format-hint" class="pref-hint" data-i18n="GitHub přidává bezpečné HTML, upozornění a poznámky pod čarou. Strict používá původní Markdown. Text dokumentu se nemění.">GitHub přidává bezpečné HTML, upozornění a poznámky pod čarou. Strict používá původní Markdown. Text dokumentu se nemění.</p>
+          </div>
+          <span class="select"><select id="markdown-format-setting" aria-describedby="markdown-format-hint">
+            <option value="github">GitHub</option>
+            <option value="strict">Strict Markdown</option>
+          </select></span>
+        </div>
+
+        <div class="pref-row">
+          <div class="pref-text">
             <label class="pref-label" for="preview-theme-setting" data-i18n="Styl náhledu">Styl náhledu</label>
             <p id="preview-theme-hint" class="pref-hint" data-i18n="Platí jen pro náhled, nezávisle na stylu rozhraní.">Platí jen pro náhled, nezávisle na stylu rozhraní.</p>
           </div>

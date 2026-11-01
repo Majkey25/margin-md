@@ -15,6 +15,7 @@ test('extension editing, safe rendering and file-save regressions', { timeout: 6
   try {
     const worker = context.serviceWorkers()[0] ?? await context.waitForEvent('serviceworker');
     const page = await context.newPage();
+    await page.addInitScript(() => localStorage.setItem('margin.markdownFormat', 'strict'));
     const errors: string[] = [];
     const network: string[] = [];
     page.on('pageerror', (error) => errors.push(error.message));
