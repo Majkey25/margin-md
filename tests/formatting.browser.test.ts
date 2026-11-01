@@ -46,9 +46,9 @@ test('GitHub showcase, strict mode, safe HTML, images and document preservation'
     assert.equal(await preview.locator('.footnotes').count(), 1);
     assert.equal(await preview.locator('.task-list-checkbox:disabled').count(), 2);
     assert.match(await preview.innerText(), /🚀/u);
-    for (const image of await preview.locator('img').all()) await image.scrollIntoViewIfNeeded();
-    await page.waitForFunction(() => Array.from(document.querySelectorAll<HTMLImageElement>('#preview img')).every((image) => image.complete && image.naturalWidth > 0));
-    assert.equal(await preview.locator('img').count(), 3);
+    for (const image of await preview.locator('.markdown-image img').all()) await image.scrollIntoViewIfNeeded();
+    await page.waitForFunction(() => Array.from(document.querySelectorAll<HTMLImageElement>('#preview .markdown-image img')).every((image) => image.complete && image.naturalWidth > 0));
+    assert.equal(await preview.locator('.markdown-image img').count(), 3);
     assert.deepEqual(requests, []);
     await preview.locator('a[href="#user-content-code"]').first().click();
     assert.equal(await page.evaluate(() => document.activeElement?.id), 'user-content-code');

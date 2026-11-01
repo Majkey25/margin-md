@@ -1,6 +1,7 @@
 import MarkdownIt, { type Env } from 'markdown-it';
 import footnote from 'markdown-it-footnote';
 import { full as emoji } from 'markdown-it-emoji';
+import { tex } from '@mdit/plugin-tex';
 import DOMPurify from 'dompurify';
 import { classHighlighter, highlightCode } from '@lezer/highlight';
 import { parser as javascript } from '@lezer/javascript';
@@ -9,6 +10,7 @@ import { parser as html } from '@lezer/html';
 import { getLocale, t, type Locale } from './i18n';
 import type { MarkdownFormat } from './preferences';
 import { hydrateImages, prepareImages, resetImages } from './images';
+import { enhanceRichPreview, resetRichPreview } from './rich-preview';
 
 const markdown = new MarkdownIt({ html: false, linkify: false, typographer: false });
 const github = new MarkdownIt({ html: true, linkify: true, typographer: false }).use(footnote).use(emoji, { shortcuts: {} });
@@ -35,6 +37,7 @@ let previous: { target: HTMLElement; locale: Locale; format: MarkdownFormat; blo
 export function resetPreview(): void {
   previous = undefined;
   resetImages();
+  resetRichPreview();
 }
 window.addEventListener('pagehide', (event) => { if (!event.persisted) resetPreview(); });
 
@@ -75,6 +78,14 @@ markdown.renderer.rules.fence = (tokens, index, options, context, renderer) => {
   return plainFence(tokens, index, { ...options, highlight: () => highlighted }, context, renderer);
 };
 github.renderer.rules.fence = markdown.renderer.rules.fence;
+github.use(tex, {
+  mathFence: true,
+  render: (content: string, display: boolean) => {
+    if (!display && content.startsWith('`') && content.endsWith('`')) content = content.slice(1, -1);
+    return display ? `<div class="math-block">${github.utils.escapeHtml(content)}</div>`
+      : `<span class="math-inline">${github.utils.escapeHtml(content)}</span>`;
+  },
+});
 
 for (const parser of [markdown, github]) parser.core.ruler.before('inline', 'task-list', (state) => {
   for (let i = 2; i < state.tokens.length; i++) {
@@ -181,7 +192,8 @@ export function renderMarkdown(source: string, target: HTMLElement, format: Mark
   });
   for (const node of fragment.querySelectorAll<HTMLElement>('[class]')) {
     for (const value of Array.from(node.classList)) {
-      if (!/^(?:tok-[A-Za-z0-9]+|align-(?:left|center|right)|task-list-(?:item|checked)|blocked-image|footnote(?:s|s-list|s-sep|-ref|-item|-backref)|markdown-alert(?:-note|-tip|-important|-warning|-caution|-title)?)$/.test(value)) node.classList.remove(value);
+      if (!/^(?:tok-[A-Za-z0-9]+|align-(?:left|center|right)|task-list-(?:item|checked)|blocked-image|footnote(?:s|s-list|s-sep|-ref|-item|-backref)|markdown-alert(?:-note|-tip|-important|-warning|-caution|-title)?)$/.test(value)
+        && !(format === 'github' && /^(?:language-mermaid|math-(?:inline|block))$/.test(value))) node.classList.remove(value);
     }
     if (!node.className) node.removeAttribute('class');
   }
@@ -229,6 +241,7 @@ export function renderMarkdown(source: string, target: HTMLElement, format: Mark
   if (whole) {
     target.replaceChildren(fragment);
     previous = undefined;
+    enhanceRichPreview(target, format);
     return;
   }
   if (fragment.children.length !== newEnd - first) throw new Error('Unexpected Markdown block structure.');
@@ -244,4 +257,5 @@ export function renderMarkdown(source: string, target: HTMLElement, format: Mark
     target.insertBefore(fragment, target.children[first] ?? null);
   }
   previous = htmlChars <= MAX_CACHED_HTML_CHARS ? { target, locale, format, blocks } : undefined;
+  enhanceRichPreview(target, format);
 }

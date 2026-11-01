@@ -141,3 +141,100 @@ test('language settings follow device preferences and preserve documents', { tim
     await context.close();
   }
 });
+
+test('settings cards stay in sync and preserve an edited document', { timeout: 120000 }, async () => {
+  const extension = resolve('dist');
+  const context = await chromium.launchPersistentContext('', {
+    channel: 'chromium', headless: true, locale: 'cs-CZ',
+    args: [`--disable-extensions-except=${extension}`, `--load-extension=${extension}`],
+    viewport: { width: 1440, height: 900 },
+  });
+  try {
+    const worker = context.serviceWorkers()[0] ?? await context.waitForEvent('serviceworker');
+    const page = await context.newPage();
+    const errors: string[] = [];
+    page.on('pageerror', (error) => errors.push(error.message));
+    await page.emulateMedia({ colorScheme: 'light', reducedMotion: 'reduce' });
+    await page.goto(`chrome-extension://${new URL(worker.url()).host}/index.html`);
+    await page.locator('#file-input').setInputFiles({
+      name: 'cards.md', mimeType: 'text/markdown', buffer: Buffer.from('# Original'),
+    });
+    await page.waitForFunction(() => document.querySelector('#doc-name')?.textContent === 'cards.md');
+    const editor = page.locator('.cm-content');
+    const source = '# Draft\n\nText with **formatting**.';
+    const editorText = async () => (await editor.locator('.cm-line').allTextContents()).join('\n');
+    await editor.fill(source);
+    const cursor = await page.locator('#cursor-position').innerText();
+    await page.locator('#preferences-open').click();
+    await page.locator('#preferences-dialog').waitFor({ state: 'visible' });
+    const appPreview = page.locator('.theme-preview').first();
+    const markdownPreview = page.locator('.markdown-style-preview').first();
+    const lightApp = await appPreview.screenshot();
+    const lightMarkdown = await markdownPreview.screenshot();
+    await page.emulateMedia({ colorScheme: 'dark' });
+    await page.waitForFunction(() => document.documentElement.dataset.theme === 'dark');
+    assert.notDeepEqual(await appPreview.screenshot(), lightApp, 'application preview follows dark mode');
+    assert.notDeepEqual(await markdownPreview.screenshot(), lightMarkdown, 'Markdown preview follows dark mode');
+    await page.emulateMedia({ colorScheme: 'light' });
+    await page.waitForFunction(() => document.documentElement.dataset.theme === 'light');
+
+    const groups = [
+      { id: 'surface-setting', key: 'margin.surface', values: ['minimal', 'glass', 'material', 'fluent', 'nord', 'paper', 'terminal'] },
+      { id: 'preview-theme-setting', key: 'margin.previewTheme', values: ['github', 'vscode', 'reading', 'nord', 'paper', 'terminal'] },
+      { id: 'editor-type-setting', key: 'margin.editorType', values: ['code', 'prose', 'plain'] },
+    ];
+    for (const group of groups) {
+      const cards = page.locator(`button[data-setting="${group.id}"]`);
+      const select = page.locator(`#${group.id}`);
+      assert.equal(await cards.count(), group.values.length);
+      for (const value of group.values) {
+        const card = page.locator(`button[data-setting="${group.id}"][data-value="${value}"]`);
+        await card.click();
+        assert.equal(await select.inputValue(), value);
+        assert.equal(await card.getAttribute('aria-pressed'), 'true');
+        assert.equal(await page.locator(`button[data-setting="${group.id}"][aria-pressed="true"]`).count(), 1);
+        assert.equal(await page.evaluate((key) => localStorage.getItem(key), group.key), value);
+        assert.equal(await editorText(), source);
+        assert.equal(await page.locator('#cursor-position').innerText(), cursor);
+        assert.equal(await page.locator('#dirty-state').innerText(), 'Neuložené změny');
+      }
+      await select.selectOption(group.values[0]);
+      assert.equal(await page.locator(`button[data-setting="${group.id}"][data-value="${group.values[0]}"]`).getAttribute('aria-pressed'), 'true');
+      await page.locator(`button[data-setting="${group.id}"][data-value="${group.values[group.values.length - 1]}"]`).click();
+    }
+
+    await page.locator('#editor-font-setting').selectOption('serif');
+    await page.locator('#editor-size-setting').selectOption('18');
+    await page.locator('#preview-font-setting').selectOption('serif');
+    await page.locator('#preview-size-setting').selectOption('20');
+    const sourceSample = page.locator('.editor-font-sample').first();
+    const previewSample = page.locator('[data-follow-preview]').first();
+    assert.match(await sourceSample.evaluate((node) => getComputedStyle(node).fontFamily), /Georgia/);
+    assert.equal(await sourceSample.evaluate((node) => getComputedStyle(node).fontSize), '18px');
+    assert.match(await previewSample.evaluate((node) => getComputedStyle(node).fontFamily), /Georgia/);
+    assert.equal(await previewSample.evaluate((node) => getComputedStyle(node).fontSize), '20px');
+    assert.equal(await editorText(), source);
+    assert.equal(await page.locator('#cursor-position').innerText(), cursor);
+    assert.equal(await page.locator('#dirty-state').innerText(), 'Neuložené změny');
+    await page.locator('#preferences-close').click();
+    await editor.press('Control+z');
+    await page.waitForFunction(() => document.querySelector('#dirty-state')?.textContent === 'Beze změn');
+    assert.equal(await editorText(), '# Original');
+    assert.equal(await page.locator('#doc-name').innerText(), 'cards.md');
+
+    await page.reload();
+    await page.locator('#preferences-open').click();
+    for (const group of groups) {
+      const value = group.values[group.values.length - 1];
+      assert.equal(await page.locator(`#${group.id}`).inputValue(), value);
+      assert.equal(await page.locator(`button[data-setting="${group.id}"][data-value="${value}"]`).getAttribute('aria-pressed'), 'true');
+    }
+    assert.equal(await page.locator('#editor-font-setting').inputValue(), 'serif');
+    assert.equal(await page.locator('#editor-size-setting').inputValue(), '18');
+    assert.equal(await page.locator('#preview-font-setting').inputValue(), 'serif');
+    assert.equal(await page.locator('#preview-size-setting').inputValue(), '20');
+    assert.deepEqual(errors, []);
+  } finally {
+    await context.close();
+  }
+});

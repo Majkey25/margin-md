@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.5.0 | 2026-11-01
+
+* Add Paper and Terminal application themes and Markdown presets, with light and dark palettes.
+* Add clickable previews for every application theme, Markdown preset and editor profile, using the same palettes as the real window.
+* Show live font samples and keep native selects, device appearance, language and document history intact.
+* Refine the main window's save-state chip, focused pane and status bar; widen the centered settings dialog with a responsive layout.
+* Render Mermaid diagrams and KaTeX math only in GitHub format, with localized welcome examples and unchanged Strict Markdown.
+* Load rich previews on demand, isolate diagram rendering from network and extension APIs, bound complexity and preserve source on errors.
+
 ## 1.4.0 | 2026-11-01
 
 * Add GitHub and Strict Markdown formatting independently of preview appearance; preserve open text, cursor, saved state and undo when switching.

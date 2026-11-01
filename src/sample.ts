@@ -114,6 +114,9 @@ export function githubSample(locale: 'cs' | 'en' | 'de'): string {
       row: ['Návrh', 'Hotovo', '3'], quote: 'Jasný text začíná jednoduchou myšlenkou.', quoteMore: 'Druhý odstavec může myšlenku rozvinout.',
       note: 'Poznámka doplňuje souvislosti.', tip: 'Tip usnadní další krok.', important: 'Důležitou informaci ponechte viditelnou.',
       warning: 'Před změnou si ověřte vstupy.', caution: 'Pozor na nevratné změny.',
+      diagrams: 'Diagramy Mermaid', flow: 'Od textu k souboru', source: 'Text', preview: 'Náhled', save: 'Uložit',
+      sequence: 'Živý náhled', writer: 'Autor', editor: 'Editor', edit: 'Upravit Markdown', update: 'Obnovit náhled',
+      math: 'Matematické vzorce', mathText: 'Vzorec v řádku', mathHint: 'Pro samostatný vzorec použijte dvojité dolary nebo blok kódu math.',
       codeIntro: 'Použijte například', hardFirst: 'První řádek', hardSecond: 'Druhý řádek po pevném zalomení.',
       escape: 'Doslovné hvězdičky', footnote: 'Další vysvětlení najdete v poznámce', footnoteText: 'Poznámka pod čarou může obsahovat další kontext.',
       media: 'Místní obrázky', image: 'Ukázkový obrázek', badge: 'Štítek ukázky', picture: 'Obrázek pro světlý a tmavý režim',
@@ -132,6 +135,9 @@ export function githubSample(locale: 'cs' | 'en' | 'de'): string {
       row: ['Draft', 'Done', '3'], quote: 'Clear writing starts with a simple idea.', quoteMore: 'A second paragraph can develop the idea.',
       note: 'A note adds context.', tip: 'A tip makes the next step easier.', important: 'Keep important information visible.',
       warning: 'Check your inputs before making changes.', caution: 'Take care with irreversible changes.',
+      diagrams: 'Mermaid diagrams', flow: 'From text to file', source: 'Source', preview: 'Preview', save: 'Save',
+      sequence: 'Live preview', writer: 'Writer', editor: 'Editor', edit: 'Edit Markdown', update: 'Update preview',
+      math: 'Mathematical expressions', mathText: 'An inline expression', mathHint: 'Use double dollars or a math code block for a display expression.',
       codeIntro: 'For example, use', hardFirst: 'First line', hardSecond: 'Second line after a hard break.',
       escape: 'Literal asterisks', footnote: 'See the footnote for more context', footnoteText: 'A footnote can provide more context.',
       media: 'Local images', image: 'Example image', badge: 'Example badge', picture: 'Image for light and dark themes',
@@ -150,6 +156,9 @@ export function githubSample(locale: 'cs' | 'en' | 'de'): string {
       row: ['Entwurf', 'Fertig', '3'], quote: 'Klarer Text beginnt mit einem einfachen Gedanken.', quoteMore: 'Ein zweiter Absatz kann den Gedanken vertiefen.',
       note: 'Eine Notiz ergänzt den Zusammenhang.', tip: 'Ein Tipp erleichtert den nächsten Schritt.', important: 'Wichtige Informationen sichtbar halten.',
       warning: 'Eingaben vor Änderungen prüfen.', caution: 'Bei unumkehrbaren Änderungen aufpassen.',
+      diagrams: 'Mermaid-Diagramme', flow: 'Vom Text zur Datei', source: 'Text', preview: 'Vorschau', save: 'Speichern',
+      sequence: 'Live-Vorschau', writer: 'Autor', editor: 'Editor', edit: 'Markdown bearbeiten', update: 'Vorschau aktualisieren',
+      math: 'Mathematische Ausdrücke', mathText: 'Ein Ausdruck in einer Zeile', mathHint: 'Verwenden Sie doppelte Dollarzeichen oder einen math-Codeblock für eine abgesetzte Formel.',
       codeIntro: 'Verwenden Sie zum Beispiel', hardFirst: 'Erste Zeile', hardSecond: 'Zweite Zeile nach einem festen Umbruch.',
       escape: 'Wörtliche Sternchen', footnote: 'Weitere Hinweise stehen in der Fußnote', footnoteText: 'Eine Fußnote kann weitere Zusammenhänge erklären.',
       media: 'Lokale Bilder', image: 'Beispielbild', badge: 'Beispiel-Badge', picture: 'Bild für helle und dunkle Darstellung',
@@ -241,6 +250,37 @@ ${text.hardSecond}
 ${text.escape}: \\*text\\*.
 
 ${text.footnote}.[^1]
+
+## ${text.diagrams}
+
+\`\`\`mermaid
+flowchart LR
+  accTitle: ${text.flow}
+  A["${text.source}"] --> B["${text.preview}"] --> C["${text.save}"]
+\`\`\`
+
+\`\`\`mermaid
+sequenceDiagram
+  accTitle: ${text.sequence}
+  participant A as ${text.writer}
+  participant B as ${text.editor}
+  A->>B: ${text.edit}
+  B-->>A: ${text.update}
+\`\`\`
+
+## ${text.math}
+
+${text.mathText}: $e^{i\\pi} + 1 = 0$.
+
+${text.mathHint}
+
+$$
+x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}
+$$
+
+\`\`\`math
+\\int_0^1 x^2\\,dx = \\frac{1}{3}
+\`\`\`
 
 ## ${text.media}
 

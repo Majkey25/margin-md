@@ -1,21 +1,30 @@
 /* Margin: a precise writing instrument.
-   Five application styles (minimal, glass, material, fluent, nord) × light/dark.
-   main/preferences set html[data-theme], html[data-surface] and html.theme-switch.
+   Seven application styles (minimal, glass, material, fluent, nord, paper,
+   terminal) × light/dark. main/preferences set html[data-theme],
+   html[data-surface], html[data-editor-type] and html.theme-switch.
    Rendered Markdown lives in preview.css (html[data-preview-theme]); this file
    owns the window frame, chrome, dialogs and the source editor.
 
    Token grammar: :root holds every token at its Minimal-light value. Surface and
    theme blocks override values only; components read tokens and never branch on
-   the surface (the Glass solid fallback is the one exception). */
+   the surface (the Glass solid fallback is the one exception).
+
+   Every palette selector is shared with .theme-preview[data-surface][data-theme]:
+   the settings miniatures read the same declarations as the real window, and
+   the base block resets them so a card never inherits the current style. */
 
 /* ── Shared tokens + Minimal light (default) ───────────────────────── */
 
-:root {
+:root,
+.theme-preview {
   color-scheme: light;
 
   --font-ui: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-mono: ui-monospace, "Cascadia Code", "Cascadia Mono", "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
   --font-read: Charter, "Bitstream Charter", "Iowan Old Style", "Sitka Text", Sitka, "Source Serif 4", Cambria, Georgia, serif;
+  /* Document identity and dialog titles; status, counts and pane titles. */
+  --font-title: var(--font-ui);
+  --font-meta: var(--font-ui);
 
   --fs-xs: 12px;
   --fs-sm: 13px;
@@ -27,6 +36,7 @@
   --gutter-w: 56px;
   --code-lh: 23px;
   --source-max: 52rem;
+  --prose-max: 42rem;
   --pane-head-h: 36px;
 
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
@@ -122,7 +132,8 @@
 }
 
 /* Minimal dark: white on true black. */
-:root[data-theme="dark"] {
+:root[data-theme="dark"],
+.theme-preview[data-theme="dark"] {
   color-scheme: dark;
 
   --ws-border: 1px solid #262626;
@@ -185,7 +196,8 @@
 
 /* ── Glass: frosted chrome on a cool ground, two opaque sheets ─────── */
 
-:root[data-surface="glass"] {
+:root[data-surface="glass"],
+.theme-preview[data-surface="glass"] {
   --r-control: 8px;
   --r-field: 8px;
   --r-seg: 10px;
@@ -263,7 +275,8 @@
   --syntax-code: #8a4500;
 }
 
-:root[data-surface="glass"][data-theme="dark"] {
+:root[data-surface="glass"][data-theme="dark"],
+.theme-preview[data-surface="glass"][data-theme="dark"] {
   --sheet-border: 1px solid rgba(255, 255, 255, 0.07);
 
   --chrome-glass: rgba(24, 29, 36, 0.58);
@@ -328,7 +341,8 @@
 
 /* Solid glass when blur is unsupported or transparency is reduced. */
 @supports not (backdrop-filter: blur(1px)) {
-  :root[data-surface="glass"] {
+  :root[data-surface="glass"],
+  .theme-preview[data-surface="glass"] {
     --blur: none;
     --chrome: var(--chrome-solid);
     --raised: var(--raised-solid);
@@ -336,7 +350,8 @@
 }
 
 @media (prefers-reduced-transparency: reduce) {
-  :root[data-surface="glass"] {
+  :root[data-surface="glass"],
+  .theme-preview[data-surface="glass"] {
     --blur: none;
     --chrome: var(--chrome-solid);
     --raised: var(--raised-solid);
@@ -345,7 +360,8 @@
 
 /* ── Material: tonal sage palette, pill controls, tonal containers ─── */
 
-:root[data-surface="material"] {
+:root[data-surface="material"],
+.theme-preview[data-surface="material"] {
   --font-ui: Roboto, system-ui, -apple-system, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
   --r-control: 999px;
   --r-field: 12px;
@@ -422,7 +438,8 @@
   --syntax-code: #3d6373;
 }
 
-:root[data-surface="material"][data-theme="dark"] {
+:root[data-surface="material"][data-theme="dark"],
+.theme-preview[data-surface="material"][data-theme="dark"] {
   --ground: #171d1a;
   --chrome: #171d1a;
   --paper: #0f1512;
@@ -478,7 +495,8 @@
 
 /* ── Fluent: Mica-like ground, one stroked content layer, accent pivot ─ */
 
-:root[data-surface="fluent"] {
+:root[data-surface="fluent"],
+.theme-preview[data-surface="fluent"] {
   --font-ui: "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
   --r-control: 4px;
   --r-field: 4px;
@@ -559,7 +577,8 @@
   --syntax-code: #8e3c00;
 }
 
-:root[data-surface="fluent"][data-theme="dark"] {
+:root[data-surface="fluent"][data-theme="dark"],
+.theme-preview[data-surface="fluent"][data-theme="dark"] {
   --ws-border: 1px solid #191919;
   --split-line: 1px solid #333333;
 
@@ -624,7 +643,8 @@
 
 /* ── Nord: Snow Storm / Polar Night layers, Frost selection ─────────── */
 
-:root[data-surface="nord"] {
+:root[data-surface="nord"],
+.theme-preview[data-surface="nord"] {
   --r-control: 4px;
   --r-field: 4px;
   --r-seg: 6px;
@@ -700,7 +720,8 @@
   --syntax-code: #4f6b3a;
 }
 
-:root[data-surface="nord"][data-theme="dark"] {
+:root[data-surface="nord"][data-theme="dark"],
+.theme-preview[data-surface="nord"][data-theme="dark"] {
   --split-line: 1px solid #3b4252;
 
   --ground: #272c36;
@@ -753,6 +774,297 @@
   --syntax-mark: #aab4c4;
   --syntax-link: #96b5d3;
   --syntax-code: #a3be8c;
+}
+
+/* ── Paper: warm paper layers, ink type, serif document identity ───── */
+
+:root[data-surface="paper"],
+.theme-preview[data-surface="paper"] {
+  --font-title: var(--font-read);
+
+  --r-control: 6px;
+  --r-field: 6px;
+  --r-seg: 8px;
+  --r-group: 10px;
+  --r-dialog: 12px;
+
+  --frame-gap: 0px;
+  --ws-border: 1px solid #e2dccf;
+  --ws-radius: 8px;
+  --ws-bg: var(--source);
+  --sheet-border: none;
+  --sheet-radius: 0px;
+  --split-line: 1px solid #e2dccf;
+
+  --ground: #f3efe6;
+  --chrome: #f3efe6;
+  --paper: #fbf8f2;
+  --source: #fbf8f2;
+  --raised: #fbf8f2;
+  --field: #fffdf9;
+  --sunken: #ebe5d9;
+  --group-bg: #f8f4ec;
+  --group-border: 1px solid #e2dccf;
+
+  --ink: #1f1a14;
+  --text: #2b251e;
+  --muted: #5e5547;
+  --faint: #6c6253;
+  --icon: #4a4236;
+  --mark-ink: #1f1a14;
+
+  --line: #e2dccf;
+  --line-strong: #d0c7b5;
+  --control-line: #bdb29d;
+
+  --hover: rgba(70, 50, 20, 0.05);
+  --press: rgba(70, 50, 20, 0.09);
+  --focus: #93361a;
+  --accent: #93361a;
+  --primary: #2b251e;
+  --on-primary: #fbf8f2;
+  --danger: #a1261b;
+  --on-danger: #ffffff;
+  --danger-soft: #f6e2db;
+
+  --btn-std-bg: transparent;
+  --btn-std-border: #cdc3b0;
+  --btn-std-shadow: none;
+  --seg-track-bg: #e9e3d6;
+  --seg-track-border: none;
+  --seg-inset: 3px;
+  --seg-active-bg: #fffdf9;
+  --seg-active-fg: #1f1a14;
+  --seg-active-shadow: 0 0 0 1px #d6cdbb, 0 1px 2px rgba(70, 50, 20, 0.08);
+  --seg-indicator: transparent;
+  --seg-divider: transparent;
+
+  --dialog-border: 1px solid #ddd5c5;
+  --shadow-pop: 0 24px 48px -16px rgba(60, 40, 15, 0.28), 0 2px 6px rgba(60, 40, 15, 0.06);
+  --backdrop: rgba(40, 30, 15, 0.32);
+  --backdrop-soft: rgba(40, 30, 15, 0.07);
+
+  --selection: rgba(147, 54, 26, 0.16);
+  --edit-select: #ead6c8;
+  --edit-select-blur: #ebe4d7;
+  --caret: #93361a;
+  --active-line: rgba(70, 50, 20, 0.045);
+  --scroll-thumb: rgba(60, 40, 15, 0.26);
+
+  --syntax-heading: #8a3216;
+  --syntax-mark: #6c6253;
+  --syntax-link: #245a73;
+  --syntax-code: #6b4a12;
+}
+
+/* Paper dark: lamplit umber layers, parchment ink, a sienna accent. */
+:root[data-surface="paper"][data-theme="dark"],
+.theme-preview[data-surface="paper"][data-theme="dark"] {
+  --ws-border: 1px solid #36302a;
+  --split-line: 1px solid #36302a;
+
+  --ground: #191714;
+  --chrome: #191714;
+  --paper: #211e1a;
+  --source: #211e1a;
+  --raised: #2a2621;
+  --field: #1c1a17;
+  --sunken: #2a2621;
+  --group-bg: #211e1a;
+  --group-border: 1px solid #36302a;
+
+  --ink: #f3eee5;
+  --text: #e6dfd3;
+  --muted: #b4aa99;
+  --faint: #9d9382;
+  --icon: #cfc6b6;
+  --mark-ink: #f3eee5;
+
+  --line: #36302a;
+  --line-strong: #4a4339;
+  --control-line: #645a4c;
+
+  --hover: rgba(255, 245, 225, 0.06);
+  --press: rgba(255, 245, 225, 0.1);
+  --focus: #e5a07a;
+  --accent: #e5a07a;
+  --primary: #efe8dc;
+  --on-primary: #1f1a14;
+  --danger: #ff9a8a;
+  --on-danger: #2b0a05;
+  --danger-soft: rgba(255, 154, 138, 0.12);
+
+  --btn-std-border: #4f473c;
+  --seg-track-bg: #2a2621;
+  --seg-active-bg: #3b352d;
+  --seg-active-fg: #f3eee5;
+  --seg-active-shadow: 0 0 0 1px #4f473c;
+
+  --dialog-border: 1px solid #3d362e;
+  --shadow-pop: 0 24px 48px -16px rgba(0, 0, 0, 0.72);
+  --backdrop: rgba(0, 0, 0, 0.56);
+  --backdrop-soft: rgba(0, 0, 0, 0.2);
+
+  --selection: rgba(229, 160, 122, 0.26);
+  --edit-select: #4b3a2d;
+  --edit-select-blur: #36302a;
+  --caret: #e5a07a;
+  --active-line: rgba(255, 245, 225, 0.04);
+  --scroll-thumb: rgba(243, 238, 229, 0.24);
+
+  --syntax-heading: #f0b48a;
+  --syntax-mark: #9d9382;
+  --syntax-link: #9cc7d9;
+  --syntax-code: #dcc27e;
+}
+
+/* ── Terminal: square controls, technical type, restrained green ───── */
+
+:root[data-surface="terminal"],
+.theme-preview[data-surface="terminal"] {
+  --font-title: var(--font-mono);
+  --font-meta: var(--font-mono);
+
+  --r-control: 0px;
+  --r-field: 0px;
+  --r-seg: 0px;
+  --r-group: 0px;
+  --r-dialog: 0px;
+
+  --frame-gap: 0px;
+  --ws-border: 1px solid #c3ccc2;
+  --ws-radius: 0px;
+  --ws-bg: var(--source);
+  --sheet-border: none;
+  --sheet-radius: 0px;
+  --split-line: 1px solid #c3ccc2;
+
+  --ground: #eef1ed;
+  --chrome: #eef1ed;
+  --paper: #fafbf9;
+  --source: #fafbf9;
+  --raised: #fafbf9;
+  --field: #ffffff;
+  --sunken: #e3e8e2;
+  --group-bg: #f6f8f5;
+  --group-border: 1px solid #d3dad2;
+
+  --ink: #0e1a12;
+  --text: #18231b;
+  --muted: #46524a;
+  --faint: #59655c;
+  --icon: #2f3b33;
+  --mark-ink: #0e1a12;
+
+  --line: #dbe1da;
+  --line-strong: #c3ccc2;
+  --control-line: #98a39a;
+
+  --hover: rgba(14, 26, 18, 0.05);
+  --press: rgba(14, 26, 18, 0.09);
+  --focus: #1b6935;
+  --focus-offset: 1px;
+  --accent: #1b6935;
+  --primary: #1b6935;
+  --on-primary: #ffffff;
+  --danger: #b3261e;
+  --on-danger: #ffffff;
+  --danger-soft: #fbe4e1;
+
+  --btn-std-bg: transparent;
+  --btn-std-border: #98a39a;
+  --btn-std-shadow: none;
+  --seg-track-bg: transparent;
+  --seg-track-border: 1px solid #98a39a;
+  --seg-inset: 0px;
+  --seg-active-bg: #dcebdf;
+  --seg-active-fg: #0e1a12;
+  --seg-active-shadow: inset 0 -2px 0 #1b6935;
+  --seg-indicator: transparent;
+  --seg-divider: #c3ccc2;
+
+  --dialog-border: 1px solid #98a39a;
+  --dialog-foot-bg: #eef1ed;
+  --dialog-foot-line: 1px solid #d3dad2;
+  --shadow-pop: 0 16px 32px -12px rgba(14, 26, 18, 0.24);
+  --backdrop: rgba(14, 26, 18, 0.3);
+  --backdrop-soft: rgba(14, 26, 18, 0.06);
+
+  --selection: rgba(27, 105, 53, 0.18);
+  --edit-select: #cde3d2;
+  --edit-select-blur: #e0e6df;
+  --caret: #1b6935;
+  --active-line: rgba(27, 105, 53, 0.05);
+  --scroll-thumb: rgba(14, 26, 18, 0.28);
+
+  --syntax-heading: #1b6935;
+  --syntax-mark: #59655c;
+  --syntax-link: #1f5b8f;
+  --syntax-code: #7a4a00;
+}
+
+/* Terminal dark: green-black layers, sage accent, no glow. */
+:root[data-surface="terminal"][data-theme="dark"],
+.theme-preview[data-surface="terminal"][data-theme="dark"] {
+  --ws-border: 1px solid #263029;
+  --split-line: 1px solid #263029;
+
+  --ground: #0b0e0c;
+  --chrome: #0b0e0c;
+  --paper: #101411;
+  --source: #101411;
+  --raised: #151a16;
+  --field: #0b0e0c;
+  --sunken: #1a201b;
+  --group-bg: #101411;
+  --group-border: 1px solid #263029;
+
+  --ink: #e4ebe5;
+  --text: #d0d9d2;
+  --muted: #9eaaa1;
+  --faint: #828f85;
+  --icon: #bcc7be;
+  --mark-ink: #e4ebe5;
+
+  --line: #1f2621;
+  --line-strong: #2f3a32;
+  --control-line: #56635a;
+
+  --hover: rgba(228, 235, 229, 0.06);
+  --press: rgba(228, 235, 229, 0.1);
+  --focus: #7fc493;
+  --accent: #7fc493;
+  --primary: #7fc493;
+  --on-primary: #08160c;
+  --danger: #ff8f85;
+  --on-danger: #2b0603;
+  --danger-soft: rgba(255, 143, 133, 0.12);
+
+  --btn-std-border: #56635a;
+  --seg-track-border: 1px solid #56635a;
+  --seg-active-bg: #1c2a20;
+  --seg-active-fg: #e4ebe5;
+  --seg-active-shadow: inset 0 -2px 0 #7fc493;
+  --seg-divider: #2f3a32;
+
+  --dialog-border: 1px solid #3a463d;
+  --dialog-foot-bg: #0b0e0c;
+  --dialog-foot-line: 1px solid #1f2621;
+  --shadow-pop: 0 16px 32px -12px rgba(0, 0, 0, 0.75);
+  --backdrop: rgba(0, 0, 0, 0.6);
+  --backdrop-soft: rgba(0, 0, 0, 0.2);
+
+  --selection: rgba(127, 196, 147, 0.24);
+  --edit-select: #234430;
+  --edit-select-blur: #1f2621;
+  --caret: #7fc493;
+  --active-line: rgba(127, 196, 147, 0.05);
+  --scroll-thumb: rgba(228, 235, 229, 0.22);
+
+  --syntax-heading: #8fd4a3;
+  --syntax-mark: #828f85;
+  --syntax-link: #8ab8e6;
+  --syntax-code: #e0c27a;
 }
 
 /* ── Theme switch: circular reveal runs on the root snapshot only ──── */
@@ -1040,12 +1352,15 @@ select {
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 0;
 }
 
+/* The filename is the window title; Paper sets it in the reading serif and
+   Terminal in the mono stack through --font-title. */
 .doc-name {
   margin: 0;
   overflow: hidden;
+  font-family: var(--font-title);
   font-size: var(--fs-lg);
   font-weight: 600;
   line-height: 22px;
@@ -1059,9 +1374,10 @@ select {
 .doc-meta {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 6px;
   min-width: 0;
   margin: 0;
+  font-family: var(--font-meta);
   font-size: var(--fs-xs);
   line-height: 16px;
   color: var(--muted);
@@ -1074,11 +1390,15 @@ select {
   text-overflow: ellipsis;
 }
 
+/* Save state is a quiet chip: hollow dot while clean, a tinted chip with a
+   filled dot while dirty. Padding stays constant between states. */
 .dirty-state {
   flex: none;
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  padding: 1px 7px 1px 6px;
+  border-radius: var(--r-control);
   white-space: nowrap;
 }
 
@@ -1091,6 +1411,7 @@ select {
 }
 
 .dirty-state[data-dirty="true"] {
+  background: color-mix(in srgb, var(--accent) 13%, transparent);
   color: var(--ink);
   font-weight: 500;
 }
@@ -1129,12 +1450,12 @@ select {
 
 .toolbar:has(#dirty-state[data-dirty="true"]) #save-file:enabled .kbd {
   border-color: color-mix(in srgb, var(--on-primary) 30%, transparent);
-  color: color-mix(in srgb, var(--on-primary) 80%, transparent);
+  color: var(--on-primary);
 }
 
 @media (hover: hover) {
   .toolbar:has(#dirty-state[data-dirty="true"]) #save-file:hover:enabled {
-    background-image: linear-gradient(color-mix(in srgb, var(--on-primary) 12%, transparent), color-mix(in srgb, var(--on-primary) 12%, transparent));
+    background-image: linear-gradient(color-mix(in srgb, var(--on-primary) 6%, transparent), color-mix(in srgb, var(--on-primary) 6%, transparent));
   }
 }
 
@@ -1340,10 +1661,17 @@ select {
 
 .pane-title {
   margin: 0;
+  font-family: var(--font-meta);
   font-size: var(--fs-xs);
   font-weight: 600;
   line-height: 16px;
+  letter-spacing: 0.01em;
   color: var(--muted);
+}
+
+/* The pane holding focus marks its head rule in the accent. */
+.source-pane:focus-within .source-head {
+  border-bottom-color: var(--accent);
 }
 
 .source-pane:focus-within .pane-title {
@@ -1441,6 +1769,44 @@ select {
   border-left: 2px solid var(--caret);
 }
 
+/* ── Editor profiles (html[data-editor-type]) ──────────────────────────
+   Root reconfigures CodeMirror (gutter, active line, syntax); these rules
+   only shape the column. Code keeps the gutter layout above. Prose is a
+   narrower centred column; Plain fills the pane. Font and size stay the
+   user's choice in every profile. */
+
+:root[data-editor-type="prose"] #editor .cm-scroller {
+  justify-content: center;
+}
+
+:root[data-editor-type="prose"] #editor .cm-content {
+  max-width: var(--prose-max);
+  padding-top: 28px;
+}
+
+:root[data-editor-type="prose"] #editor .cm-line {
+  padding: 0 32px;
+}
+
+:root[data-editor-type="prose"] .source-head .pane-head-inner {
+  max-width: var(--prose-max);
+  margin-inline: auto;
+  padding-inline: 32px;
+}
+
+:root[data-editor-type="plain"] #editor .cm-content {
+  max-width: none;
+}
+
+:root[data-editor-type="plain"] #editor .cm-line {
+  padding: 0 24px;
+}
+
+:root[data-editor-type="plain"] .source-head .pane-head-inner {
+  max-width: none;
+  padding-inline: 24px;
+}
+
 /* ── Footer ────────────────────────────────────────────────────────── */
 
 .footer {
@@ -1452,6 +1818,7 @@ select {
   padding: 0 16px 8px;
   background: var(--chrome);
   backdrop-filter: var(--blur);
+  font-family: var(--font-meta);
   font-size: var(--fs-xs);
   line-height: 16px;
   color: var(--muted);
@@ -1473,21 +1840,25 @@ select {
   overflow-wrap: anywhere;
 }
 
+/* Counts read as one ruled group: words | lines | cursor | local only. */
 .footer-right {
   flex: none;
   display: flex;
   align-items: center;
-  gap: 16px;
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
+}
+
+.footer-right > * + * {
+  margin-left: 12px;
+  padding-left: 12px;
+  border-left: 1px solid var(--line-strong);
 }
 
 .footer-local {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding-left: 16px;
-  border-left: 1px solid var(--line-strong);
 }
 
 .footer-local > .icon {
@@ -1574,6 +1945,7 @@ select {
 
 .dialog-title {
   margin: 0 0 8px;
+  font-family: var(--font-title);
   font-size: var(--fs-title);
   font-weight: 600;
   line-height: 1.3;
@@ -1661,10 +2033,14 @@ select {
   width: min(400px, calc(100vw - 32px));
 }
 
-/* Preferences keep the close control visible while the body scrolls. */
+/* Preferences: centred at every viewport size (native modal inset + auto
+   margins, no edge anchor), a fixed head with the close button and a body
+   that scrolls. The live window stays visible behind a soft backdrop. */
 .dialog-prefs {
-  width: min(520px, calc(100vw - 24px));
-  max-height: calc(100dvh - 24px);
+  inset: 0;
+  margin: auto;
+  width: min(960px, calc(100vw - 32px));
+  max-height: calc(100dvh - 32px);
   overflow: hidden;
 }
 
@@ -1683,7 +2059,8 @@ select {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 10px 10px 10px var(--dialog-pad-x);
+  min-height: 56px;
+  padding: 8px 10px 8px var(--dialog-pad-x);
   border-bottom: 1px solid var(--line);
 }
 
@@ -1692,16 +2069,31 @@ select {
 }
 
 .prefs-body {
+  container: prefs / inline-size;
   flex: 1 1 auto;
   min-height: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
-  padding: 4px var(--dialog-pad-x) 20px;
+  padding: 18px var(--dialog-pad-x) 22px;
   scrollbar-width: thin;
 }
 
+/* One column by default; two from 820 px of body width. Aplikace and the
+   storage note span both columns; Náhled Markdownu and Editor sit side by
+   side, each a self-contained group. */
+.prefs-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+  gap: 22px 20px;
+}
+
+.pref-section {
+  min-width: 0;
+}
+
 .pref-section-title {
-  margin: 18px 0 8px;
+  margin: 0 0 8px 2px;
   font-size: var(--fs-md);
   font-weight: 600;
   line-height: 1.3;
@@ -1709,6 +2101,7 @@ select {
 }
 
 .pref-group {
+  container: group / inline-size;
   border: var(--group-border);
   border-radius: var(--r-group);
   background: var(--group-bg);
@@ -1718,7 +2111,7 @@ select {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(160px, 200px);
   align-items: center;
-  gap: 8px 16px;
+  gap: 10px 16px;
   padding: 12px 14px;
 }
 
@@ -1726,9 +2119,59 @@ select {
   border-top: 1px solid var(--line);
 }
 
+/* A row with a card gallery: label and select on top, cards across. */
+.pref-row-cards {
+  align-items: start;
+}
+
+.pref-row > .card-grid,
+.pref-row > .font-sample {
+  grid-column: 1 / -1;
+}
+
 .pref-pair {
   grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
   align-items: end;
+}
+
+@container prefs (min-width: 820px) {
+  .prefs-layout {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .pref-section-wide,
+  .prefs-layout > .pref-note {
+    grid-column: 1 / -1;
+  }
+
+  /* Language and mode share the first line of Aplikace. */
+  .pref-group-split {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .pref-group-split > .pref-row:nth-child(2) {
+    border-top: 0;
+    border-left: 1px solid var(--line);
+  }
+
+  .pref-group-split > .pref-row-cards {
+    grid-column: 1 / -1;
+  }
+}
+
+/* Rows stack inside narrow groups; font/size pairs stack a little later so
+   the longest font label keeps the full row width. */
+@container group (max-width: 420px) {
+  .pref-row:not(.pref-pair) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@container group (max-width: 360px) {
+  .pref-pair {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 .pref-text,
@@ -1764,15 +2207,492 @@ select {
 :root[data-surface="glass"] .surface-note[data-for="glass"],
 :root[data-surface="material"] .surface-note[data-for="material"],
 :root[data-surface="fluent"] .surface-note[data-for="fluent"],
-:root[data-surface="nord"] .surface-note[data-for="nord"] {
+:root[data-surface="nord"] .surface-note[data-for="nord"],
+:root[data-surface="paper"] .surface-note[data-for="paper"],
+:root[data-surface="terminal"] .surface-note[data-for="terminal"] {
   display: block;
 }
 
 .pref-note {
-  margin: 16px 0 0;
+  margin: 0 2px;
   font-size: var(--fs-xs);
   line-height: 1.5;
   color: var(--muted);
+}
+
+/* ── Setting cards ─────────────────────────────────────────────────────
+   Buttons that select the option named by data-setting/data-value. Root
+   keeps aria-pressed in sync with the native select. Selection is shown by
+   an accent edge plus a check mark, never by colour alone. */
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.card-grid-markdown {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.card-grid-editor {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@container group (min-width: 421px) {
+  .card-grid-theme {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .card-grid-markdown,
+  .card-grid-editor {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@container group (min-width: 760px) {
+  .card-grid-theme {
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+  }
+
+  .card-grid-markdown {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+}
+
+.setting-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  margin: 0;
+  padding: 4px 4px 8px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-group);
+  background-color: var(--field);
+  color: var(--ink);
+  text-align: start;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  transition: border-color 150ms ease, box-shadow 150ms ease, transform 150ms var(--ease-out);
+}
+
+.setting-card > [aria-hidden="true"] {
+  grid-area: pic;
+}
+
+@media (hover: hover) {
+  .setting-card:hover {
+    border-color: var(--control-line);
+    background-image: linear-gradient(var(--hover), var(--hover));
+  }
+}
+
+.setting-card:active {
+  transform: scale(0.985);
+}
+
+.setting-card[aria-pressed="true"] {
+  border-color: var(--accent);
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+
+.setting-card-label {
+  grid-area: label;
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  min-width: 0;
+  padding: 0 4px;
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  line-height: 1.3;
+  overflow-wrap: break-word;
+}
+
+.setting-card[aria-pressed="true"] .setting-card-label::after {
+  content: "";
+  flex: none;
+  width: 5px;
+  height: 9px;
+  margin: 1px 3px 0 auto;
+  border: solid var(--accent);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.setting-card-hint {
+  grid-area: hint;
+  min-width: 0;
+  padding: 0 4px;
+  font-size: var(--fs-xs);
+  line-height: 1.4;
+  color: var(--muted);
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
+/* Narrow groups lay editor cards out as rows: picture left, text right. */
+.card-grid-editor .setting-card {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr);
+  grid-template-areas: "pic label" "pic hint";
+  align-content: center;
+  column-gap: 10px;
+  row-gap: 2px;
+  padding: 4px;
+}
+
+.card-grid-editor .setting-card-label {
+  align-self: end;
+}
+
+.card-grid-editor .setting-card-hint {
+  align-self: start;
+}
+
+@container group (min-width: 421px) {
+  .card-grid-editor .setting-card {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "pic" "label" "hint";
+    align-content: start;
+    row-gap: 4px;
+    padding: 4px 4px 8px;
+  }
+}
+
+@media (forced-colors: active) {
+  .setting-card[aria-pressed="true"] {
+    outline: 2px solid Highlight;
+    outline-offset: -3px;
+  }
+
+  .setting-card[aria-pressed="true"] .setting-card-label::after {
+    border-color: Highlight;
+  }
+}
+
+/* ── Theme miniature: a real window in its own style ───────────────────
+   .theme-preview carries a fixed data-surface (and data-theme mirrored by
+   root), so every value below resolves from that style's own tokens. */
+
+.theme-preview {
+  display: flex;
+  flex-direction: column;
+  height: 70px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: max(0px, calc(min(var(--r-group), 12px) - 3px));
+  background: var(--ground);
+  color: var(--text);
+  font-family: var(--font-ui);
+  forced-color-adjust: none;
+  pointer-events: none;
+}
+
+.tp-bar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 17px;
+  padding: 0 5px 0 6px;
+  background: var(--chrome);
+}
+
+.tp-mark {
+  display: block;
+  flex: none;
+  color: var(--mark-ink);
+}
+
+.tp-name {
+  font: 600 9px / 1 var(--font-title);
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+.tp-seg {
+  display: flex;
+  gap: 1px;
+  width: 24px;
+  height: 9px;
+  margin-left: auto;
+  padding: 1px;
+  border: var(--seg-track-border);
+  border-radius: min(var(--r-seg), 5px);
+  background: var(--seg-track-bg);
+}
+
+.tp-seg > span {
+  flex: 1;
+  border-radius: inherit;
+}
+
+.tp-seg > .tp-on {
+  border-bottom: 1px solid var(--seg-indicator);
+  background: var(--seg-active-bg);
+  box-shadow: var(--seg-active-shadow);
+}
+
+.tp-save {
+  flex: none;
+  width: 13px;
+  height: 9px;
+  border-radius: min(var(--r-control), 4px);
+  background: var(--primary);
+}
+
+.tp-main {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  padding: 0 4px;
+}
+
+.tp-ws {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  gap: calc(var(--frame-gap) / 2);
+  overflow: hidden;
+  border: var(--ws-border);
+  border-radius: calc(var(--ws-radius) / 2);
+  background: var(--ws-bg);
+}
+
+.tp-pane {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 5px;
+  border: var(--sheet-border);
+  border-radius: calc(var(--sheet-radius) / 2);
+  background: var(--source);
+}
+
+.tp-src {
+  border-right: var(--split-line);
+}
+
+.tp-doc {
+  background: var(--paper);
+}
+
+.tp-l {
+  display: block;
+  height: 3px;
+  border-radius: 1px;
+  background: color-mix(in srgb, var(--text) 36%, transparent);
+}
+
+.tp-pane > .tp-l:last-child {
+  width: 70%;
+}
+
+.tp-h {
+  width: 60%;
+  background: var(--syntax-heading);
+}
+
+.tp-act {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  margin: -1px -5px;
+  padding: 1px 5px;
+  background: var(--active-line);
+}
+
+.tp-act > .tp-l {
+  width: 72%;
+}
+
+.tp-caret {
+  width: 1px;
+  height: 6px;
+  background: var(--caret);
+}
+
+.tp-row {
+  display: flex;
+  gap: 2px;
+}
+
+.tp-row > .tp-l {
+  flex: 1;
+}
+
+.tp-k {
+  width: 4px;
+  height: 3px;
+  background: var(--syntax-mark);
+}
+
+.tp-dh {
+  width: 66%;
+  height: 4px;
+  background: var(--ink);
+}
+
+.tp-foot {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 9px;
+  padding: 0 6px;
+  background: var(--chrome);
+}
+
+.tp-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.tp-foot > .tp-l {
+  width: 30%;
+  height: 2px;
+  background: color-mix(in srgb, var(--muted) 60%, transparent);
+}
+
+/* ── Editor-profile miniature, drawn in the current style ──────────── */
+
+.editor-preview {
+  display: flex;
+  height: 64px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: max(0px, calc(min(var(--r-group), 12px) - 3px));
+  background: var(--source);
+  color: var(--text);
+  font: 9px / 12px var(--editor-font, var(--font-mono));
+  forced-color-adjust: none;
+  pointer-events: none;
+}
+
+.ep-gutter {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  width: 18px;
+  padding: 6px 4px 0 0;
+  color: var(--faint);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.ep-gutter > .ep-on {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.ep-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 6px 6px 0 4px;
+}
+
+.editor-preview[data-type="prose"] .ep-text {
+  flex: 0 1 68%;
+  margin-inline: auto;
+  padding-inline: 0;
+}
+
+.editor-preview[data-type="plain"] .ep-text {
+  padding-inline: 8px;
+}
+
+.ep-line {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  height: 12px;
+}
+
+.ep-active {
+  margin: 0 -6px 0 -4px;
+  padding: 0 6px 0 4px;
+  background: var(--active-line);
+}
+
+.ep-mark {
+  color: var(--syntax-mark);
+}
+
+.ep-bar {
+  display: block;
+  height: 3px;
+  border-radius: 1px;
+  background: color-mix(in srgb, var(--text) 40%, transparent);
+}
+
+.ep-h { width: 55%; background: var(--syntax-heading); }
+.ep-link { width: 48%; background: var(--syntax-link); }
+.ep-code { width: 22%; background: var(--syntax-code); }
+.ep-w1 { width: 70%; }
+.ep-w2 { width: 40%; }
+
+.ep-caret {
+  width: 1px;
+  height: 9px;
+  background: var(--caret);
+}
+
+.editor-preview[data-type="plain"] :is(.ep-h, .ep-link, .ep-code) {
+  background: color-mix(in srgb, var(--text) 40%, transparent);
+}
+
+.editor-preview[data-type="plain"] .ep-mark {
+  color: var(--text);
+}
+
+/* ── Live font samples ─────────────────────────────────────────────────
+   Read the user overrides (--editor-*, --preview-*) and never set them. The
+   preview sample's palette and type are in preview.css. */
+
+.font-sample {
+  min-width: 0;
+  overflow: hidden;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-field);
+}
+
+.editor-font-sample {
+  display: grid;
+  background: var(--source);
+  color: var(--text);
+  font-family: var(--editor-font, var(--font-mono));
+  font-size: var(--editor-size, 14px);
+  line-height: var(--code-lh);
+  font-variant-ligatures: none;
+}
+
+.editor-font-sample .sample-line {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.editor-font-sample .sample-mark {
+  color: var(--syntax-mark);
+}
+
+.editor-font-sample .sample-heading {
+  color: var(--syntax-heading);
+}
+
+.editor-font-sample .sample-code {
+  color: var(--syntax-code);
 }
 
 .select {
@@ -1914,13 +2834,23 @@ select {
     padding: 0 6px 0 4px;
   }
 
+  :root[data-editor-type="prose"] #editor .cm-line,
+  :root[data-editor-type="plain"] #editor .cm-line {
+    padding: 0 16px;
+  }
+
+  :root[data-editor-type="prose"] #editor .cm-content {
+    padding-top: 18px;
+  }
+
   .footer {
     gap: 12px;
     padding: 0 12px 6px;
   }
 
-  .footer-right {
-    gap: 12px;
+  .footer-right > * + * {
+    margin-left: 10px;
+    padding-left: 10px;
   }
 
   #line-count {
@@ -1929,6 +2859,15 @@ select {
 
   .dialog {
     --dialog-pad-x: 18px;
+  }
+
+  .dialog-prefs {
+    width: calc(100vw - 24px);
+    max-height: calc(100dvh - 24px);
+  }
+
+  .prefs-body {
+    padding-top: 14px;
   }
 
   .dialog-actions .btn {
@@ -1953,16 +2892,27 @@ select {
   .toolbar-actions .btn > .icon {
     display: none;
   }
+}
 
-  .pref-row:not(.pref-pair) {
-    grid-template-columns: minmax(0, 1fr);
+/* Short windows: a tighter settings head keeps more of the body visible. */
+@media (max-height: 520px) {
+  .prefs-head {
+    min-height: 48px;
+    padding-block: 4px;
+  }
+
+  .prefs-body {
+    padding-top: 12px;
   }
 }
 
-@media (max-width: 360px) {
-  .pref-pair {
-    grid-template-columns: minmax(0, 1fr);
-  }
+.diagram-renderer {
+  position: fixed;
+  left: -10000px;
+  width: 1024px;
+  height: 768px;
+  visibility: hidden;
+  pointer-events: none;
 }
 
 /* ── Reduced motion ────────────────────────────────────────────────── */
@@ -1977,7 +2927,8 @@ select {
 
   .btn:active:enabled,
   .icon-btn:active,
-  .seg:active {
+  .seg:active,
+  .setting-card:active {
     transform: none;
   }
 }

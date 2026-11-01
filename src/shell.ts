@@ -15,6 +15,54 @@ const icons = {
 const mark = (size: number, className: string): string =>
   `<svg class="${className}" viewBox="0 0 32 32" width="${size}" height="${size}" aria-hidden="true"><path fill="currentColor" d="M4 4h15v5H9v11H4zM28 28H13v-5h10V12h5z"/></svg>`;
 
+/* Settings cards. Each is a visual shortcut for the native select named in
+   data-setting; root dispatches the select change and keeps aria-pressed in
+   sync. Miniatures are decorative (aria-hidden) and carry their own fixed
+   data-surface / data-preview-theme, so they read the same palette tokens as
+   the real window and pane. Only the visible label is translated. */
+const cardLabel = (label: string, translated: boolean): string =>
+  `<span class="setting-card-label"${translated ? ` data-i18n="${label}"` : ''}>${label}</span>`;
+
+const themeCard = (value: string, label: string, translated = false): string => `
+<button type="button" class="setting-card" data-setting="surface-setting" data-value="${value}" aria-pressed="false">
+  <span class="theme-preview" data-surface="${value}" aria-hidden="true">
+    <span class="tp-bar">${mark(8, 'tp-mark')}<span class="tp-name">Aa</span><span class="tp-seg"><span></span><span class="tp-on"></span><span></span></span><span class="tp-save"></span></span>
+    <span class="tp-main"><span class="tp-ws">
+      <span class="tp-pane tp-src"><span class="tp-l tp-h"></span><span class="tp-act"><span class="tp-l"></span><span class="tp-caret"></span></span><span class="tp-row"><span class="tp-k"></span><span class="tp-l"></span></span><span class="tp-l"></span></span>
+      <span class="tp-pane tp-doc"><span class="tp-l tp-dh"></span><span class="tp-l"></span><span class="tp-l"></span><span class="tp-l"></span></span>
+    </span></span>
+    <span class="tp-foot"><span class="tp-dot"></span><span class="tp-l"></span></span>
+  </span>
+  ${cardLabel(label, translated)}
+</button>`;
+
+const markdownCard = (value: string, label: string, translated = false): string => `
+<button type="button" class="setting-card" data-setting="preview-theme-setting" data-value="${value}" aria-pressed="false">
+  <span class="markdown-style-preview mini-doc" data-preview-theme="${value}" aria-hidden="true">
+    <span class="md-h">Aa</span>
+    <span class="md-l"></span>
+    <span class="md-row"><span class="md-l"></span><span class="md-link"></span><span class="md-code"></span></span>
+    <span class="md-quote"><span class="md-l"></span></span>
+    <span class="md-blocks"><span class="md-pre"><span class="md-tk md-tk-k"></span><span class="md-tk md-tk-s"></span><span class="md-tk md-tk-c"></span></span><span class="md-table"><span class="md-th"></span><span class="md-th"></span><span></span><span></span></span></span>
+  </span>
+  ${cardLabel(label, translated)}
+</button>`;
+
+const editorCard = (value: 'code' | 'prose' | 'plain', label: string, hint: string): string => `
+<button type="button" class="setting-card" data-setting="editor-type-setting" data-value="${value}" aria-pressed="false">
+  <span class="editor-preview" data-type="${value}" aria-hidden="true">
+    ${value === 'code' ? '<span class="ep-gutter"><span>1</span><span class="ep-on">2</span><span>3</span><span>4</span></span>' : ''}
+    <span class="ep-text">
+      <span class="ep-line"><span class="ep-mark">#</span><span class="ep-bar ep-h"></span></span>
+      <span class="ep-line${value === 'code' ? ' ep-active' : ''}"><span class="ep-bar ep-w1"></span><span class="ep-caret"></span></span>
+      <span class="ep-line"><span class="ep-mark">-</span><span class="ep-bar ep-link"></span></span>
+      <span class="ep-line"><span class="ep-bar ep-code"></span><span class="ep-bar ep-w2"></span></span>
+    </span>
+  </span>
+  <span class="setting-card-label" data-i18n="${label}">${label}</span>
+  <span class="setting-card-hint" data-i18n="${hint}">${hint}</span>
+</button>`;
+
 export const shell = String.raw`
 <header class="toolbar" aria-label="Hlavní panel nástrojů" data-i18n-aria-label="Hlavní panel nástrojů">
   <div class="brand">
@@ -128,9 +176,10 @@ export const shell = String.raw`
   </div>
 
   <div class="prefs-body">
-    <section class="pref-section" aria-labelledby="pref-app-title">
+   <div class="prefs-layout">
+    <section class="pref-section pref-section-wide" aria-labelledby="pref-app-title">
       <h3 id="pref-app-title" class="pref-section-title" data-i18n="Aplikace">Aplikace</h3>
-      <div class="pref-group">
+      <div class="pref-group pref-group-split">
         <div class="pref-row">
           <div class="pref-text">
             <label class="pref-label" for="language-setting" data-i18n="Jazyk">Jazyk</label>
@@ -155,7 +204,7 @@ export const shell = String.raw`
           </span>
         </div>
 
-        <div class="pref-row">
+        <div class="pref-row pref-row-cards">
           <div class="pref-text">
             <label class="pref-label" for="surface-setting" data-i18n="Styl rozhraní">Styl rozhraní</label>
             <p class="pref-hint surface-note" data-for="minimal" data-i18n="Černá a bílá, tenké linky, nic navíc.">Černá a bílá, tenké linky, nic navíc.</p>
@@ -163,6 +212,8 @@ export const shell = String.raw`
             <p class="pref-hint surface-note" data-for="material" data-i18n="Měkké tvary a tlumené zelené tóny.">Měkké tvary a tlumené zelené tóny.</p>
             <p class="pref-hint surface-note" data-for="fluent" data-i18n="Klidné plochy ve stylu Windows, jemné obrysy a modrý akcent.">Klidné plochy ve stylu Windows, jemné obrysy a modrý akcent.</p>
             <p class="pref-hint surface-note" data-for="nord" data-i18n="Arktické barvy: sněhově světlé nebo polárně tmavé vrstvy s mrazivým akcentem.">Arktické barvy: sněhově světlé nebo polárně tmavé vrstvy s mrazivým akcentem.</p>
+            <p class="pref-hint surface-note" data-for="paper" data-i18n="Papírové plochy a teplý inkoust.">Papírové plochy a teplý inkoust.</p>
+            <p class="pref-hint surface-note" data-for="terminal" data-i18n="Ostré hrany, zelený akcent a technické písmo.">Ostré hrany, zelený akcent a technické písmo.</p>
           </div>
           <span class="select">
             <select id="surface-setting">
@@ -171,8 +222,19 @@ export const shell = String.raw`
               <option value="material">Material You</option>
               <option value="fluent">Fluent</option>
               <option value="nord">Nord</option>
+              <option value="paper" data-i18n="Papír">Papír</option>
+              <option value="terminal" data-i18n="Terminál">Terminál</option>
             </select>
           </span>
+          <div class="card-grid card-grid-theme" role="group" aria-label="Styl rozhraní" data-i18n-aria-label="Styl rozhraní">
+            ${themeCard('minimal', 'Minimal')}
+            ${themeCard('glass', 'Glass')}
+            ${themeCard('material', 'Material You')}
+            ${themeCard('fluent', 'Fluent')}
+            ${themeCard('nord', 'Nord')}
+            ${themeCard('paper', 'Papír', true)}
+            ${themeCard('terminal', 'Terminál', true)}
+          </div>
         </div>
       </div>
     </section>
@@ -191,7 +253,7 @@ export const shell = String.raw`
           </select></span>
         </div>
 
-        <div class="pref-row">
+        <div class="pref-row pref-row-cards">
           <div class="pref-text">
             <label class="pref-label" for="preview-theme-setting" data-i18n="Styl náhledu">Styl náhledu</label>
             <p id="preview-theme-hint" class="pref-hint" data-i18n="Platí jen pro náhled, nezávisle na stylu rozhraní.">Platí jen pro náhled, nezávisle na stylu rozhraní.</p>
@@ -202,8 +264,18 @@ export const shell = String.raw`
               <option value="vscode">VS Code</option>
               <option value="reading" data-i18n="Čtení">Čtení</option>
               <option value="nord">Nord</option>
+              <option value="paper" data-i18n="Papír">Papír</option>
+              <option value="terminal" data-i18n="Terminál">Terminál</option>
             </select>
           </span>
+          <div class="card-grid card-grid-markdown" role="group" aria-label="Styl náhledu" data-i18n-aria-label="Styl náhledu">
+            ${markdownCard('github', 'GitHub')}
+            ${markdownCard('vscode', 'VS Code')}
+            ${markdownCard('reading', 'Čtení', true)}
+            ${markdownCard('nord', 'Nord')}
+            ${markdownCard('paper', 'Papír', true)}
+            ${markdownCard('terminal', 'Terminál', true)}
+          </div>
         </div>
 
         <div class="pref-row pref-pair">
@@ -232,6 +304,10 @@ export const shell = String.raw`
               </select>
             </span>
           </div>
+          <div class="font-sample preview-font-sample markdown-style-preview" data-follow-preview data-preview-theme="github" aria-hidden="true">
+            <span class="sample-heading">Margin</span>
+            <span class="sample-text">Aa Bb Čč Ää 0123 <code class="sample-code">x = 1</code></span>
+          </div>
         </div>
       </div>
     </section>
@@ -239,13 +315,20 @@ export const shell = String.raw`
     <section class="pref-section" aria-labelledby="pref-editor-title">
       <h3 id="pref-editor-title" class="pref-section-title" data-i18n="Editor">Editor</h3>
       <div class="pref-group">
-        <div class="pref-row">
-          <label class="pref-label" for="editor-type-setting" data-i18n="Typ editoru">Typ editoru</label>
+        <div class="pref-row pref-row-cards">
+          <div class="pref-text">
+            <label class="pref-label" for="editor-type-setting" data-i18n="Typ editoru">Typ editoru</label>
+          </div>
           <span class="select"><select id="editor-type-setting">
             <option value="code" data-i18n="Kód">Kód</option>
             <option value="prose" data-i18n="Psaní">Psaní</option>
             <option value="plain" data-i18n="Prostý text">Prostý text</option>
           </select></span>
+          <div class="card-grid card-grid-editor" role="group" aria-label="Typ editoru" data-i18n-aria-label="Typ editoru">
+            ${editorCard('code', 'Kód', 'Čísla řádků a zvýraznění syntaxe.')}
+            ${editorCard('prose', 'Psaní', 'Klidné psaní bez čísel řádků.')}
+            ${editorCard('plain', 'Prostý text', 'Prostý text bez zvýraznění syntaxe.')}
+          </div>
         </div>
         <div class="pref-row pref-pair">
           <div class="pref-field">
@@ -274,11 +357,16 @@ export const shell = String.raw`
               </select>
             </span>
           </div>
+          <div class="font-sample editor-font-sample" aria-hidden="true">
+            <span class="sample-line"><span class="sample-mark">#</span> <span class="sample-heading">Margin</span></span>
+            <span class="sample-line"><span class="sample-mark">-</span> Aa Bb Čč 0O 1lI <span class="sample-code">x = 1</span></span>
+          </div>
         </div>
       </div>
     </section>
 
     <p class="pref-note" data-i18n="Používají se písma nainstalovaná v zařízení; chybějící nahradí podobné dostupné písmo. Nastavení se ukládá jen v tomto prohlížeči.">Používají se písma nainstalovaná v zařízení; chybějící nahradí podobné dostupné písmo. Nastavení se ukládá jen v tomto prohlížeči.</p>
+   </div>
   </div>
 </dialog>
 `;

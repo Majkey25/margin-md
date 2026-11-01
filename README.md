@@ -3,7 +3,7 @@
 A local Markdown editor for Chrome. Write the source, see a live preview, and save the file on your computer.
 
 [![Checks](https://github.com/Majkey25/margin-md/actions/workflows/ci.yml/badge.svg)](https://github.com/Majkey25/margin-md/actions/workflows/ci.yml)
-[![Stable release](https://img.shields.io/badge/release-v1.4.0-black?style=flat-square&logo=github&logoColor=white)](https://github.com/Majkey25/margin-md/releases/latest)
+[![Stable release](https://img.shields.io/badge/release-v1.5.0-black?style=flat-square&logo=github&logoColor=white)](https://github.com/Majkey25/margin-md/releases/latest)
 ![Chrome Manifest V3](https://img.shields.io/badge/Chrome-Manifest_V3-black?style=flat-square&logo=googlechrome&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-strict-black?style=flat-square&logo=typescript&logoColor=white)
 ![Local files](https://img.shields.io/badge/files-local_only-black?style=flat-square)
@@ -35,17 +35,25 @@ Open a `.md` or `.markdown` file with **Open**, or drop it into the editor. Choo
 
 **Markdown format** is independent of the preview's visual style. **GitHub**, the default, supports tables, tasks, strikethrough, automatic links, emoji shortcodes, heading links, footnotes and the five GitHub alert types. Safe HTML includes alignment, layout tables, collapsible details, keyboard keys, subscript, superscript, inserted/deleted text and highlighting. The expanded welcome document demonstrates these features in English, Czech and German, with bundled images and badges that work offline.
 
-Choose **Strict Markdown** to use the previous renderer, with HTML shown as text and the original short welcome on newly opened editor pages. Changing format updates the preview and preserves the current raw text, cursor, saved state and undo history. It does not replace an open welcome document. This is a GitHub-inspired renderer, not a complete GitHub implementation; Mermaid, mathematical typesetting, repository mentions and issue references are not interpreted.
+GitHub format also renders fenced `mermaid` diagrams and LaTeX expressions in `$...$`, `$$...$$` and fenced `math` blocks. GitHub's inline backtick form is supported too. The welcome includes a flowchart, a sequence diagram, Euler's identity, the quadratic formula and an integral. These examples work offline. The renderers load only when a diagram or expression approaches the visible preview.
+
+Mermaid runs in an isolated sandbox without network access or extension APIs. Its output is a static SVG image; diagram clicks, HTML labels and external images are disabled. KaTeX uses native MathML with TeX annotations for accessibility, without downloaded fonts. It supports [KaTeX's LaTeX functions](https://katex.org/docs/supported), rather than all of MathJax or a full TeX installation. Network and HTML commands are disabled. Invalid or oversized input remains readable source, without changing the editor text.
+
+Rich previews are bounded to 32 diagrams, 200 expressions and 64,000 source characters per document. A diagram allows 12,000 characters and 200 edges; an expression allows 8,000 characters and 500 macro expansions. Long expressions scroll within the preview. Diagrams follow the light or dark appearance and retain their accessible titles.
+
+Choose **Strict Markdown** to use the previous renderer, with HTML shown as text and the original short welcome on newly opened editor pages. Mermaid fences and math remain literal text in Strict. Changing format updates the preview and preserves the current raw text, cursor, saved state and undo history. It does not replace an open welcome document. This is a GitHub-inspired renderer, not a complete GitHub implementation; repository mentions and issue references are not interpreted.
 
 Images from your documents start as labelled placeholders. **Load image** requests an HTTPS image only after your click and shows its host first. Relative images use **Choose document folder**; select the document's root folder, and Margin reads only the referenced paths without listing or writing the folder. The choice lasts for the current document. Local images are limited to 10 MiB each and 64 MiB in total, with up to 128 approved image sources. Single-URL `<picture>` sources follow their media queries. Scripts, forms, embeds, custom CSS and active SVG markup are removed; SVG files can be displayed as images.
 
-![Welcome showcase with safe HTML, image variants and collapsible content](docs/images/formatting.png)
+![Welcome showcase with offline Mermaid diagrams and mathematical expressions](docs/images/formatting.png)
 
 **Save** writes to the opened file. **Save As** asks for a filename and destination folder, then asks before replacing an existing file. Choosing a destination does not empty an existing file. Save is manual; text remains in the editor if a write fails.
 
-The theme button shows the current light or dark appearance. First open follows your device; clicking the button switches it with the circular reveal used on Init. Reduced motion disables the reveal. **Appearance** offers System, Light and Dark appearance, plus **Minimal**, **Glass**, **Material You**, **Fluent** and **Nord** visual styles. These preferences stay on this device; document contents are not stored with them. Material You uses a bundled tonal palette, not wallpaper colors from the operating system. Settings open in the center of the window, with a fixed close control and scrollable body.
+The theme button shows the current light or dark appearance. First open follows your device; clicking the button switches it with the circular reveal used on Init. Reduced motion disables the reveal. **Appearance** offers System, Light and Dark appearance, plus **Minimal**, **Glass**, **Material You**, **Fluent**, **Nord**, **Paper** and **Terminal** visual styles. These preferences stay on this device; document contents are not stored with them. Material You uses a bundled tonal palette, not wallpaper colors from the operating system. Settings open in the center of the window, with a fixed close control and scrollable body.
 
-Each style changes the window surfaces, controls and selection states. Fluent uses restrained Windows-inspired layers and blue accents. Nord uses an arctic palette with a Frost selection and separate light and dark layers. Settings group related controls and pair font with size; the close button remains reachable in short windows.
+Each style changes the window surfaces, controls and selection states. Fluent uses restrained Windows-inspired layers and blue accents. Nord uses an arctic palette with a Frost selection. Paper adds warm surfaces and editorial titles; Terminal adds square controls, green accents and monospace metadata. All seven have light and dark palettes.
+
+Every application style, Markdown preset and editor profile has a clickable preview. Miniatures use the same palette declarations as the real window and follow its light or dark mode. Native selects remain available. Live samples show your selected font and size; the close control stays reachable in short windows.
 
 Choose the Markdown preview separately in **Markdown preview**:
 
@@ -55,12 +63,14 @@ Choose the Markdown preview separately in **Markdown preview**:
 | **VS Code** | System sans, 14 px | Compact editor preview, bordered code and open tables |
 | **Čtení** | Serif, 17 px | A quiet reading column with softer contrast |
 | **Nord** | System sans, 16 px | Arctic reading surfaces, Frost accents and dark code blocks in both modes |
+| **Paper** | Serif, 18 px | Editorial measure, varied heading styles, old-style numerals and warm paper surfaces |
+| **Terminal** | Monospace, 14 px | Technical rhythm, heading-level markers, square task boxes and restrained green accents |
 
-All four follow the current light or dark mode. They are inspired by their sources, not exact copies. Set the preview font and size independently from the source editor; **Use style default** restores the preset defaults. The editor offers system monospace, Cascadia, Consolas, sans-serif and serif stacks at 12–20 px. Missing fonts use installed fallbacks; nothing is downloaded. Changes apply immediately and preserve the document and undo history.
+All six follow the current light or dark mode. The named external styles are inspired by their sources; Paper and Terminal are Margin's own. Set the preview font and size independently from the source editor; **Use style default** restores the preset defaults. The editor offers system monospace, Cascadia, Consolas, sans-serif and serif stacks at 12–20 px. Missing fonts use installed fallbacks; nothing is downloaded. Changes apply immediately and preserve the document and undo history.
 
 Choose **Code** for line numbers, an active line and Markdown syntax colors, **Writing** for syntax colors without line numbers, or **Plain text** without syntax colors. Every profile edits the raw Markdown. Switching profiles keeps your font, text, cursor, saved state and undo history.
 
-![Nord interface and Markdown preview in dark mode](docs/images/nord.png)
+![Appearance settings with clickable theme and editor previews](docs/images/settings.png)
 
 Markdown supports headings, emphasis, links, quotes, nested lists, tables and disabled task checkboxes. Fenced JavaScript, TypeScript, JSX, TSX, JSON, CSS and HTML receive syntax colors. Highlighting is limited to 20,000 code characters per render; larger or unknown fences remain readable plain code. The preview does not edit task checkboxes; change their `[ ]` or `[x]` markers in the source.
 
@@ -93,6 +103,8 @@ Save checks the destination's bytes before and after opening the temporary writa
 ## Development
 
 Use Node.js 24. Install dependencies with `npm ci`. `npm run dev` starts the local development server; Chrome extension integration uses the production build.
+
+Mermaid requires the sandbox of the loaded Chrome extension. The plain development-server page keeps diagram source with an explanatory tooltip; math works there. Build and load `dist/` to test diagrams. No development CORS or sandbox permissions are relaxed.
 
 ```sh
 npm ci

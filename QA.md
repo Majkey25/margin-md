@@ -1,5 +1,47 @@
 # Validation
 
+## Themes, live previews and main window | 1.5.0
+
+Claude Code's authenticated runtime picker and a successful probe confirmed Opus 5.5 after the quota reset. Opus implemented the main-window and settings design at medium effort, with access limited to four design files. No fallback model, overage, top-up or billing change was used. The primary agent completed preference wiring and verified the result independently. Astra reviewed that wiring and found no confirmed P1/P2 defect; source review did not replace execution.
+
+Paper and Terminal bring the application to seven styles and Markdown to six presets, each with light/dark palettes. All 16 theme, Markdown and editor-profile cards use the validated native-select path and preserve source, cursor, dirty state and undo. Inactive miniature previews share the real palette declarations. The centered settings window has a fixed close control, a scrollable body and live font samples. The original bracket icon, Minimal default, device language and appearance remain.
+
+Final `npm test` passed 19 tests. `npm run test:browser` passed TypeScript, the production build and all seven scenarios. `npm audit --omit=dev` reported zero vulnerabilities. A card regression caught an explicit click on an already-selected default failing to persist that choice; the shared handler now processes it through the same validated change path.
+
+Real Chromium checks compared all inactive application/Markdown miniatures against their actual palettes in 14 light/dark contexts, with no mismatches. All 84 application/Markdown/mode combinations passed axe. Thirty main-window/settings cases across EN/CS/DE, 1440/768/390/320 px and a short 390 × 460 viewport passed axe, centering, containment, overflow, keyboard traversal and Escape focus restoration. Dirty, error and discard states passed another 42 axe scans. A Nord dirty-save hint contrast defect was fixed. Fourteen actual hovered Save paints were also composited and measured against WCAG AA 4.5:1, including their keyboard hints; all passed after reducing the hover overlay. Axe alone could not establish the gradient's exact contrast.
+
+Fresh desktop/mobile and 320 px screenshots were inspected after the dialog's opening transition settled. Source/preview/split, fullscreen, keyboard card selection, normal circular theme reveal, reduced motion and forced colors worked without console errors or document HTTP(S) requests. Browser accessibility snapshots omitted decorative Terminal heading markers. This does not establish physical screen-reader speech.
+
+Three runs of the pre-Opus feature build and final build used isolated Chromium 156 profiles on the same host, without throttling or concurrent test browsers. Actual 100 KiB/1 MiB disk files were imported. Timings end two frames after preview mutation; edits include the existing 120 ms debounce. All six final Undo checks restored the full source hash through genuine disposable OPFS saves; the imported disk fixtures were unchanged.
+
+| Check | Before UI | 1.5.0 |
+| :--- | ---: | ---: |
+| Local load event | 330.1 ms | 383.8 ms |
+| Largest contentful paint | 588 ms | 592 ms |
+| Cumulative layout shift | 0 | 0 |
+| 100 KiB open and preview | 153.2 ms | 160 ms |
+| 100 KiB edit and preview | 169.8 ms | 175.5 ms |
+| 1 MiB open and preview | 1,195.2 ms | 1,286.2 ms |
+| 1 MiB edit and preview | 546.5 ms | 612.7 ms |
+
+These local samples show modest regressions, not a universal speedup. Ordinary startup still avoids both rich engines and their sandbox frame. Field INP, cold OS caches, physical mobile behavior, native external-disk chooser/write behavior for this version and worst-case 5 MiB latency remain unmeasured. Existing file-save failure/cancellation/overwrite regressions passed; OPFS validation is not a native external-disk write test.
+
+The final 1,877,110-byte ZIP was extracted separately. All 115 files match `dist/` byte for byte and its manifest reports 1.5.0. That extracted extension opened a real local Czech Markdown file, rendered and edited it, preserved an existing destination through overwrite cancellation, then saved exact UTF-8 BOM/CRLF bytes to genuine OPFS after confirmation. The original disk fixture remained unchanged, with no console errors or HTTP(S) requests. SHA-256: `5b6c99ba30df8589c09f9394c840c816b12faee99f278e0b6f3a86fb906f025a`. This archive smoke test did not repeat a native external-disk picker/write.
+
+## Mermaid and mathematical expressions | 1.5.0
+
+GitHub format now supports fenced Mermaid diagrams, dollar-delimited inline/display math, fenced `math` blocks and GitHub's inline backtick form. The English, Czech and German welcome examples include two diagrams and three expressions. The original `sample` and `initialSample` source is unchanged. Strict keeps its previous sanitized output, literal fences/dollars and original welcome. Switching format preserves the source, dirty state and undo history.
+
+`npm test` passed all 19 tests. The production build and TypeScript check passed. All six loaded-extension browser scenarios passed; the rich-preview scenario was rerun after final lifecycle guards. That scenario verifies offline image decoding, native MathML and TeX annotations, accessible diagram titles, unchanged-block reuse, malformed input, disabled URL/HTML commands, bounded input, document replacement and Strict switching. It delays the first real MessagePort response to reproduce a theme change during the first render, then requires a completed result. The actual sandbox reports an opaque origin, rejects parent-document access and has no extension runtime ID. The production dependency audit reports zero vulnerabilities. Runtime license notices are bundled.
+
+The real Chromium build rendered actual disk Markdown fixtures at 1440 and 390 px in EN/CS/DE, light and dark. All 12 cases had zero axe violations, console errors, HTTP(S) requests or outer overflow. Very long inline and display expressions also scroll inside their own containers without widening the preview pane. Fresh desktop/mobile screenshots were inspected. Diagram output is sanitized SVG displayed only as a blob image; raw authored SVG/MathML still does not bypass the existing HTML sanitizer. The diagram sandbox denies network, frames, external images, fonts and extension APIs. Renderers and diagram definitions load locally only when rich content approaches the viewport. Host permissions and main-page script policy are unchanged.
+
+Performance preflight used three alternating runs of the extracted 1.4.0 release and the feature build, Chromium 156, 1440×900, light, reduced motion and no CPU throttling. A genuine 1,092,018-byte disk Markdown file was opened and edited, with timings including browser automation and two animation frames. Medians were 2247/2219 ms for open and 1066/1029 ms for edit, baseline/feature. Initial load was 317/363 ms, LCP 476/532 ms and CLS 0/0. Preflight startup JavaScript was 713,700/727,308 bytes, or 253,814/259,283 bytes with Node gzip. Neither build loaded Mermaid or KaTeX during ordinary startup. These are local samples with host variation, not a general speedup claim. The final uncompressed distribution is 6,385,182 bytes across 115 files because diagram engines ship locally, although they are loaded on demand.
+
+Independent Astra source review found a first-render theme race, fixed before the deterministic browser regression passed. Self-review also guarded late iframe-load callbacks after abort, restored retry state after render failure and retained MathML semantics/annotations. Release and installed-Brave checks are recorded separately after their execution. Physical-mobile behavior, screen-reader speech, field INP, every Mermaid diagram grammar and the worst permitted complexity remain unverified. Mathematical syntax follows KaTeX's supported subset; diagram interactions and external diagram resources are intentionally disabled.
+
+The development-server probe confirmed that an opaque iframe cannot import Vite modules under the default CORS policy. Mermaid therefore keeps literal source with an explanatory tooltip outside the loaded Chrome extension; math remains functional. The guarded development page produced zero console errors. The production extension scenario and all 19 unit tests passed again after this final guard. Neither development CORS nor sandbox permissions were broadened. The final source prefix containing the original Strict samples was compared byte-for-byte against `HEAD` and matched.
+
 ## GitHub formatting and welcome showcase | 1.4.0
 
 GitHub formatting is the new default, independent of preview appearance. Strict Markdown retains the previous renderer and exact original welcome source on new editor pages. The new English, Czech and German showcase covers the supported Markdown and safe HTML features. Format changes rerender only; they preserve raw text, cursor, dirty state and undo. The supplied profile README was also rendered locally with its aligned header, mixed HTML/Markdown tables, image placeholders and three alerts.

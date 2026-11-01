@@ -1,5 +1,4 @@
 type Theme = 'system' | 'light' | 'dark';
-type Surface = 'minimal' | 'glass' | 'material' | 'fluent' | 'nord';
 export type EditorType = 'code' | 'prose' | 'plain';
 export type MarkdownFormat = 'github' | 'strict';
 
@@ -12,29 +11,32 @@ export function setupPreferences(
   const root = document.documentElement;
   const dialog = document.getElementById('preferences-dialog') as HTMLDialogElement;
   const themeSetting = document.getElementById('theme-setting') as HTMLSelectElement;
-  const surfaceSetting = document.getElementById('surface-setting') as HTMLSelectElement;
   const themeButton = document.getElementById('theme-toggle') as HTMLButtonElement;
   const systemTheme = matchMedia('(prefers-color-scheme: dark)');
   let appearance: Theme = 'system';
-  let surface: Surface = 'minimal';
   let transition: ViewTransition | undefined;
   let revision = 0;
 
   try {
     const savedTheme = localStorage.getItem('margin.theme');
-    const savedSurface = localStorage.getItem('margin.surface');
     if (savedTheme === 'light' || savedTheme === 'dark') appearance = savedTheme;
-    if (savedSurface === 'glass' || savedSurface === 'material' || savedSurface === 'fluent' || savedSurface === 'nord') surface = savedSurface;
   } catch { /* Default settings remain usable without storage. */ }
 
   const effectiveTheme = (): 'light' | 'dark' => appearance === 'system'
     ? (systemTheme.matches ? 'dark' : 'light') : appearance;
+  const syncPreviews = (): void => {
+    for (const preview of dialog.querySelectorAll<HTMLElement>('.theme-preview, .markdown-style-preview')) {
+      preview.dataset.theme = effectiveTheme();
+      if (preview.hasAttribute('data-follow-preview')) preview.dataset.previewTheme = root.dataset.previewTheme ?? 'github';
+    }
+  };
   const applyTheme = (): void => {
     const theme = effectiveTheme();
     root.dataset.theme = theme;
     root.style.colorScheme = theme;
     themeSetting.value = appearance;
     themeButton.setAttribute('aria-pressed', String(theme === 'dark'));
+    syncPreviews();
   };
   const save = (key: string, value: string): void => {
     try { localStorage.setItem(key, value); } catch { onStorageError(); }
@@ -43,16 +45,21 @@ export function setupPreferences(
     id: string, key: string, values: readonly T[], fallback: T, apply: (value: T) => void, onChange?: (value: T) => void,
   ): void => {
     const select = document.getElementById(id) as HTMLSelectElement;
+    const cards = dialog.querySelectorAll<HTMLButtonElement>(`button.setting-card[data-setting="${id}"]`);
     let stored: string | null = null;
     try { stored = localStorage.getItem(key); } catch { /* Use the default when storage is unavailable. */ }
     let selected = values.find((value) => value === stored) ?? fallback;
     select.value = selected;
-    apply(selected);
+    const applySelected = (): void => {
+      apply(selected);
+      for (const card of cards) card.setAttribute('aria-pressed', String(card.dataset.value === selected));
+    };
+    applySelected();
     select.addEventListener('change', () => {
       const next = values.find((value) => value === select.value);
       if (!next) { select.value = selected; return; }
       selected = next;
-      apply(selected);
+      applySelected();
       save(key, selected);
       onChange?.(selected);
     });
@@ -64,8 +71,8 @@ export function setupPreferences(
     root.classList.remove('theme-switch');
   };
   applyTheme();
-  root.dataset.surface = surface;
-  surfaceSetting.value = surface;
+  setting('surface-setting', 'margin.surface', ['minimal', 'glass', 'material', 'fluent', 'nord', 'paper', 'terminal'] as const, 'minimal',
+    (value) => { root.dataset.surface = value; });
 
   const previewFonts = {
     sans: '"Segoe UI", Arial, sans-serif',
@@ -83,8 +90,8 @@ export function setupPreferences(
     (value) => { root.dataset.editorType = value; }, onEditorTypeChange);
   setting('markdown-format-setting', 'margin.markdownFormat', ['github', 'strict'] as const, 'github',
     (value) => { root.dataset.markdownFormat = value; }, onMarkdownFormatChange);
-  setting('preview-theme-setting', 'margin.previewTheme', ['github', 'vscode', 'reading', 'nord'] as const, 'github',
-    (value) => { root.dataset.previewTheme = value; });
+  setting('preview-theme-setting', 'margin.previewTheme', ['github', 'vscode', 'reading', 'nord', 'paper', 'terminal'] as const, 'github',
+    (value) => { root.dataset.previewTheme = value; syncPreviews(); });
   setting('preview-font-setting', 'margin.previewFont', ['default', 'sans', 'serif', 'mono'] as const, 'default',
     (value) => {
       if (value === 'default') root.style.removeProperty('--preview-font');
@@ -113,12 +120,15 @@ export function setupPreferences(
     applyTheme();
     save('margin.theme', value);
   });
-  surfaceSetting.addEventListener('change', () => {
-    const value = surfaceSetting.value;
-    if (value !== 'minimal' && value !== 'glass' && value !== 'material' && value !== 'fluent' && value !== 'nord') return;
-    surface = value;
-    root.dataset.surface = surface;
-    save('margin.surface', surface);
+  dialog.addEventListener('click', (event) => {
+    const card = event.target instanceof Element ? event.target.closest<HTMLButtonElement>('button.setting-card') : null;
+    const id = card?.dataset.setting;
+    if (!card || !id || !['surface-setting', 'preview-theme-setting', 'editor-type-setting'].includes(id)) return;
+    const select = document.getElementById(id) as HTMLSelectElement;
+    const value = card.dataset.value;
+    if (!value || !Array.from(select.options).some((option) => option.value === value && !option.disabled)) return;
+    select.value = value;
+    select.dispatchEvent(new Event('change', { bubbles: true }));
   });
   systemTheme.addEventListener('change', () => { if (appearance === 'system') applyTheme(); });
   themeButton.addEventListener('click', () => {

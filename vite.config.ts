@@ -7,6 +7,7 @@ export default defineConfig({
     rollupOptions: {
       input: {
         editor: 'index.html',
+        diagram: 'diagram.html',
         launcher: 'launcher.html',
         background: 'src/background.ts',
         content: 'src/content.ts',

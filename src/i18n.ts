@@ -59,6 +59,10 @@ const english = {
   'Místní obrázky překračují celkový limit 64 MiB.': 'Local images exceed the total 64 MiB limit.',
   'Poznámka': 'Note', 'Tip': 'Tip', 'Důležité': 'Important', 'Varování': 'Warning', 'Upozornění': 'Caution',
   'Náhled je prázdný.': 'The preview is empty.', 'Náhled se zobrazí, jakmile začnete psát.': 'The preview appears when you start typing.',
+  'Mermaid diagram': 'Mermaid diagram',
+  'Diagramy Mermaid vyžadují načtené rozšíření Chrome.': 'Mermaid diagrams require the loaded Chrome extension.',
+  'Náhled překračuje limit složitosti. Zdrojový text zůstává zobrazený.': 'The preview exceeds the complexity limit. Source text remains visible.',
+  'Náhled nelze vykreslit. Ověřte syntaxi; zdrojový text zůstává zobrazený.': 'Could not render the preview. Check the syntax; source text remains visible.',
 } as const;
 
 export type MessageKey = keyof typeof english;
@@ -126,6 +130,10 @@ const german: Record<MessageKey, string> = {
   'Místní obrázky překračují celkový limit 64 MiB.': 'Lokale Bilder überschreiten die Gesamtgrenze von 64 MiB.',
   'Poznámka': 'Hinweis', 'Tip': 'Tipp', 'Důležité': 'Wichtig', 'Varování': 'Warnung', 'Upozornění': 'Achtung',
   'Náhled je prázdný.': 'Die Vorschau ist leer.', 'Náhled se zobrazí, jakmile začnete psát.': 'Die Vorschau erscheint, sobald Sie zu schreiben beginnen.',
+  'Mermaid diagram': 'Mermaid-Diagramm',
+  'Diagramy Mermaid vyžadují načtené rozšíření Chrome.': 'Mermaid-Diagramme erfordern die geladene Chrome-Erweiterung.',
+  'Náhled překračuje limit složitosti. Zdrojový text zůstává zobrazený.': 'Die Vorschau überschreitet das Komplexitätslimit. Der Quelltext bleibt sichtbar.',
+  'Náhled nelze vykreslit. Ověřte syntaxi; zdrojový text zůstává zobrazený.': 'Die Vorschau konnte nicht gerendert werden. Prüfen Sie die Syntax; der Quelltext bleibt sichtbar.',
 };
 
 export const messages = { en: english, de: german };

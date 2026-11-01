@@ -1,25 +1,35 @@
 /* Margin: Markdown preview presets.
    Loaded after styles.css. The single home for how rendered Markdown looks.
 
-   html[data-preview-theme] = github (default) | vscode | reading | nord
+   html[data-preview-theme] = github (default) | vscode | reading | nord | paper | terminal
    html[data-theme]         = light | dark
 
    Presets are inspired by GitHub's README rendering (primer/css), the VS Code
-   built-in Markdown preview and the Nord palette. They reproduce scale and
-   character, not the original stylesheets. Every token is scoped to
-   #preview-pane, so the chrome keeps the application palette and the
-   application style never reaches here.
+   built-in Markdown preview and the Nord palette; Paper and Terminal are
+   Margin's own. They reproduce scale and character, not the original
+   stylesheets. Every token is scoped to #preview-pane, so the chrome keeps the
+   application palette and the application style never reaches here.
+
+   Each palette selector is shared with
+   .markdown-style-preview[data-preview-theme][data-theme]: the settings cards
+   and the live font sample read the same declarations as the real pane, and
+   the GitHub base block resets them. Their own element rules sit at the end
+   (.mini-doc, .preview-font-sample) and never touch .preview.
 
    Grammar: the first block sets every --pv-* / --tk-* token (GitHub light).
    Each later block overrides values only; the element rules below read tokens
-   and never branch on the preset.
+   and never branch on the preset. Optional tokens that only Paper/Terminal
+   set (heading weights/styles/caps/markers, quote style, hr width, table top
+   rule, th caps, list markers, check/chip shape, numerals) are read with a
+   var() fallback equal to the previous fixed value.
 
    User overrides are read, never redefined here:
    --preview-font, --preview-size (unset = preset default). */
 
 /* ── GitHub-inspired, light (also the fallback before JS runs) ─────── */
 
-#preview-pane {
+#preview-pane,
+.markdown-style-preview {
   /* Type and measure */
   --pv-note: #0969da;
   --pv-tip: #1a7f37;
@@ -126,7 +136,8 @@
 }
 
 /* GitHub-inspired, dark: neutral blue-grey canvas, not true black. */
-:root[data-theme="dark"] #preview-pane {
+:root[data-theme="dark"] #preview-pane,
+.markdown-style-preview[data-theme="dark"] {
   --pv-bg: #0d1117;
   --pv-fg: #e6edf3;
   --pv-heading: #f0f6fc;
@@ -171,7 +182,8 @@
 
 /* ── VS Code-inspired, light: compact, open tables ─────────────────── */
 
-:root[data-preview-theme="vscode"] #preview-pane {
+:root[data-preview-theme="vscode"] #preview-pane,
+.markdown-style-preview[data-preview-theme="vscode"] {
   --pv-font: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", system-ui, Ubuntu, "Droid Sans", sans-serif;
   --pv-code-font: "SF Mono", Monaco, Menlo, Consolas, "Ubuntu Mono", "Liberation Mono", "DejaVu Sans Mono", "Courier New", monospace;
   --pv-size: 14px;
@@ -251,7 +263,8 @@
 }
 
 /* VS Code-inspired, dark: the neutral grey of the default dark theme. */
-:root[data-preview-theme="vscode"][data-theme="dark"] #preview-pane {
+:root[data-preview-theme="vscode"][data-theme="dark"] #preview-pane,
+.markdown-style-preview[data-preview-theme="vscode"][data-theme="dark"] {
   --pv-bg: #1f1f1f;
   --pv-fg: #cccccc;
   --pv-heading: #e7e7e7;
@@ -291,7 +304,8 @@
 
 /* ── Reading (Čtení), light: calm serif column ─────────────────────── */
 
-:root[data-preview-theme="reading"] #preview-pane {
+:root[data-preview-theme="reading"] #preview-pane,
+.markdown-style-preview[data-preview-theme="reading"] {
   --pv-font: var(--font-read);
   --pv-code-font: var(--font-mono);
   --pv-size: 17px;
@@ -387,7 +401,8 @@
 }
 
 /* Reading, dark: soft charcoal, warm grey ink. */
-:root[data-preview-theme="reading"][data-theme="dark"] #preview-pane {
+:root[data-preview-theme="reading"][data-theme="dark"] #preview-pane,
+.markdown-style-preview[data-preview-theme="reading"][data-theme="dark"] {
   --pv-bg: #161615;
   --pv-fg: #e4e3df;
   --pv-heading: #f3f2ee;
@@ -427,7 +442,8 @@
 
 /* ── Nord, light: Snow Storm page, Polar Night code, Frost accents ─── */
 
-:root[data-preview-theme="nord"] #preview-pane {
+:root[data-preview-theme="nord"] #preview-pane,
+.markdown-style-preview[data-preview-theme="nord"] {
   --pv-font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --pv-code-font: ui-monospace, "Cascadia Code", "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
   --pv-size: 16px;
@@ -524,7 +540,8 @@
 }
 
 /* Nord, dark: Polar Night page, a deeper code well, Frost links. */
-:root[data-preview-theme="nord"][data-theme="dark"] #preview-pane {
+:root[data-preview-theme="nord"][data-theme="dark"] #preview-pane,
+.markdown-style-preview[data-preview-theme="nord"][data-theme="dark"] {
   --pv-bg: #2e3440;
   --pv-fg: #d8dee9;
   --pv-heading: #eceff4;
@@ -549,6 +566,319 @@
   --pv-check-line: #aab4c4;
   --pv-check-bg: #88c0d0;
   --pv-check-ink: #2e3440;
+}
+
+/* ── Paper, light: a printed page ──────────────────────────────────────
+   Book typography rather than a screen column: an old-style serif with
+   old-style numerals, a light large h1, italic h3/h5, small-caps h4/h6 and
+   table heads, booktabs tables (heavy top and bottom rule, no grid), italic
+   indented quotes without a bar, a short centred rule. Oxblood links on
+   warm paper; Reading stays the plain neutral serif column. */
+
+:root[data-preview-theme="paper"] #preview-pane,
+.markdown-style-preview[data-preview-theme="paper"] {
+  --pv-font: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", "URW Palladio L", P052, "Sitka Text", Georgia, serif;
+  --pv-code-font: var(--font-mono);
+  --pv-size: 18px;
+  --pv-measure: calc(34 * var(--preview-size, var(--pv-size)));
+  --pv-pad: clamp(24px, 6vw, 72px);
+  --pv-lh: 1.6;
+  --pv-block: 0.95em;
+  --pv-list-gap: 0.2em;
+  --pv-numeric: oldstyle-nums;
+
+  --pv-h-weight: 600;
+  --pv-h-lh: 1.2;
+  --pv-h-mt: 1.9em;
+  --pv-h-mt-minor: 1.5em;
+  --pv-h-mb: 0.55em;
+  --pv-h-stack: 0.6em;
+  --pv-h-track: -0.01em;
+  --pv-h1: 2.1em;
+  --pv-h2: 1.45em;
+  --pv-h3: 1.2em;
+  --pv-h4: 1em;
+  --pv-h5: 1em;
+  --pv-h6: 0.9em;
+  --pv-h1-weight: 400;
+  --pv-h3-weight: 400;
+  --pv-h3-style: italic;
+  --pv-h4-caps: all-small-caps;
+  --pv-h4-track: 0.06em;
+  --pv-h5-weight: 400;
+  --pv-h5-style: italic;
+  --pv-h6-caps: all-small-caps;
+  --pv-h6-track: 0.06em;
+  --pv-h1-rule: none;
+  --pv-h2-rule: none;
+  --pv-h-rule-pad: 0em;
+
+  --pv-code-size: 0.8em;
+  --pv-code-pad: 0.12em 0.35em;
+  --pv-code-radius: 3px;
+  --pv-code-border: none;
+  --pv-pre-size: 0.78em;
+  --pv-pre-lh: 1.6;
+  --pv-pre-pad: 1em 1.25em;
+  --pv-pre-radius: 2px;
+  --pv-pre-border: 1px solid var(--pv-pre-line);
+  --pv-comment-style: italic;
+
+  --pv-quote-w: 0px;
+  --pv-quote-pad: 0 1.6em;
+  --pv-quote-radius: 0px;
+  --pv-quote-style: italic;
+  --pv-hr-size: 1px;
+  --pv-hr-width: 6em;
+  --pv-hr-margin: 2.4em;
+  --pv-hr-color: var(--pv-rule-strong);
+
+  --pv-table-size: 0.88em;
+  --pv-cell-pad: 0.45em 0.9em;
+  --pv-cell-edge: 0px;
+  --pv-cell-border: none;
+  --pv-row-rule: none;
+  --pv-head-rule: 1px solid var(--pv-rule-strong);
+  --pv-table-top: 1.5px solid var(--pv-heading);
+  --pv-table-foot: 1.5px solid var(--pv-heading);
+  --pv-th-caps: all-small-caps;
+  --pv-th-track: 0.05em;
+
+  --pv-bg: #f7f3ea;
+  --pv-fg: #2b2620;
+  --pv-heading: #1c1814;
+  --pv-h3-color: var(--pv-heading);
+  --pv-h6-color: var(--pv-muted);
+  --pv-muted: #675d4d;
+  --pv-del: #675d4d;
+  --pv-rule: #e0d8c8;
+  --pv-rule-soft: #e0d8c8;
+  --pv-rule-strong: #b9ad97;
+  --pv-link: #8b2e16;
+  --pv-focus: #8b2e16;
+  --pv-code-bg: #ece5d6;
+  --pv-code-fg: #3a332a;
+  --pv-pre-bg: #f0eadd;
+  --pv-pre-fg: #2b2620;
+  --pv-pre-line: #e0d8c8;
+  --pv-quote-bar: transparent;
+  --pv-quote-bg: transparent;
+  --pv-quote-fg: #4a4237;
+  --pv-th-bg: transparent;
+  --pv-row-alt: transparent;
+  --pv-selection: rgba(139, 46, 22, 0.16);
+  --pv-check-line: #675d4d;
+  --pv-check-bg: #8b2e16;
+  --pv-check-ink: #f7f3ea;
+
+  --tk-keyword: #8b2e16;
+  --tk-atom: #7a4b00;
+  --tk-string: #4a6526;
+  --tk-comment: #675d4d;
+  --tk-variable: #2b2620;
+  --tk-property: #2f5577;
+  --tk-type: #5b3f7a;
+  --tk-operator: #4a4237;
+  --tk-punct: #4a4237;
+  --tk-tag: #8b2e16;
+  --tk-attr: #7a4b00;
+  --tk-meta: #675d4d;
+  --tk-invalid: #a1261b;
+}
+
+/* Paper, dark: the same page by lamplight. Umber ground, parchment ink. */
+:root[data-preview-theme="paper"][data-theme="dark"] #preview-pane,
+.markdown-style-preview[data-preview-theme="paper"][data-theme="dark"] {
+  --pv-bg: #1c1915;
+  --pv-fg: #e6dfd2;
+  --pv-heading: #f4eee3;
+  --pv-muted: #b2a793;
+  --pv-del: #b2a793;
+  --pv-rule: #37312a;
+  --pv-rule-soft: #37312a;
+  --pv-rule-strong: #635a4c;
+  --pv-link: #e8a888;
+  --pv-focus: #e8a888;
+  --pv-code-bg: #2a2620;
+  --pv-code-fg: #e6dfd2;
+  --pv-pre-bg: #23201b;
+  --pv-pre-fg: #e6dfd2;
+  --pv-pre-line: #37312a;
+  --pv-quote-fg: #d4cbbb;
+  --pv-selection: rgba(232, 168, 136, 0.24);
+  --pv-check-line: #b2a793;
+  --pv-check-bg: #e8a888;
+  --pv-check-ink: #1c1915;
+
+  --tk-keyword: #e8a888;
+  --tk-atom: #e0bc7a;
+  --tk-string: #b5cc8e;
+  --tk-comment: #a89e8b;
+  --tk-variable: #e6dfd2;
+  --tk-property: #a9c4e0;
+  --tk-type: #cbb5e8;
+  --tk-operator: #cfc6b6;
+  --tk-punct: #cfc6b6;
+  --tk-tag: #e8a888;
+  --tk-attr: #e0bc7a;
+  --tk-meta: #a89e8b;
+  --tk-invalid: #ff9a8a;
+}
+
+/* ── Terminal, light: a monospace document on a line grid ──────────────
+   One face and one size for everything; hierarchy comes from weight, colour
+   and silent #-markers (alt text "", so they are not announced). Vertical
+   space moves in half-line steps of the 1.6 leading: one empty line between
+   blocks. Square code, tables ruled as a grid, plain - * + list markers. */
+
+:root[data-preview-theme="terminal"] #preview-pane,
+.markdown-style-preview[data-preview-theme="terminal"] {
+  --pv-font: "Cascadia Mono", "Cascadia Code", ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  --pv-code-font: var(--pv-font);
+  --pv-size: 14px;
+  --pv-measure: calc(46 * var(--preview-size, var(--pv-size)));
+  --pv-pad: clamp(16px, 4vw, 40px);
+  --pv-lh: 1.6;
+  --pv-block: 1.6em;
+  --pv-list-gap: 0em;
+  --pv-ul-1: "- ";
+  --pv-ul-2: "* ";
+  --pv-ul-3: "+ ";
+  --pv-check-radius: 0px;
+  --pv-chip-font: var(--pv-font);
+  --pv-chip-radius: 0px;
+
+  --pv-h-weight: 700;
+  --pv-h-lh: 1.6;
+  --pv-h-mt: 2.4em;
+  --pv-h-mt-minor: 1.6em;
+  --pv-h-mb: 0.8em;
+  --pv-h-stack: 0.8em;
+  --pv-h-track: 0em;
+  --pv-h1: 1em;
+  --pv-h2: 1em;
+  --pv-h3: 1em;
+  --pv-h4: 1em;
+  --pv-h5: 1em;
+  --pv-h6: 1em;
+  --pv-h1-marker: "# " / "";
+  --pv-h2-marker: "## " / "";
+  --pv-h3-marker: "### " / "";
+  --pv-h4-marker: "#### " / "";
+  --pv-h5-marker: "##### " / "";
+  --pv-h6-marker: "###### " / "";
+  --pv-h1-rule: 1px solid var(--pv-rule-strong);
+  --pv-h2-rule: 1px dashed var(--pv-rule-strong);
+  --pv-h-rule-pad: 0.2em;
+
+  --pv-code-size: 1em;
+  --pv-code-pad: 0 0.35em;
+  --pv-code-radius: 0px;
+  --pv-code-border: none;
+  --pv-pre-size: 1em;
+  --pv-pre-lh: 1.6;
+  --pv-pre-pad: 0.8em 2ch;
+  --pv-pre-radius: 0px;
+  --pv-pre-border: 1px solid var(--pv-pre-line);
+  --pv-comment-style: normal;
+
+  --pv-quote-w: 2px;
+  --pv-quote-pad: 0 0 0 2ch;
+  --pv-quote-radius: 0px;
+  --pv-hr-size: 1px;
+  --pv-hr-margin: 1.6em;
+  --pv-hr-color: var(--pv-rule-strong);
+
+  --pv-table-size: 1em;
+  --pv-cell-pad: 0.2em 1.5ch;
+  --pv-cell-edge: 1.5ch;
+  --pv-cell-border: 1px solid var(--pv-rule);
+  --pv-row-rule: 1px solid var(--pv-rule);
+  --pv-head-rule: 1px solid var(--pv-rule-strong);
+  --pv-table-foot: 1px solid var(--pv-rule);
+
+  --pv-bg: #f7f9f6;
+  --pv-fg: #1a241d;
+  --pv-heading: #0e1a12;
+  --pv-h3-color: #1b6935;
+  --pv-h6-color: var(--pv-muted);
+  --pv-muted: #4d594f;
+  --pv-del: #4d594f;
+  --pv-rule: #d3dbd2;
+  --pv-rule-soft: #d3dbd2;
+  --pv-rule-strong: #8e9a90;
+  --pv-link: #1b6935;
+  --pv-focus: #1b6935;
+  --pv-code-bg: #e6ede5;
+  --pv-code-fg: #14532b;
+  --pv-pre-bg: #eef2ed;
+  --pv-pre-fg: #1a241d;
+  --pv-pre-line: #cbd4ca;
+  --pv-quote-bar: #8e9a90;
+  --pv-quote-bg: transparent;
+  --pv-quote-fg: #3a463d;
+  --pv-th-bg: #e6ede5;
+  --pv-row-alt: transparent;
+  --pv-selection: rgba(27, 105, 53, 0.18);
+  --pv-check-line: #4d594f;
+  --pv-check-bg: #1b6935;
+  --pv-check-ink: #ffffff;
+
+  --tk-keyword: #8b1d5a;
+  --tk-atom: #1f5b8f;
+  --tk-string: #6b4a00;
+  --tk-comment: #59655c;
+  --tk-variable: #1a241d;
+  --tk-property: #1f5b8f;
+  --tk-type: #136363;
+  --tk-operator: #3a463d;
+  --tk-punct: #3a463d;
+  --tk-tag: #1b6935;
+  --tk-attr: #6b4a00;
+  --tk-meta: #59655c;
+  --tk-invalid: #a1261b;
+}
+
+/* Terminal, dark: green-black page, sage accent, no glow. */
+:root[data-preview-theme="terminal"][data-theme="dark"] #preview-pane,
+.markdown-style-preview[data-preview-theme="terminal"][data-theme="dark"] {
+  --pv-bg: #0f1310;
+  --pv-fg: #d3dcd5;
+  --pv-heading: #e8efe9;
+  --pv-h3-color: #8fd4a3;
+  --pv-muted: #9eaaa1;
+  --pv-del: #9eaaa1;
+  --pv-rule: #263029;
+  --pv-rule-soft: #263029;
+  --pv-rule-strong: #4f5c52;
+  --pv-link: #8fd4a3;
+  --pv-focus: #8fd4a3;
+  --pv-code-bg: #1a221c;
+  --pv-code-fg: #a8e0b8;
+  --pv-pre-bg: #141a16;
+  --pv-pre-fg: #d3dcd5;
+  --pv-pre-line: #263029;
+  --pv-quote-bar: #4f5c52;
+  --pv-quote-fg: #b9c4bc;
+  --pv-th-bg: #1a221c;
+  --pv-selection: rgba(143, 212, 163, 0.22);
+  --pv-check-line: #9eaaa1;
+  --pv-check-bg: #8fd4a3;
+  --pv-check-ink: #0f1310;
+
+  --tk-keyword: #e3a0c8;
+  --tk-atom: #8ab8e6;
+  --tk-string: #e0c27a;
+  --tk-comment: #8a978d;
+  --tk-variable: #d3dcd5;
+  --tk-property: #8ab8e6;
+  --tk-type: #7fd1c7;
+  --tk-operator: #b9c4bc;
+  --tk-punct: #b9c4bc;
+  --tk-tag: #8fd4a3;
+  --tk-attr: #e0c27a;
+  --tk-meta: #8a978d;
+  --tk-invalid: #ff9a8a;
 }
 
 /* ── Pane: the preset fills the whole pane, no inner card ──────────── */
@@ -580,6 +910,11 @@
   color: var(--pv-focus);
 }
 
+/* Matches the source head: the pane holding focus marks its head rule. */
+#preview-pane:focus-within .preview-head {
+  border-bottom-color: var(--pv-focus);
+}
+
 #preview-pane ::selection {
   background: var(--pv-selection);
 }
@@ -598,6 +933,7 @@
   color: var(--pv-fg);
   overflow-wrap: break-word;
   font-kerning: normal;
+  font-variant-numeric: var(--pv-numeric, normal);
   text-rendering: optimizeLegibility;
 }
 
@@ -651,6 +987,7 @@
   padding-bottom: var(--pv-h-rule-pad);
   border-bottom: var(--pv-h1-rule);
   font-size: var(--pv-h1);
+  font-weight: var(--pv-h1-weight, var(--pv-h-weight));
 }
 
 .preview h2 {
@@ -661,20 +998,43 @@
 
 .preview h3 {
   font-size: var(--pv-h3);
+  font-weight: var(--pv-h3-weight, var(--pv-h-weight));
+  font-style: var(--pv-h3-style, normal);
   color: var(--pv-h3-color);
 }
 
 .preview h4 {
   font-size: var(--pv-h4);
+  font-variant-caps: var(--pv-h4-caps, normal);
+  letter-spacing: var(--pv-h4-track, 0);
 }
 
 .preview h5 {
   font-size: var(--pv-h5);
+  font-weight: var(--pv-h5-weight, var(--pv-h-weight));
+  font-style: var(--pv-h5-style, normal);
 }
 
 .preview h6 {
   font-size: var(--pv-h6);
+  font-variant-caps: var(--pv-h6-caps, normal);
+  letter-spacing: var(--pv-h6-track, 0);
   color: var(--pv-h6-color);
+}
+
+/* Level markers (Terminal only; unset elsewhere, so no box is generated).
+   The values carry empty alt text and are not announced. */
+.preview h1::before { content: var(--pv-h1-marker, none); }
+.preview h2::before { content: var(--pv-h2-marker, none); }
+.preview h3::before { content: var(--pv-h3-marker, none); }
+.preview h4::before { content: var(--pv-h4-marker, none); }
+.preview h5::before { content: var(--pv-h5-marker, none); }
+.preview h6::before { content: var(--pv-h6-marker, none); }
+
+.preview :is(h1, h2, h3, h4, h5, h6)::before {
+  color: var(--pv-muted);
+  font-weight: 400;
+  font-style: normal;
 }
 
 .preview :is(h1, h2, h3, h4, h5, h6) code {
@@ -751,6 +1111,7 @@
   border-radius: var(--pv-quote-radius);
   background: var(--pv-code-bg);
   color: var(--pv-fg);
+  font-style: normal;
 }
 .preview .markdown-alert-title { margin-bottom: 0.5em; font-weight: var(--pv-h-weight); }
 .preview .markdown-alert-note { border-inline-start-color: var(--pv-note); }
@@ -758,7 +1119,8 @@
 .preview .markdown-alert-important { border-inline-start-color: var(--pv-important); }
 .preview .markdown-alert-warning { border-inline-start-color: var(--pv-warning); }
 .preview .markdown-alert-caution { border-inline-start-color: var(--pv-caution); }
-:root[data-theme="dark"] #preview-pane {
+:root[data-theme="dark"] #preview-pane,
+.markdown-style-preview[data-theme="dark"] {
   --pv-note: #4493f8;
   --pv-tip: #3fb950;
   --pv-important: #ab7df8;
@@ -778,7 +1140,7 @@
   border-radius: var(--pv-code-radius);
   background: var(--pv-bg);
   color: var(--pv-link);
-  font: 500 var(--fs-sm) / 1.45 var(--font-ui);
+  font: 500 var(--fs-sm) / 1.45 var(--pv-chip-font, var(--font-ui));
   cursor: pointer;
 }
 .preview .image-load:focus-visible { outline: 2px solid var(--pv-focus); outline-offset: 2px; }
@@ -807,15 +1169,15 @@
 }
 
 .preview ul {
-  list-style-type: disc;
+  list-style-type: var(--pv-ul-1, disc);
 }
 
 .preview :is(ul, ol) ul {
-  list-style-type: circle;
+  list-style-type: var(--pv-ul-2, circle);
 }
 
 .preview :is(ul, ol) :is(ul, ol) ul {
-  list-style-type: square;
+  list-style-type: var(--pv-ul-3, square);
 }
 
 .preview ol {
@@ -872,7 +1234,7 @@
   margin: 0 0.4em 0 -1.4em;
   vertical-align: -0.15em;
   border: 1.5px solid var(--pv-check-line);
-  border-radius: 0.22em;
+  border-radius: var(--pv-check-radius, 0.22em);
   background: var(--pv-bg);
   cursor: default;
 }
@@ -912,6 +1274,7 @@
   border-radius: var(--pv-quote-radius);
   background: var(--pv-quote-bg);
   color: var(--pv-quote-fg);
+  font-style: var(--pv-quote-style, normal);
 }
 
 .preview blockquote > :first-child {
@@ -923,8 +1286,9 @@
 }
 
 .preview hr {
+  width: var(--pv-hr-width, auto);
   height: var(--pv-hr-size);
-  margin: var(--pv-hr-margin) 0;
+  margin: var(--pv-hr-margin) auto;
   padding: 0;
   border: 0;
   background: var(--pv-hr-color);
@@ -1008,9 +1372,12 @@
 }
 
 .preview th {
+  border-top: var(--pv-table-top, var(--pv-cell-border));
   border-bottom: var(--pv-head-rule);
   background: var(--pv-th-bg);
   font-weight: var(--pv-h-weight);
+  font-variant-caps: var(--pv-th-caps, normal);
+  letter-spacing: var(--pv-th-track, 0);
   color: var(--pv-heading);
 }
 
@@ -1044,12 +1411,240 @@
   max-width: 100%;
   padding: 0.2em 0.65em;
   border: 1px dashed var(--pv-rule-strong);
-  border-radius: 6px;
+  border-radius: var(--pv-chip-radius, 6px);
   background: var(--pv-code-bg);
   color: var(--pv-muted);
-  font: 500 var(--fs-sm) / 1.45 var(--font-ui);
+  font: 500 var(--fs-sm) / 1.45 var(--pv-chip-font, var(--font-ui));
   vertical-align: baseline;
   overflow-wrap: anywhere;
+}
+
+.preview .markdown-diagram {
+  background: transparent;
+  border: 1px solid var(--pv-rule-strong);
+}
+
+.preview .markdown-diagram img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin-inline: auto;
+}
+
+.preview :is(.math-inline, .math-block) {
+  font-family: 'Cambria Math', 'STIX Two Math', math;
+}
+
+.preview .math-inline {
+  display: inline-grid;
+  max-width: 100%;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  vertical-align: baseline;
+}
+
+.preview .math-block {
+  max-width: 100%;
+  margin-block: var(--pv-hr-margin);
+  padding-block: 0.5em;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.preview .math-inline math { display: inline math; }
+.preview .math-block math { display: block math; }
+
+.preview :is(.math-block, .markdown-diagram):focus-visible {
+  outline: 2px solid var(--pv-focus);
+  outline-offset: 2px;
+}
+
+.preview [data-rich-state='error'] {
+  text-decoration: underline wavy var(--tk-invalid);
+}
+
+/* ── Settings: miniature documents (.mini-doc) ─────────────────────────
+   One per preset, each with its own fixed data-preview-theme; root mirrors
+   the effective data-theme. Built only from the preset's tokens: heading
+   face, weight, rule and marker, text, link, inline code, quote bar, a code
+   block with three syntax colours and a two-column table. Static, no user
+   content, no motion. */
+
+.mini-doc {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  height: 86px;
+  overflow: hidden;
+  padding: 7px 9px;
+  border: 1px solid color-mix(in srgb, var(--pv-fg) 16%, transparent);
+  border-radius: max(0px, calc(min(var(--r-group), 12px) - 3px));
+  background: var(--pv-bg);
+  color: var(--pv-fg);
+  font-family: var(--pv-font);
+  font-size: 10px;
+  line-height: 1.2;
+  forced-color-adjust: none;
+  pointer-events: none;
+}
+
+.mini-doc .md-h {
+  padding-bottom: 2px;
+  border-bottom: var(--pv-h1-rule);
+  font-size: 15px;
+  font-weight: var(--pv-h1-weight, var(--pv-h-weight));
+  line-height: 1.1;
+  letter-spacing: var(--pv-h-track);
+  color: var(--pv-heading);
+  white-space: nowrap;
+}
+
+.mini-doc .md-h::before {
+  content: var(--pv-h1-marker, none);
+  color: var(--pv-muted);
+  font-weight: 400;
+}
+
+.mini-doc .md-l {
+  display: block;
+  height: 3px;
+  border-radius: 1px;
+  background: color-mix(in srgb, var(--pv-fg) 42%, transparent);
+}
+
+.mini-doc .md-row {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.mini-doc .md-row > .md-l {
+  flex: 1;
+}
+
+.mini-doc .md-link {
+  width: 24%;
+  height: 3px;
+  border-radius: 1px;
+  background: var(--pv-link);
+}
+
+.mini-doc .md-code {
+  width: 14px;
+  height: 7px;
+  border: var(--pv-code-border);
+  border-radius: min(var(--pv-code-radius), 2px);
+  background: var(--pv-code-bg);
+}
+
+.mini-doc .md-quote {
+  display: block;
+  padding: 2px 0 2px 6px;
+  border-left: var(--pv-quote-w) solid var(--pv-quote-bar);
+  background: var(--pv-quote-bg);
+}
+
+.mini-doc .md-quote > .md-l {
+  width: 72%;
+  background: color-mix(in srgb, var(--pv-quote-fg) 48%, transparent);
+}
+
+.mini-doc .md-blocks {
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  align-items: start;
+  gap: 5px;
+}
+
+.mini-doc .md-pre {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 4px;
+  border: var(--pv-pre-border);
+  border-radius: min(var(--pv-pre-radius), 3px);
+  background: var(--pv-pre-bg);
+}
+
+.mini-doc .md-tk {
+  display: block;
+  height: 2px;
+  border-radius: 1px;
+}
+
+.mini-doc .md-tk-k { width: 42%; background: var(--tk-keyword); }
+.mini-doc .md-tk-s { width: 78%; background: var(--tk-string); }
+.mini-doc .md-tk-c { width: 58%; background: var(--tk-comment); }
+
+.mini-doc .md-table {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-bottom: var(--pv-table-foot);
+}
+
+.mini-doc .md-table > span {
+  border: var(--pv-cell-border);
+}
+
+.mini-doc .md-table > .md-th {
+  border-top: var(--pv-table-top, var(--pv-cell-border));
+  border-bottom: var(--pv-head-rule);
+  background: var(--pv-th-bg);
+}
+
+.mini-doc .md-table > span::before {
+  content: "";
+  display: block;
+  height: 2px;
+  margin: 2px 3px;
+  background: color-mix(in srgb, var(--pv-fg) 36%, transparent);
+}
+
+.mini-doc .md-table > .md-th::before {
+  background: var(--pv-heading);
+}
+
+/* ── Settings: live preview font sample ────────────────────────────────
+   Follows the selected preset (root updates data-preview-theme/data-theme)
+   and reads the user's --preview-font / --preview-size. The heading inherits
+   the chosen family; code stays in the preset's monospace. */
+
+.preview-font-sample {
+  display: grid;
+  gap: 2px;
+  background: var(--pv-bg);
+  color: var(--pv-fg);
+  font-family: var(--preview-font, var(--pv-font));
+  font-size: var(--preview-size, var(--pv-size));
+  line-height: var(--pv-lh);
+  font-variant-numeric: var(--pv-numeric, normal);
+  overflow-wrap: anywhere;
+  forced-color-adjust: none;
+}
+
+.preview-font-sample .sample-heading {
+  font-size: 1.25em;
+  font-weight: var(--pv-h1-weight, var(--pv-h-weight));
+  line-height: var(--pv-h-lh);
+  letter-spacing: var(--pv-h-track);
+  color: var(--pv-heading);
+}
+
+.preview-font-sample .sample-heading::before {
+  content: var(--pv-h1-marker, none);
+  color: var(--pv-muted);
+  font-weight: 400;
+}
+
+.preview-font-sample .sample-code {
+  padding: var(--pv-code-pad);
+  border: var(--pv-code-border);
+  border-radius: var(--pv-code-radius);
+  background: var(--pv-code-bg);
+  color: var(--pv-code-fg);
+  font-family: var(--pv-code-font);
+  font-size: var(--pv-code-size);
+  font-variant-ligatures: none;
 }
 
 /* Phone: less vertical air only. The chosen text size is kept. */
