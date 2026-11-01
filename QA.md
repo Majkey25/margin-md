@@ -36,6 +36,8 @@ The final main JavaScript is 711,160 bytes, gzip 252,648 bytes using Node defaul
 
 The 287,406-byte archive was extracted separately. All 18 files match the final build, the manifest reports 1.4.0, and its three bundled images decoded successfully. The extracted extension opened a real local Czech Markdown file, rendered safe HTML, edited it and saved exact BOM/CRLF bytes to genuine OPFS; the original disk fixture stayed unchanged. It reported no browser errors or HTTP(S) requests. SHA-256: `2e8297086d135d3536f5c319d883384d990178ff2d841c78dbe76936fde59da1`.
 
+The first Linux CI run exposed a test synchronization race: filling the editor immediately after discard confirmation could run before the native dialog's close event completed the new-document operation. The test now waits for the enabled New control and empty preview before entering the next fixture. Production code and archive bytes did not change.
+
 ## Pinned action startup | 1.3.1
 
 The toolbar action now runs a small launcher directly instead of dispatching its opening through the background service worker. It activates an existing editor without navigating or rebuilding its document, preferring the current window and matching its private-browsing mode. It creates a new editor only when none is open. Successful activation closes the launcher; failure keeps a native link available. No permission, keepalive, polling or document persistence was added. The worker retains the existing validated local-file message handler.

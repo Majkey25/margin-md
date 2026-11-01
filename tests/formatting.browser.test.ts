@@ -70,6 +70,12 @@ test('GitHub showcase, strict mode, safe HTML, images and document preservation'
         && document.querySelector('#dirty-state')?.getAttribute('data-dirty') === 'false', name);
       return page.evaluate(async (name) => (await (await (await navigator.storage.getDirectory()).getFileHandle(name)).getFile()).text(), name);
     };
+    const newDocument = async (): Promise<void> => {
+      await page.locator('#new-file').click();
+      await page.locator('#discard-confirm').click();
+      await page.waitForFunction(() => !(document.querySelector('#new-file') as HTMLButtonElement).disabled
+        && document.querySelector('#preview')?.childNodes.length === 0);
+    };
     assert.equal(await saveTo('showcase.md'), githubSample('en'));
 
     const source = '# Original\n\n<details><summary>More</summary>Text</details>\n';
@@ -159,8 +165,7 @@ test('GitHub showcase, strict mode, safe HTML, images and document preservation'
     await page.waitForFunction(() => document.querySelector('#preview h1')?.textContent === 'Invalid image');
     assert.equal(await preview.getByRole('button').count(), 0);
     assert.equal(await preview.locator('img').count(), 0);
-    await page.locator('#new-file').click();
-    await page.locator('#discard-confirm').click();
+    await newDocument();
     await page.evaluate(() => {
       let cancel = true;
       window.showDirectoryPicker = async () => {
@@ -177,8 +182,7 @@ test('GitHub showcase, strict mode, safe HTML, images and document preservation'
     await preview.getByRole('button').click();
     await page.waitForFunction(() => !!document.querySelector<HTMLImageElement>('#preview img')?.naturalWidth);
 
-    await page.locator('#new-file').click();
-    await page.locator('#discard-confirm').click();
+    await newDocument();
     await page.evaluate(() => {
       const state = window as ImagePickerTestWindow;
       state.pickerCalls = 0;
@@ -190,8 +194,7 @@ test('GitHub showcase, strict mode, safe HTML, images and document preservation'
     await editor.fill('# Pending image\n\n![Local](assets/local.svg)');
     await page.waitForFunction(() => document.querySelector('#preview h1')?.textContent === 'Pending image');
     await preview.getByRole('button').click();
-    await page.locator('#new-file').click();
-    await page.locator('#discard-confirm').click();
+    await newDocument();
     await page.evaluate(async () => (window as ImagePickerTestWindow).resolveImageFolder?.(await navigator.storage.getDirectory()));
     assert.equal(await preview.locator('img').count(), 0);
     await editor.fill('# Next image\n\n![Local](assets/local.svg)');
