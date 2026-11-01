@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.3.1 | 2026-11-01
+
+* Refine the original transparent corner-bracket icon with stronger vector geometry and fresh PNG exports.
+* Preserve unchanged preview blocks while editing; reparse the full Markdown so references and syntax budgets stay correct.
+* Open the editor from a small action launcher instead of waiting for a background-worker click handler.
+* Reuse an existing editor without reloading its text or history; create a new tab only when needed.
+* Prefer the current window and keep private and normal editor contexts separate.
+* Keep a native link available if automatic opening fails and omit the unnecessary modulepreload polyfill.
+
 ## 1.3.0 | 2026-11-01
 
 * Replace the corner brackets with a geometric M monogram, transparent browser icons and matching in-app marks.

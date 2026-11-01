@@ -4,7 +4,7 @@ import { classHighlighter, highlightCode } from '@lezer/highlight';
 import { parser as javascript } from '@lezer/javascript';
 import { parser as css } from '@lezer/css';
 import { parser as html } from '@lezer/html';
-import { t } from './i18n';
+import { getLocale, t, type Locale } from './i18n';
 
 const markdown = new MarkdownIt({ html: false, linkify: false, typographer: false });
 // shortcut: color at most 20,000 characters per render; use a worker for larger highlighted documents.
@@ -20,6 +20,9 @@ const codeParsers: ReadonlyMap<string, typeof javascript> = new Map([
 ]);
 
 interface RenderContext extends Env { highlightRemaining: number }
+// Cache only the displayed document, capped at 32 million HTML characters and released with the page.
+const MAX_CACHED_HTML_CHARS = 32 * 1024 * 1024;
+let previous: { target: HTMLElement; locale: Locale; blocks: string[] } | undefined;
 
 const plainFence = markdown.renderer.rules.fence!;
 markdown.renderer.rules.fence = (tokens, index, options, context, renderer) => {
@@ -69,9 +72,28 @@ for (const type of ['th_open', 'td_open']) {
   };
 }
 
-export function renderMarkdown(source: string): DocumentFragment {
+export function renderMarkdown(source: string, target: HTMLElement): void {
   const context: RenderContext = { highlightRemaining: MAX_HIGHLIGHT_CHARS };
-  const fragment = DOMPurify.sanitize(markdown.render(source, context), {
+  const tokens = markdown.parse(source, context);
+  const blocks: string[] = [];
+  let blockStart = 0;
+  let htmlChars = 0;
+  for (let index = 0; index < tokens.length; index++) {
+    if (tokens[index].level !== 0 || tokens[index].nesting > 0) continue;
+    const html = markdown.renderer.render(tokens.slice(blockStart, index + 1), markdown.options, context);
+    blocks.push(html);
+    htmlChars += html.length;
+    blockStart = index + 1;
+  }
+  const locale = getLocale();
+  let first = 0;
+  let oldEnd = target.children.length;
+  let newEnd = blocks.length;
+  if (previous?.target === target && previous.locale === locale && previous.blocks.length === oldEnd) {
+    while (first < oldEnd && first < newEnd && previous.blocks[first] === blocks[first]) first++;
+    while (oldEnd > first && newEnd > first && previous.blocks[oldEnd - 1] === blocks[newEnd - 1]) { oldEnd--; newEnd--; }
+  }
+  const fragment = DOMPurify.sanitize(blocks.slice(first, newEnd).join(''), {
     ALLOWED_TAGS: ['p', 'br', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'strong', 'em', 's',
       'a', 'code', 'pre', 'blockquote', 'ul', 'ol', 'li', 'hr', 'table', 'thead', 'tbody',
       'tr', 'th', 'td', 'span'],
@@ -94,5 +116,14 @@ export function renderMarkdown(source: string): DocumentFragment {
     text.prepend(checkbox, ' ');
   }
   for (const block of fragment.querySelectorAll<HTMLElement>('pre, table')) block.tabIndex = 0;
-  return fragment;
+  if (fragment.children.length !== newEnd - first) throw new Error('Unexpected Markdown block structure.');
+  for (const node of Array.from(fragment.childNodes)) if (node.nodeType !== Node.ELEMENT_NODE) node.remove();
+  if (oldEnd > first) {
+    const range = document.createRange();
+    range.setStartBefore(target.children[first]);
+    range.setEndAfter(target.children[oldEnd - 1]);
+    range.deleteContents();
+  }
+  target.insertBefore(fragment, target.children[first] ?? null);
+  previous = htmlChars <= MAX_CACHED_HTML_CHARS ? { target, locale, blocks } : undefined;
 }

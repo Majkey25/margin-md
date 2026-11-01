@@ -1,5 +1,36 @@
 # Validation
 
+## Pinned action startup | 1.3.1
+
+The toolbar action now runs a small launcher directly instead of dispatching its opening through the background service worker. It activates an existing editor without navigating or rebuilding its document, preferring the current window and matching its private-browsing mode. It creates a new editor only when none is open. Successful activation closes the launcher; failure keeps a native link available. No permission, keepalive, polling or document persistence was added. The worker retains the existing validated local-file message handler.
+
+`npm test` passed all 19 tests. The complete local browser command passed all four scenarios, covering editor/file-save regressions, language/preferences, the launcher and incremental preview updates. TypeScript and the production build passed; the production dependency audit reported zero vulnerabilities. The launcher scenario checks first opening, repeated reuse with one editor tab, unchanged unsaved text, undo, and the real fallback link after an injected context-lookup failure. The regular launcher document is used in this test; it does not establish native popup lifecycle or private-window behavior.
+
+Claude Opus reviewed the initial launcher and found no blocking defect. Its follow-up review was unavailable after quota exhaustion. Astra reviewed the final context-selection and success-close route and found no confirmed blocking defect; its review did not execute browser tests. The primary agent verified the browser API calls and preserved the file-safety and CSP boundaries. Chrome's [runtime API](https://developer.chrome.com/docs/extensions/reference/api/runtime#method-getContexts) provides the extension's own contexts from Chrome 116; Margin retains its Chrome 120 minimum.
+
+An isolated Chromium measurement timed real Chrome API work after launcher document initialization. First creation took 65.8 ms; reuse took 37.1, 38.1 and 35.9 ms, while the editor-tab count stayed at one. These figures exclude toolbar dispatch, popup creation and HTML loading. Earlier end-to-end native-action probes varied substantially and some timed out, so they do not support a reliable before/after latency claim. Physical Brave latency, native popup behavior and private-window behavior remain unverified.
+
+### Preview rendering and original icon
+
+Editing now preserves unchanged top-level preview blocks instead of rebuilding the entire DOM. Full-document Markdown parsing and rendering remain, preserving reference resolution and the shared highlighting budget. Only the changed range is sanitized and inserted. Previously sanitized blocks remain unchanged. The one-document in-memory HTML comparison cache is capped at 32 × 1,024 × 1,024 characters and rebuilt on language changes; it is not persisted.
+
+The new real-browser regression verifies DOM identity for unchanged headings, quotes, tables and code, changed reference definitions, insertion/deletion, an empty document and recovery. Existing tests also cover localized task labels, the aggregate code budget, blocked active content, zero automatic document HTTP(S) requests and genuine OPFS save bytes. Astra independently checked the renderer and compared 13 token-group fixtures with markdown-it's full output without finding a confirmed defect. The primary agent executed the DOM regressions.
+
+An initial paired test used real synthetic 100 KiB and 1 MiB files in isolated Chromium at 1440 × 900. Browser timings started at file-input change or typing and ended two frames after preview mutation, including the 120 ms typing debounce. The 100 KiB edit changed from 386.1 to 176.1 ms; the 1 MiB edit changed from 2,686.8 to 523.4 ms. Full 1 MiB opening remained around 2.7 seconds. These local observations do not establish a universal speedup; large single-block documents still require replacing their whole block.
+
+The user-preferred opposing corner-bracket icon replaces the M, with stronger vector geometry and new 16/32/48/128 px exports. Browser PNG decoding verified each dimension, visible pixels, transparent background pixels and transparent corners. Fresh light/dark screenshots at 1440 × 900 and 390 × 844 were inspected; all four axe checks reported zero violations and no outer horizontal overflow. The final main JavaScript is 643,316 bytes, gzip 225,684 bytes using Node defaults, close to 1.3.0's 643,285/225,681 bytes. One local load measured 362.5 ms, LCP 584 ms and CLS 0. Field INP, physical mobile devices and worst-case 5 MiB latency remain unmeasured.
+
+A second comparison loaded the extracted 1.3.0 release and final build in separate isolated Chromium sessions, with three runs for each file size. Medians are below. Host load varied substantially, so these support the reduced DOM work without establishing a guaranteed speed ratio.
+
+| Check | 1.3.0 | 1.3.1 |
+| :--- | ---: | ---: |
+| 100 KiB open and preview | 575.1 ms | 431 ms |
+| 100 KiB edit and preview | 541.5 ms | 168.3 ms |
+| 1 MiB open and preview | 3,796.9 ms | 2,852 ms |
+| 1 MiB edit and preview | 4,709.1 ms | 605.3 ms |
+
+The final 258,475-byte ZIP was extracted separately. All 15 files match `dist/` byte for byte and its manifest reports 1.3.1. The extracted extension opened a real local Czech Markdown fixture, edited and rendered it, then wrote a genuine OPFS target with exact UTF-8 BOM/CRLF bytes; the original disk fixture stayed unchanged. No browser error occurred. This archive check does not repeat the native external-disk write/chooser tests described below. SHA-256: `91487ed90af5983df0e1229e4f29799b29df12d16e112ab5431340d7e31208f7`.
+
 ## Language, editor profiles and icon | 1.3.0
 
 Checked on 1 November 2026 on Windows. `npm test` passed 19 tests. `npm run test:browser` passed TypeScript, the production build and both loaded-extension scenarios. `npm audit --omit=dev` reported zero vulnerabilities. No runtime dependency or permission was added.

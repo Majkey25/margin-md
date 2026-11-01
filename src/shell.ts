@@ -13,7 +13,7 @@ const icons = {
 };
 
 const mark = (size: number, className: string): string =>
-  `<svg class="${className}" viewBox="0 0 32 32" width="${size}" height="${size}" aria-hidden="true"><path fill="currentColor" d="M4 27V7a2 2 0 0 1 2-2h4l6 9 6-9h4a2 2 0 0 1 2 2v20h-6V15l-6 8-6-8v12z"/></svg>`;
+  `<svg class="${className}" viewBox="0 0 32 32" width="${size}" height="${size}" aria-hidden="true"><path fill="currentColor" d="M4 4h15v5H9v11H4zM28 28H13v-5h10V12h5z"/></svg>`;
 
 export const shell = String.raw`
 <header class="toolbar" aria-label="Hlavní panel nástrojů" data-i18n-aria-label="Hlavní panel nástrojů">

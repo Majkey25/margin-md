@@ -3,7 +3,7 @@
 A local Markdown editor for Chrome. Write the source, see a live preview, and save the file on your computer.
 
 [![Checks](https://github.com/Majkey25/margin-md/actions/workflows/ci.yml/badge.svg)](https://github.com/Majkey25/margin-md/actions/workflows/ci.yml)
-[![Stable release](https://img.shields.io/badge/release-v1.3.0-black?style=flat-square&logo=github&logoColor=white)](https://github.com/Majkey25/margin-md/releases/latest)
+[![Stable release](https://img.shields.io/badge/release-v1.3.1-black?style=flat-square&logo=github&logoColor=white)](https://github.com/Majkey25/margin-md/releases/latest)
 ![Chrome Manifest V3](https://img.shields.io/badge/Chrome-Manifest_V3-black?style=flat-square&logo=googlechrome&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-strict-black?style=flat-square&logo=typescript&logoColor=white)
 ![Local files](https://img.shields.io/badge/files-local_only-black?style=flat-square)
@@ -19,7 +19,9 @@ A local Markdown editor for Chrome. Write the source, see a live preview, and sa
 3. Click **Load unpacked** and select the extracted folder containing `manifest.json`.
 4. Pin Margin and click its toolbar icon.
 
-No build tools are needed for the release ZIP. The release also includes `SHA256SUMS.txt` for verifying the download. This repository is private, so GitHub downloads require repository access.
+The icon returns to an existing editor without reloading its document. It prefers an editor in the current window and keeps private and normal windows separate. If no editor is open, it opens a new tab. The launch path runs independently of the background service worker; it adds no keepalive or polling.
+
+No build tools are needed for the release ZIP. The release also includes `SHA256SUMS.txt` for verifying the download.
 
 Chrome desktop is the supported installation target. The unpacked release also works in Brave. Margin is not published in the Chrome Web Store.
 

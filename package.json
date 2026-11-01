@@ -1,6 +1,6 @@
 {
   "name": "margin-md",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "private": true,
   "type": "module",
   "description": "Local Markdown editor and preview for Chrome",
@@ -9,7 +9,7 @@
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview --host 127.0.0.1",
     "test": "node --import tsx --test tests/files.test.ts tests/i18n.test.ts",
-    "test:browser": "npm run build && node --import tsx --test --test-concurrency=1 tests/browser.test.ts tests/preferences.browser.test.ts",
+    "test:browser": "npm run build && node --import tsx --test --test-concurrency=1 tests/browser.test.ts tests/preferences.browser.test.ts tests/launcher.browser.test.ts tests/preview.browser.test.ts",
     "check": "tsc --noEmit"
   },
   "dependencies": {

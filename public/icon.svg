@@ -1,4 +1,4 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
   <title>Margin</title>
-  <path fill="#202020" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke fill" d="M4 27V7a2 2 0 0 1 2-2h4l6 9 6-9h4a2 2 0 0 1 2 2v20h-6V15l-6 8-6-8v12z"/>
+  <path fill="#202020" stroke="#fff" stroke-width="3" stroke-linejoin="round" paint-order="stroke fill" d="M4 4h15v5H9v11H4zM28 28H13v-5h10V12h5z"/>
 </svg>

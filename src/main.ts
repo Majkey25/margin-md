@@ -150,7 +150,7 @@ function updatePreview(): void {
   element('word-count').textContent = countText(words, '{count} slovo', '{count} slova', '{count} slov');
   if (mode === 'source') return;
   try {
-    preview.replaceChildren(renderMarkdown(source));
+    renderMarkdown(source, preview);
   } catch {
     say('Náhled nelze vytvořit. Text zůstává v editoru.', true);
     return;

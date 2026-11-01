@@ -1,9 +1,5 @@
 import { getLocalMarkdownUrl } from './files';
 
-chrome.action.onClicked.addListener(() => {
-  void chrome.tabs.create({ url: chrome.runtime.getURL('index.html') });
-});
-
 chrome.runtime.onMessage.addListener((message: unknown, sender) => {
   if (message !== 'open-local-markdown' || sender.id !== chrome.runtime.id
     || sender.frameId !== 0 || sender.tab?.id === undefined || !sender.url) return;

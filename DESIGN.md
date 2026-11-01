@@ -1,4 +1,4 @@
-# Margin design (1.3.0)
+# Margin design (1.3.1)
 
 A precise writing instrument. The filename is the title, the document sits on its own sheet inside a quiet window frame, and the chrome only holds what you act on.
 
@@ -51,7 +51,7 @@ Short phone windows (≤ 520 px tall) drop controls to 40 px so the sheet keeps 
 
 ## Signature
 
-One mark: a geometric M with a folded center and rounded outer shoulders on a transparent background (`public/icon.svg`, PNGs keep alpha). A white keyline keeps the browser icon legible on dark toolbars. Toolbar and drop marks share the geometry and use `--mark-ink`.
+One mark: the original two corner brackets, with stronger strokes and clean vector geometry on a transparent background (`public/icon.svg`, PNGs keep alpha). A white keyline keeps the browser icon legible on dark toolbars. Toolbar and drop marks share the geometry and use `--mark-ink`.
 
 ## Token grammar
 
