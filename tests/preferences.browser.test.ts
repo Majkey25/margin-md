@@ -120,6 +120,7 @@ test('language settings follow device preferences and preserve documents', { tim
     await page.locator('#new-file').click();
     assert.equal(await page.locator('#discard-title').innerText(), 'Ungespeicherte Änderungen verwerfen?');
     await page.locator('#discard-cancel').click();
+    await page.waitForFunction(() => document.querySelector('#open-file')?.hasAttribute('disabled') === false);
     await page.locator('#file-input').setInputFiles({ name: 'wrong.txt', mimeType: 'text/plain', buffer: Buffer.from('x') });
     await page.waitForFunction(() => document.querySelector('#status-message')?.getAttribute('data-error') === 'true');
     assert.match(await page.locator('#status-message').innerText(), /Endung \.md oder \.markdown/);
