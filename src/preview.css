@@ -597,7 +597,7 @@
 }
 
 .preview:empty::before {
-  content: "Náhled se zobrazí, jakmile začnete psát.";
+  content: attr(data-empty-hint);
   font-family: var(--font-ui);
   font-size: var(--fs-md);
   color: var(--pv-muted);

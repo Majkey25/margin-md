@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.3.0 | 2026-11-01
+
+* Replace the corner brackets with a geometric M monogram, transparent browser icons and matching in-app marks.
+* Follow the device's browser language by default, with persistent English, Czech and German overrides.
+* Translate controls, accessible labels, dialogs, errors and counters without changing open documents.
+* Add Code, Writing and Plain text editor profiles that preserve text, cursor, saved state and undo history.
+* Add installed sans-serif and serif source fonts and center the scrollable settings dialog.
+
 ## 1.2.0 | 2026-11-01
 
 * Refresh the whole window with an inset writing surface, clearer document identity and consistent command icons.

@@ -208,7 +208,7 @@ test('accepts only local Markdown file URLs', () => {
     'file:///notes%ZZ.md',
     'not a url',
   ]) {
-    assert.throws(() => getLocalMarkdownUrl(url), /local/);
+    assert.throws(() => getLocalMarkdownUrl(url), /místní/);
   }
 });
 

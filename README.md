@@ -3,7 +3,7 @@
 A local Markdown editor for Chrome. Write the source, see a live preview, and save the file on your computer.
 
 [![Checks](https://github.com/Majkey25/margin-md/actions/workflows/ci.yml/badge.svg)](https://github.com/Majkey25/margin-md/actions/workflows/ci.yml)
-[![Stable release](https://img.shields.io/badge/release-v1.2.0-black?style=flat-square&logo=github&logoColor=white)](https://github.com/Majkey25/margin-md/releases/latest)
+[![Stable release](https://img.shields.io/badge/release-v1.3.0-black?style=flat-square&logo=github&logoColor=white)](https://github.com/Majkey25/margin-md/releases/latest)
 ![Chrome Manifest V3](https://img.shields.io/badge/Chrome-Manifest_V3-black?style=flat-square&logo=googlechrome&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-strict-black?style=flat-square&logo=typescript&logoColor=white)
 ![Local files](https://img.shields.io/badge/files-local_only-black?style=flat-square)
@@ -21,21 +21,23 @@ A local Markdown editor for Chrome. Write the source, see a live preview, and sa
 
 No build tools are needed for the release ZIP. The release also includes `SHA256SUMS.txt` for verifying the download. This repository is private, so GitHub downloads require repository access.
 
-Chrome desktop is the supported installation target. Margin is distributed as an unpacked extension and is not published in the Chrome Web Store.
+Chrome desktop is the supported installation target. The unpacked release also works in Brave. Margin is not published in the Chrome Web Store.
 
 Updates are manual. Save open documents, replace the extracted extension files with a newer ZIP, and click **Reload** in `chrome://extensions`.
 
 ## Read and edit
 
-Open a `.md` or `.markdown` file with **Otevřít**, or drop it into the editor. Choose **Text**, **Vedle sebe**, or **Náhled**. Preview-only mode gives the document the full application area, and the fullscreen control expands the browser view.
+The interface follows your device's preferred browser language. English, Czech and German are available; unsupported languages fall back to English. Choose an explicit language in **Appearance → Language** to override the device setting. Changing language preserves the open file, text and undo history.
 
-**Uložit** writes to the opened file. **Uložit jako** asks for a filename and destination folder, then asks before replacing an existing file. Choosing a destination does not empty an existing file. Save is manual; text remains in the editor if a write fails.
+Open a `.md` or `.markdown` file with **Open**, or drop it into the editor. Choose **Text**, **Side by side**, or **Preview**. Preview-only mode gives the document the full application area, and the fullscreen control expands the browser view.
 
-The theme button shows the current light or dark appearance. First open follows your device; clicking the button switches it with the circular reveal used on Init. Reduced motion disables the reveal. **Nastavení** offers System, Light and Dark appearance, plus **Minimal**, **Glass**, **Material You**, **Fluent** and **Nord** visual styles. These preferences stay on this device; document contents are not stored with them. Material You uses a bundled tonal palette, not wallpaper colors from the operating system.
+**Save** writes to the opened file. **Save As** asks for a filename and destination folder, then asks before replacing an existing file. Choosing a destination does not empty an existing file. Save is manual; text remains in the editor if a write fails.
+
+The theme button shows the current light or dark appearance. First open follows your device; clicking the button switches it with the circular reveal used on Init. Reduced motion disables the reveal. **Appearance** offers System, Light and Dark appearance, plus **Minimal**, **Glass**, **Material You**, **Fluent** and **Nord** visual styles. These preferences stay on this device; document contents are not stored with them. Material You uses a bundled tonal palette, not wallpaper colors from the operating system. Settings open in the center of the window, with a fixed close control and scrollable body.
 
 Each style changes the window surfaces, controls and selection states. Fluent uses restrained Windows-inspired layers and blue accents. Nord uses an arctic palette with a Frost selection and separate light and dark layers. Settings group related controls and pair font with size; the close button remains reachable in short windows.
 
-Choose the Markdown preview separately in **Náhled Markdownu**:
+Choose the Markdown preview separately in **Markdown preview**:
 
 | Preview | Default typography | Appearance |
 | :--- | :--- | :--- |
@@ -44,7 +46,9 @@ Choose the Markdown preview separately in **Náhled Markdownu**:
 | **Čtení** | Serif, 17 px | A quiet reading column with softer contrast |
 | **Nord** | System sans, 16 px | Arctic reading surfaces, Frost accents and dark code blocks in both modes |
 
-All four follow the current light or dark mode. They are inspired by their sources, not exact copies. Set the preview font and size independently from the source editor; **Podle stylu** restores the preset defaults. The editor offers system monospace, Cascadia and Consolas stacks at 12–20 px. Missing fonts use installed fallbacks; nothing is downloaded. Changes apply immediately and preserve the document and undo history.
+All four follow the current light or dark mode. They are inspired by their sources, not exact copies. Set the preview font and size independently from the source editor; **Use style default** restores the preset defaults. The editor offers system monospace, Cascadia, Consolas, sans-serif and serif stacks at 12–20 px. Missing fonts use installed fallbacks; nothing is downloaded. Changes apply immediately and preserve the document and undo history.
+
+Choose **Code** for line numbers, an active line and Markdown syntax colors, **Writing** for syntax colors without line numbers, or **Plain text** without syntax colors. Every profile edits the raw Markdown. Switching profiles keeps your font, text, cursor, saved state and undo history.
 
 ![Nord interface and Markdown preview in dark mode](docs/images/nord.png)
 

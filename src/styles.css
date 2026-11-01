@@ -1661,8 +1661,7 @@ select {
   width: min(400px, calc(100vw - 32px));
 }
 
-/* Preferences: anchored under the toolbar on wide screens, light backdrop so
-   changes stay visible behind it. The head stays put; only the body scrolls. */
+/* Preferences keep the close control visible while the body scrolls. */
 .dialog-prefs {
   width: min(520px, calc(100vw - 24px));
   max-height: calc(100dvh - 24px);
@@ -1811,13 +1810,6 @@ select {
 }
 
 /* ── Responsive ────────────────────────────────────────────────────── */
-
-@media (min-width: 961px) {
-  .dialog-prefs {
-    margin: 64px 12px auto auto;
-    max-height: calc(100dvh - 76px);
-  }
-}
 
 @media (max-width: 1359px) {
   .kbd {

@@ -1,5 +1,38 @@
 # Validation
 
+## Language, editor profiles and icon | 1.3.0
+
+Checked on 1 November 2026 on Windows. `npm test` passed 19 tests. `npm run test:browser` passed TypeScript, the production build and both loaded-extension scenarios. `npm audit --omit=dev` reported zero vulnerabilities. No runtime dependency or permission was added.
+
+Device-language resolution covers regional English, Czech and German, ordered language preferences and an unsupported-language fallback. Browser checks cover manual persistence, device language changes, invalid stored choices, translated labels/errors/dialogs, and unchanged document names, raw text, cursor, dirty state and undo. All three editor profiles reconfigure the existing CodeMirror state. A focused independent source review found no confirmed substantive defect.
+
+Twelve final axe checks of the window and settings in Czech, English and German passed without violations at 1440 × 900 and 390 × 844. No outer horizontal overflow was found. Settings center exactly in the viewport; at 390 × 460 both Close and the focused last control remain visible. German device and monospace labels were shortened after screenshot and text-width inspection. Fresh desktop and mobile images were inspected. The settings close action restores keyboard focus.
+
+The SVG and four PNG icons share a geometric M. Actual PNG decoding confirmed the expected 16, 32, 48 and 128 px dimensions, transparent corner pixels and clear background pixels. The source and Markdown palettes remain those validated for 1.2.0.
+
+### Local performance
+
+The extracted 1.2.0 release and final 1.3.0 build ran on the same machine in Chromium 156.0.8078.4 at 1440 × 900, in light mode with reduced motion and no throttling. Both imported the same 102,400-byte Markdown fixture five times. Timings include browser automation and two animation frames after insertion.
+
+| Check | 1.2.0 | 1.3.0 |
+| :--- | ---: | ---: |
+| Local load event | 373 ms | 357.2 ms |
+| Largest contentful paint | 496 ms | 476 ms |
+| Cumulative layout shift | 0 | 0 |
+| Import and preview, median of 5 | 336 ms | 295.7 ms |
+| Main JavaScript bytes | 619,429 | 643,285 |
+| Main JavaScript gzip bytes, Node zlib defaults | 219,309 | 225,681 |
+
+Final import runs were 357.1, 278.7, 287.7, 295.7 and 299.7 ms. Repeated local preflight runs varied, so these results do not establish a statistically significant speed improvement or a universal latency guarantee. Field INP, physical mobile behavior and worst-case 5 MiB rendering remain unmeasured.
+
+### Archive and Brave update
+
+The final ZIP contains 259,642 bytes. Its separately extracted manifest reports 1.3.0 and its main JavaScript matches the final production build byte for byte. The release smoke check opened a real local Markdown fixture and preserved its text while switching language and profile; it reported no browser errors or axe violations.
+
+The existing Brave unpacked-extension folder was backed up before replacing its files. All 13 release files match the installed files byte for byte. Brave's Reload action confirmed version 1.3.0 under the existing extension ID, and the toolbar action opened the translated editor. Browser permissions were not changed. Native Windows file/folder chooser automation and real external disk-write tests were not repeated; the earlier disk evidence and its limits remain below.
+
+Archive SHA-256: `91a227e405de7c1f6a5216dac2c10dbe5be405814e28675fd9c8bedad5cb830b`.
+
 ## Modern window and Nord | 1.2.0
 
 Checked on 1 November 2026 in Chromium 156.0.8078.4 on Windows. `npm test` passed all 16 file tests. `npm run test:browser` passed TypeScript, the production build and the loaded-extension scenario, including persistence of Fluent/Nord and the Nord preview. `npm audit --omit=dev` reported zero vulnerabilities. Impeccable's static scan of the shell and both stylesheets returned no findings.

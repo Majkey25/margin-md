@@ -7,6 +7,7 @@ test('extension editing, safe rendering and file-save regressions', { timeout: 6
   const extension = resolve('dist');
   const context = await chromium.launchPersistentContext('', {
     channel: 'chromium', headless: true,
+    locale: 'cs-CZ',
     args: [`--disable-extensions-except=${extension}`, `--load-extension=${extension}`],
     // Keep the complete sample mounted while testing persisted editor typography.
     viewport: { width: 1440, height: 1200 },

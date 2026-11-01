@@ -4,6 +4,7 @@ import { classHighlighter, highlightCode } from '@lezer/highlight';
 import { parser as javascript } from '@lezer/javascript';
 import { parser as css } from '@lezer/css';
 import { parser as html } from '@lezer/html';
+import { t } from './i18n';
 
 const markdown = new MarkdownIt({ html: false, linkify: false, typographer: false });
 // shortcut: color at most 20,000 characters per render; use a worker for larger highlighted documents.
@@ -56,7 +57,7 @@ markdown.core.ruler.before('inline', 'task-list', (state) => {
 
 // Images stay text so opening an untrusted document cannot contact another server.
 markdown.renderer.rules.image = (tokens, index) =>
-  `<span class="blocked-image">Obrázek: ${markdown.utils.escapeHtml(tokens[index].content || 'bez popisu')} (nenačten)</span>`;
+  `<span class="blocked-image">${markdown.utils.escapeHtml(t('Obrázek: {name} (nenačten)', { name: tokens[index].content || t('bez popisu') }))}</span>`;
 
 for (const type of ['th_open', 'td_open']) {
   markdown.renderer.rules[type] = (tokens, index, options, _env, renderer) => {
@@ -89,7 +90,7 @@ export function renderMarkdown(source: string): DocumentFragment {
     const label = Array.from(text.childNodes)
       .filter((node) => !(node instanceof HTMLElement && (node.tagName === 'UL' || node.tagName === 'OL')))
       .map((node) => node.textContent ?? '').join('').trim().slice(0, 240);
-    checkbox.setAttribute('aria-label', label || 'Úkol');
+    checkbox.setAttribute('aria-label', label || t('Úkol'));
     text.prepend(checkbox, ' ');
   }
   for (const block of fragment.querySelectorAll<HTMLElement>('pre, table')) block.tabIndex = 0;

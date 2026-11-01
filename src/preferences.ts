@@ -1,7 +1,8 @@
 type Theme = 'system' | 'light' | 'dark';
 type Surface = 'minimal' | 'glass' | 'material' | 'fluent' | 'nord';
+export type EditorType = 'code' | 'prose' | 'plain';
 
-export function setupPreferences(onStorageError: () => void, onEditorTypographyChange: () => void): HTMLDialogElement {
+export function setupPreferences(onStorageError: () => void, onEditorTypographyChange: () => void, onEditorTypeChange: (value: EditorType) => void): HTMLDialogElement {
   const root = document.documentElement;
   const dialog = document.getElementById('preferences-dialog') as HTMLDialogElement;
   const themeSetting = document.getElementById('theme-setting') as HTMLSelectElement;
@@ -33,7 +34,7 @@ export function setupPreferences(onStorageError: () => void, onEditorTypographyC
     try { localStorage.setItem(key, value); } catch { onStorageError(); }
   };
   const setting = <T extends string>(
-    id: string, key: string, values: readonly T[], fallback: T, apply: (value: T) => void, onChange?: () => void,
+    id: string, key: string, values: readonly T[], fallback: T, apply: (value: T) => void, onChange?: (value: T) => void,
   ): void => {
     const select = document.getElementById(id) as HTMLSelectElement;
     let stored: string | null = null;
@@ -47,7 +48,7 @@ export function setupPreferences(onStorageError: () => void, onEditorTypographyC
       selected = next;
       apply(selected);
       save(key, selected);
-      onChange?.();
+      onChange?.(selected);
     });
   };
   const stopTransition = (): void => {
@@ -69,7 +70,11 @@ export function setupPreferences(onStorageError: () => void, onEditorTypographyC
     system: 'ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace',
     cascadia: '"Cascadia Code", "Cascadia Mono", Consolas, monospace',
     consolas: 'Consolas, "Courier New", monospace',
+    sans: '"Segoe UI", Arial, sans-serif',
+    serif: 'Georgia, "Times New Roman", serif',
   };
+  setting('editor-type-setting', 'margin.editorType', ['code', 'prose', 'plain'] as const, 'code',
+    (value) => { root.dataset.editorType = value; }, onEditorTypeChange);
   setting('preview-theme-setting', 'margin.previewTheme', ['github', 'vscode', 'reading', 'nord'] as const, 'github',
     (value) => { root.dataset.previewTheme = value; });
   setting('preview-font-setting', 'margin.previewFont', ['default', 'sans', 'serif', 'mono'] as const, 'default',
@@ -82,7 +87,7 @@ export function setupPreferences(onStorageError: () => void, onEditorTypographyC
       if (value === 'default') root.style.removeProperty('--preview-size');
       else root.style.setProperty('--preview-size', `${value}px`);
     });
-  setting('editor-font-setting', 'margin.editorFont', ['system', 'cascadia', 'consolas'] as const, 'system',
+  setting('editor-font-setting', 'margin.editorFont', ['system', 'cascadia', 'consolas', 'sans', 'serif'] as const, 'system',
     (value) => root.style.setProperty('--editor-font', editorFonts[value]), onEditorTypographyChange);
   setting('editor-size-setting', 'margin.editorSize', ['12', '13', '14', '15', '16', '18', '20'] as const, '14',
     (value) => {

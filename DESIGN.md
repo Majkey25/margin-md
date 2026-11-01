@@ -1,4 +1,4 @@
-# Margin design (1.2.0)
+# Margin design (1.3.0)
 
 A precise writing instrument. The filename is the title, the document sits on its own sheet inside a quiet window frame, and the chrome only holds what you act on.
 
@@ -51,7 +51,7 @@ Short phone windows (≤ 520 px tall) drop controls to 40 px so the sheet keeps 
 
 ## Signature
 
-One mark: two corner brackets that frame a page's margin on a transparent background (`public/icon.svg`, PNGs keep alpha). The toolbar and drop marks use `--mark-ink`. The bracket idea repeats in the frame: the sheet is the page, the chrome is its margin.
+One mark: a geometric M with a folded center and rounded outer shoulders on a transparent background (`public/icon.svg`, PNGs keep alpha). A white keyline keeps the browser icon legible on dark toolbars. Toolbar and drop marks share the geometry and use `--mark-ink`.
 
 ## Token grammar
 
@@ -128,11 +128,13 @@ User font choices are read, never redefined: `.preview` uses `font-family: var(-
 
 `#preferences-dialog` (`Vzhled`) has a fixed head with the close button and a scrolling body. Each section is a sentence-case title over a grouped container whose rows are split by hairlines:
 
-1. **Aplikace:** `Režim` with its hint; `Styl rozhraní` (Minimal, Glass, Material You, Fluent, Nord) with the note for the current style.
+1. **Aplikace:** `Jazyk`; `Režim` with its hint; `Styl rozhraní` (Minimal, Glass, Material You, Fluent, Nord) with the note for the current style.
 2. **Náhled Markdownu:** `Styl náhledu` (GitHub, VS Code, Čtení, Nord) with its hint; then one paired row of `Písmo` and `Velikost`.
-3. **Editor:** one paired row of `Písmo` and `Velikost`.
+3. **Editor:** `Typ editoru`; then one paired row of `Písmo` and `Velikost`.
 
-Single rows put the label and hint left and the select right (select 160–200 px). Paired rows put two labelled selects side by side; they stack below 360 px, and single rows stack below 480 px. Visually hidden suffixes keep each accessible name unique. Keyboard order is close, then every select top to bottom. The dialog is 520 px wide, anchored under the toolbar from 961 px, and never taller than the viewport.
+Single rows put the label and hint left and the select right (select 160–200 px). Paired rows put two labelled selects side by side; they stack below 360 px, and single rows stack below 480 px. Visually hidden suffixes keep each accessible name unique. Keyboard order is close, then every select top to bottom. The dialog is 520 px wide, centered at every viewport size, and never taller than the viewport.
+
+Language defaults to browser preferences, with explicit English, Czech and German choices. Code keeps line numbers, the active line and syntax colors; Writing keeps syntax colors without line numbers or the active line; Plain text removes all three. Profile and language changes preserve the editor state and chosen typography.
 
 ## Behaviour notes
 

@@ -132,5 +132,5 @@ export function getLocalMarkdownUrl(value: string): URL {
   } catch {
     // Report malformed URLs and percent encoding consistently.
   }
-  throw new Error('URL must refer to a local .md or .markdown file.');
+  throw new Error('Adresa musí odkazovat na místní soubor .md nebo .markdown.');
 }

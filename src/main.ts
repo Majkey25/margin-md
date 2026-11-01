@@ -1,4 +1,4 @@
-import { EditorState } from '@codemirror/state';
+import { Compartment, EditorState, type Extension } from '@codemirror/state';
 import { EditorView, keymap, lineNumbers, highlightActiveLineGutter, drawSelection, highlightActiveLine } from '@codemirror/view';
 import { defaultKeymap, history, historyKeymap } from '@codemirror/commands';
 import { markdownLanguage, markdownKeymap } from '@codemirror/lang-markdown';
@@ -7,9 +7,10 @@ import { tags } from '@lezer/highlight';
 import { decodeMarkdown, encodeMarkdown, FileConflictError, getLocalMarkdownUrl, MAX_FILE_BYTES,
   createSaveTarget, prepareSaveTarget, readMarkdown, validateMarkdownName, writeMarkdown, type LoadedFile } from './files';
 import { renderMarkdown } from './render';
-import { sample } from './sample';
+import { initialSample } from './sample';
 import { shell } from './shell';
-import { setupPreferences } from './preferences';
+import { setupPreferences, type EditorType } from './preferences';
+import { getLocale, isMessageKey, setupLanguage, t, type MessageKey } from './i18n';
 import './styles.css';
 import './preview.css';
 
@@ -20,6 +21,7 @@ function element<T extends HTMLElement>(id: string): T {
 }
 
 element('app').innerHTML = shell;
+setupLanguage(refreshLanguage, () => say('Nastavení je změněné. Prohlížeč jej nedovolil zapamatovat.'));
 const workspace = element('workspace');
 const preview = element('preview');
 const fileInput = element<HTMLInputElement>('file-input');
@@ -28,15 +30,31 @@ const modeButtons = document.querySelectorAll<HTMLButtonElement>('button[data-mo
 const preferencesDialog = setupPreferences(
   () => say('Nastavení je změněné. Prohlížeč jej nedovolil zapamatovat.'),
   () => editor.requestMeasure(),
+  (value) => {
+    editorType = value;
+    editor.dispatch({ effects: editorProfile.reconfigure(profileExtensions(value)) });
+    editor.requestMeasure();
+  },
 );
-const wordCounter = new Intl.Segmenter('cs', { granularity: 'word' });
+let wordCounter = new Intl.Segmenter(getLocale(), { granularity: 'word' });
+let pluralRules = new Intl.PluralRules(getLocale());
+let numberFormat = new Intl.NumberFormat(getLocale());
 const format = { newline: '\n', bom: false } as const;
-let current: LoadedFile = { name: 'Vítejte.md', source: sample, format, bytes: encodeMarkdown(sample, format) };
-let locationLabel = 'Ukázkový dokument';
+const sample = initialSample(getLocale());
+let current: LoadedFile = { name: t('Vítejte.md'), source: sample, format, bytes: encodeMarkdown(sample, format) };
+let locationLabel: MessageKey = 'Ukázkový dokument';
 let busy = false;
 let previewTimer: ReturnType<typeof setTimeout>;
 let previewStale = true;
 let mode = matchMedia('(max-width: 700px)').matches ? 'preview' : 'split';
+const editorAria = new Compartment();
+const editorProfile = new Compartment();
+let editorType: EditorType = document.documentElement.dataset.editorType === 'prose' ? 'prose'
+  : document.documentElement.dataset.editorType === 'plain' ? 'plain' : 'code';
+let statusKey: MessageKey = 'Otevřete soubor nebo začněte psát.';
+let statusError = false;
+let saveError: MessageKey | undefined;
+let confirmation: { title: MessageKey; description: MessageKey; action: MessageKey; params?: Readonly<Record<string, string | number>> } | undefined;
 
 const highlighting = HighlightStyle.define([
   { tag: tags.heading, fontWeight: '700', color: 'var(--syntax-heading, #256478)' },
@@ -47,12 +65,18 @@ const highlighting = HighlightStyle.define([
   { tag: tags.monospace, color: 'var(--syntax-code, #99512e)' },
 ]);
 
+function profileExtensions(value: EditorType): Extension[] {
+  if (value === 'plain') return [];
+  const syntax = [markdownLanguage, syntaxHighlighting(highlighting), keymap.of(markdownKeymap)];
+  return value === 'code' ? [lineNumbers(), highlightActiveLineGutter(), highlightActiveLine(), ...syntax] : syntax;
+}
+
 function editorState(source: string): EditorState {
   return EditorState.create({
     doc: source,
-    extensions: [lineNumbers(), highlightActiveLineGutter(), history(), drawSelection(), highlightActiveLine(),
-      keymap.of([...markdownKeymap, ...defaultKeymap, ...historyKeymap]), markdownLanguage, syntaxHighlighting(highlighting),
-      EditorView.lineWrapping, EditorView.contentAttributes.of({ 'aria-label': 'Zdrojový Markdown', spellcheck: 'false', tabindex: '0' }),
+    extensions: [history(), drawSelection(), editorProfile.of(profileExtensions(editorType)),
+      keymap.of([...defaultKeymap, ...historyKeymap]),
+      EditorView.lineWrapping, editorAria.of(EditorView.contentAttributes.of({ 'aria-label': t('Zdrojový Markdown'), spellcheck: 'false', tabindex: '0' })),
       EditorView.updateListener.of((update) => {
         if (update.docChanged) {
           previewStale = true;
@@ -71,26 +95,51 @@ function dirty(): boolean {
   return !editor.state.doc.eq(savedDocument);
 }
 
-function say(message: string, error = false): void {
+function say(message: MessageKey, error = false): void {
+  statusKey = message;
+  statusError = error;
   const status = element('status-message');
-  status.textContent = message;
-  status.title = message;
+  status.textContent = t(message);
+  status.title = t(message);
   status.dataset.error = String(error);
+}
+
+function refreshLanguage(): void {
+  wordCounter = new Intl.Segmenter(getLocale(), { granularity: 'word' });
+  pluralRules = new Intl.PluralRules(getLocale());
+  numberFormat = new Intl.NumberFormat(getLocale());
+  editor.dispatch({ effects: editorAria.reconfigure(EditorView.contentAttributes.of({ 'aria-label': t('Zdrojový Markdown'), spellcheck: 'false', tabindex: '0' })) });
+  preview.dataset.emptyHint = t('Náhled se zobrazí, jakmile začnete psát.');
+  if (confirmation) {
+    element('discard-title').textContent = t(confirmation.title);
+    element('discard-description').textContent = t(confirmation.description, confirmation.params);
+    element('discard-confirm').textContent = t(confirmation.action);
+  }
+  if (saveError) element('save-error').textContent = t(saveError);
+  updateStatus();
+  previewStale = true;
+  updatePreview();
+  say(statusKey, statusError);
+}
+
+function countText(count: number, one: MessageKey, few: MessageKey, other: MessageKey): string {
+  const plural = pluralRules.select(count);
+  return t(plural === 'one' ? one : plural === 'few' ? few : other, { count: numberFormat.format(count) });
 }
 
 function updateStatus(): void {
   const changed = dirty();
   element('doc-name').textContent = current.name;
-  element('doc-location').textContent = locationLabel;
-  element('dirty-state').textContent = changed ? 'Neuložené změny' : 'Beze změn';
+  element('doc-location').textContent = t(locationLabel);
+  element('dirty-state').textContent = t(changed ? 'Neuložené změny' : 'Beze změn');
   element('dirty-state').dataset.dirty = String(changed);
   document.title = `${changed ? '● ' : ''}${current.name} | Margin`;
   element<HTMLButtonElement>('save-file').disabled = busy || (!changed && !!current.handle);
   for (const id of ['new-file', 'open-file', 'save-as']) element<HTMLButtonElement>(id).disabled = busy;
   const position = editor.state.selection.main.head;
   const line = editor.state.doc.lineAt(position);
-  element('cursor-position').textContent = `Ř ${line.number}, sl ${position - line.from + 1}`;
-  element('line-count').textContent = `${editor.state.doc.lines} ř.`;
+  element('cursor-position').textContent = t('Ř {line}, sl {column}', { line: numberFormat.format(line.number), column: numberFormat.format(position - line.from + 1) });
+  element('line-count').textContent = countText(editor.state.doc.lines, '{count} řádek', '{count} řádky', '{count} řádků');
 }
 
 function updatePreview(): void {
@@ -98,7 +147,7 @@ function updatePreview(): void {
   const source = editor.state.doc.toString();
   let words = 0;
   for (const segment of wordCounter.segment(source)) if (segment.isWordLike) words++;
-  element('word-count').textContent = `${words.toLocaleString('cs')} slov`;
+  element('word-count').textContent = countText(words, '{count} slovo', '{count} slova', '{count} slov');
   if (mode === 'source') return;
   try {
     preview.replaceChildren(renderMarkdown(source));
@@ -119,13 +168,14 @@ function setMode(value: string): void {
   editor.requestMeasure();
 }
 
-function confirmAction(title: string, description: string, action: string): Promise<boolean> {
-  element('discard-title').textContent = title;
-  element('discard-description').textContent = description;
-  element('discard-confirm').textContent = action;
+function confirmAction(title: MessageKey, description: MessageKey, action: MessageKey, params?: Readonly<Record<string, string | number>>): Promise<boolean> {
+  confirmation = { title, description, action, params };
+  element('discard-title').textContent = t(title);
+  element('discard-description').textContent = t(description, params);
+  element('discard-confirm').textContent = t(action);
   return new Promise((resolve) => {
     discardDialog.returnValue = '';
-    discardDialog.addEventListener('close', () => resolve(discardDialog.returnValue === 'discard'), { once: true });
+    discardDialog.addEventListener('close', () => { confirmation = undefined; resolve(discardDialog.returnValue === 'discard'); }, { once: true });
     discardDialog.showModal();
     element('discard-cancel').focus();
   });
@@ -143,10 +193,10 @@ async function run(action: () => Promise<void>): Promise<void> {
   try {
     await action();
   } catch (error) {
-    const message = error instanceof FileConflictError
+    const message: MessageKey = error instanceof FileConflictError
       ? 'Soubor se změnil v jiné aplikaci. Použijte Uložit jako a zachovejte obě verze.'
       : error instanceof DOMException ? 'Operace se nezdařila. Ověřte oprávnění k souboru. Text zůstává v editoru.'
-      : error instanceof Error ? error.message : 'Operace se nezdařila. Text zůstává v editoru.';
+      : error instanceof Error && isMessageKey(error.message) ? error.message : 'Operace se nezdařila. Text zůstává v editoru.';
     say(message, true);
   } finally {
     busy = false;
@@ -154,7 +204,7 @@ async function run(action: () => Promise<void>): Promise<void> {
   }
 }
 
-async function replaceDocument(file: LoadedFile, label: string): Promise<void> {
+async function replaceDocument(file: LoadedFile, label: MessageKey): Promise<void> {
   if (!await confirmDiscard()) return;
   current = file;
   locationLabel = label;
@@ -196,6 +246,7 @@ function selectSaveDestination(): Promise<{ directory: FileSystemDirectoryHandle
   nameInput.value = current.name;
   submit.disabled = false;
   errorText.hidden = true;
+  saveError = undefined;
   let selected: { directory: FileSystemDirectoryHandle; name: string } | undefined;
   let settled = false;
   const onSubmit = async (event: SubmitEvent): Promise<void> => {
@@ -211,9 +262,10 @@ function selectSaveDestination(): Promise<{ directory: FileSystemDirectoryHandle
       dialog.close();
     } catch (error) {
       if (!settled) {
-        errorText.textContent = error instanceof DOMException
+        saveError = error instanceof DOMException
           ? 'Složku nelze otevřít. Ověřte oprávnění nebo vyberte jinou.'
-          : error instanceof Error ? error.message : 'Složku nelze otevřít.';
+          : error instanceof Error && isMessageKey(error.message) ? error.message : 'Složku nelze otevřít.';
+        errorText.textContent = t(saveError);
         errorText.hidden = false;
       }
     } finally {
@@ -248,7 +300,7 @@ async function saveFile(saveAs = false): Promise<void> {
       const target = await prepareSaveTarget(destination.directory, destination.name);
       if (target.existed) {
         if (!await confirmAction('Nahradit existující soubor?',
-          `${destination.directory.name}/${destination.name} bude nahrazen aktuálním textem.`, 'Nahradit soubor')) return;
+          '{name} bude nahrazen aktuálním textem.', 'Nahradit soubor', { name: `${destination.directory.name}/${destination.name}` })) return;
         handle = target.handle;
         baseline = target.baseline;
       } else {
@@ -267,7 +319,7 @@ element('open-file').addEventListener('click', () => void openFile());
 element('save-file').addEventListener('click', () => void saveFile());
 element('save-as').addEventListener('click', () => void saveFile(true));
 element('new-file').addEventListener('click', () => void run(async () => {
-  await replaceDocument({ name: 'Bez názvu.md', source: '', format, bytes: new Uint8Array() }, 'Nový dokument');
+  await replaceDocument({ name: t('Bez názvu.md'), source: '', format, bytes: new Uint8Array() }, 'Nový dokument');
 }));
 element('discard-cancel').addEventListener('click', () => discardDialog.close('cancel'));
 element('discard-confirm').addEventListener('click', () => discardDialog.close('discard'));
@@ -346,6 +398,7 @@ preview.addEventListener('click', (event) => {
   }
 });
 
+preview.dataset.emptyHint = t('Náhled se zobrazí, jakmile začnete psát.');
 setMode(mode);
 updateStatus();
 say('Otevřete soubor nebo začněte psát.');
