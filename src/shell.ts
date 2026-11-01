@@ -1,7 +1,24 @@
+const icon = (paths: string): string =>
+  `<svg class="icon" viewBox="0 0 20 20" aria-hidden="true">${paths}</svg>`;
+
+const icons = {
+  newFile: icon('<path d="M11.5 3H6a1.5 1.5 0 0 0-1.5 1.5v11A1.5 1.5 0 0 0 6 17h8a1.5 1.5 0 0 0 1.5-1.5V7z"/><path d="M11.5 3v4h4M10 9.75v4.5M7.75 12h4.5"/>'),
+  open: icon('<path d="M2.75 14.5V5.25c0-.83.67-1.5 1.5-1.5h3.3l1.7 1.75h5.5c.83 0 1.5.67 1.5 1.5V8"/><path d="M2.75 14.5l2.05-5.1a1.5 1.5 0 0 1 1.4-.95h11.05l-2.2 6.05a1.5 1.5 0 0 1-1.41.99H4.25a1.5 1.5 0 0 1-1.5-.99z"/>'),
+  save: icon('<path d="M4.75 3.5h8.5l3 3v8.75c0 .69-.56 1.25-1.25 1.25H4.75c-.69 0-1.25-.56-1.25-1.25V4.75c0-.69.56-1.25 1.25-1.25z"/><path d="M6.75 3.5v3.25h5.5V3.5M6.25 16.5v-4.25h7.5v4.25"/>'),
+  saveAs: icon('<path d="M9.25 16.5h-4.5c-.69 0-1.25-.56-1.25-1.25V4.75c0-.69.56-1.25 1.25-1.25h8.5l3 3V9"/><path d="M6.75 3.5v3.25h5.5V3.5M6.25 16.5v-4.25h3.25"/><path d="M15.4 11.1l1.5 1.5-4.15 4.15h-1.5v-1.5z"/>'),
+  source: icon('<path d="M7 6.5 3.5 10 7 13.5M13 6.5l3.5 3.5-3.5 3.5"/>'),
+  split: icon('<rect x="3" y="4" width="14" height="12" rx="2"/><path d="M10 4v12"/>'),
+  preview: icon('<path d="M2.5 10s2.75-5.25 7.5-5.25S17.5 10 17.5 10s-2.75 5.25-7.5 5.25S2.5 10 2.5 10z"/><circle cx="10" cy="10" r="2.25"/>'),
+  local: icon('<rect x="4" y="4.5" width="12" height="8.5" rx="1.25"/><path d="M2.5 15.5h15"/>'),
+};
+
+const mark = (size: number, className: string): string =>
+  `<svg class="${className}" viewBox="0 0 16 16" width="${size}" height="${size}" aria-hidden="true"><path fill="currentColor" d="M2 2h7v2H4v6H2zM14 14H7v-2h5V6h2z"/></svg>`;
+
 export const shell = String.raw`
 <header class="toolbar" aria-label="Hlavní panel nástrojů">
   <div class="brand">
-    <svg class="brand-mark" viewBox="0 0 16 16" width="24" height="24" aria-hidden="true"><path fill="currentColor" d="M2 2h7v2H4v6H2zM14 14H7v-2h5V6h2z"/></svg>
+    ${mark(22, 'brand-mark')}
     <span class="brand-name">Margin</span>
   </div>
 
@@ -14,16 +31,17 @@ export const shell = String.raw`
   </div>
 
   <div class="toolbar-actions" role="group" aria-label="Soubor">
-    <button id="new-file" type="button" class="btn" title="Nový dokument">Nový</button>
-    <button id="open-file" type="button" class="btn" title="Otevřít soubor Markdown">Otevřít</button>
-    <button id="save-file" type="button" class="btn btn-outline" title="Uložit (Ctrl+S)" aria-keyshortcuts="Control+S">Uložit<kbd class="kbd" aria-hidden="true">Ctrl+S</kbd></button>
-    <button id="save-as" type="button" class="btn" title="Uložit jako (Ctrl+Shift+S)" aria-keyshortcuts="Control+Shift+S">Uložit jako<kbd class="kbd" aria-hidden="true">Ctrl+Shift+S</kbd></button>
+    <button id="new-file" type="button" class="btn" title="Nový dokument">${icons.newFile}<span>Nový</span></button>
+    <button id="open-file" type="button" class="btn" title="Otevřít soubor Markdown">${icons.open}<span>Otevřít</span></button>
+    <span class="toolbar-sep" aria-hidden="true"></span>
+    <button id="save-file" type="button" class="btn btn-outline" title="Uložit (Ctrl+S)" aria-keyshortcuts="Control+S">${icons.save}<span>Uložit</span><kbd class="kbd" aria-hidden="true">Ctrl+S</kbd></button>
+    <button id="save-as" type="button" class="btn" title="Uložit jako (Ctrl+Shift+S)" aria-keyshortcuts="Control+Shift+S">${icons.saveAs}<span>Uložit jako</span><kbd class="kbd" aria-hidden="true">Ctrl+Shift+S</kbd></button>
   </div>
 
   <div class="toolbar-modes" role="group" aria-label="Režim zobrazení">
-    <button type="button" class="seg" data-mode="source" aria-pressed="false" title="Jen zdrojový text">Text</button>
-    <button type="button" class="seg" data-mode="split" aria-pressed="true" title="Zdrojový text a náhled vedle sebe">Vedle sebe</button>
-    <button type="button" class="seg" data-mode="preview" aria-pressed="false" title="Jen náhled">Náhled</button>
+    <button type="button" class="seg" data-mode="source" aria-pressed="false" title="Jen zdrojový text">${icons.source}<span>Text</span></button>
+    <button type="button" class="seg" data-mode="split" aria-pressed="true" title="Zdrojový text a náhled vedle sebe">${icons.split}<span>Vedle sebe</span></button>
+    <button type="button" class="seg" data-mode="preview" aria-pressed="false" title="Jen náhled">${icons.preview}<span>Náhled</span></button>
   </div>
 
   <div class="toolbar-utils">
@@ -38,6 +56,7 @@ export const shell = String.raw`
   <section id="source-pane" class="source-pane" role="region" aria-labelledby="source-title">
     <div class="pane-head source-head">
       <div class="pane-head-inner">
+        ${icons.source}
         <h2 id="source-title" class="pane-title">Markdown</h2>
       </div>
     </div>
@@ -47,6 +66,7 @@ export const shell = String.raw`
   <section id="preview-pane" class="preview-pane" role="region" aria-labelledby="preview-title" tabindex="0">
     <div class="pane-head preview-head">
       <div class="pane-head-inner">
+        ${icons.preview}
         <h2 id="preview-title" class="pane-title">Náhled</h2>
       </div>
     </div>
@@ -57,7 +77,7 @@ export const shell = String.raw`
 
 <div id="drop-overlay" class="drop-overlay" hidden>
   <div class="drop-frame">
-    <svg class="drop-mark" viewBox="0 0 16 16" width="32" height="32" aria-hidden="true"><path fill="currentColor" d="M2 2h7v2H4v6H2zM14 14H7v-2h5V6h2z"/></svg>
+    ${mark(32, 'drop-mark')}
     <span class="drop-label">Pusťte Markdown soubor sem</span>
     <span class="drop-hint">Přípona .md nebo .markdown, nejvýše 5 MiB</span>
   </div>
@@ -69,7 +89,7 @@ export const shell = String.raw`
     <span id="word-count" class="footer-count">0 slov</span>
     <span id="line-count" class="footer-count">0 ř.</span>
     <span id="cursor-position" class="footer-count">Ř 1, sl 1</span>
-    <span class="footer-local">Jen lokálně</span>
+    <span class="footer-local">${icons.local}Jen lokálně</span>
   </div>
 </footer>
 
@@ -110,104 +130,120 @@ export const shell = String.raw`
   <div class="prefs-body">
     <section class="pref-section" aria-labelledby="pref-app-title">
       <h3 id="pref-app-title" class="pref-section-title">Aplikace</h3>
+      <div class="pref-group">
+        <div class="pref-row">
+          <div class="pref-text">
+            <label class="pref-label" for="theme-setting">Režim</label>
+            <p id="theme-hint" class="pref-hint">Podle zařízení sleduje nastavení systému. Tlačítko v liště volbu přepne na světlý nebo tmavý.</p>
+          </div>
+          <span class="select">
+            <select id="theme-setting" aria-describedby="theme-hint">
+              <option value="system">Podle zařízení</option>
+              <option value="light">Světlý</option>
+              <option value="dark">Tmavý</option>
+            </select>
+          </span>
+        </div>
 
-      <div class="pref-row">
-        <label class="pref-label" for="theme-setting">Režim</label>
-        <span class="select">
-          <select id="theme-setting" aria-describedby="theme-hint">
-            <option value="system">Podle zařízení</option>
-            <option value="light">Světlý</option>
-            <option value="dark">Tmavý</option>
-          </select>
-        </span>
-        <p id="theme-hint" class="pref-hint">Podle zařízení sleduje nastavení systému. Tlačítko v liště volbu přepne na světlý nebo tmavý.</p>
-      </div>
-
-      <div class="pref-row">
-        <label class="pref-label" for="surface-setting">Styl rozhraní</label>
-        <span class="select">
-          <select id="surface-setting">
-            <option value="minimal">Minimal</option>
-            <option value="glass">Glass</option>
-            <option value="material">Material You</option>
-          </select>
-        </span>
-        <p class="pref-hint surface-note" data-for="minimal">Černá a bílá, tenké linky, nic navíc.</p>
-        <p class="pref-hint surface-note" data-for="glass">Průsvitná lišta a dialogy s jemným rozostřením, panely jako listy.</p>
-        <p class="pref-hint surface-note" data-for="material">Měkké tvary a tlumené zelené tóny.</p>
+        <div class="pref-row">
+          <div class="pref-text">
+            <label class="pref-label" for="surface-setting">Styl rozhraní</label>
+            <p class="pref-hint surface-note" data-for="minimal">Černá a bílá, tenké linky, nic navíc.</p>
+            <p class="pref-hint surface-note" data-for="glass">Průsvitná lišta a dialogy s jemným rozostřením, panely jako listy.</p>
+            <p class="pref-hint surface-note" data-for="material">Měkké tvary a tlumené zelené tóny.</p>
+            <p class="pref-hint surface-note" data-for="fluent">Klidné plochy ve stylu Windows, jemné obrysy a modrý akcent.</p>
+            <p class="pref-hint surface-note" data-for="nord">Arktické barvy: sněhově světlé nebo polárně tmavé vrstvy s mrazivým akcentem.</p>
+          </div>
+          <span class="select">
+            <select id="surface-setting">
+              <option value="minimal">Minimal</option>
+              <option value="glass">Glass</option>
+              <option value="material">Material You</option>
+              <option value="fluent">Fluent</option>
+              <option value="nord">Nord</option>
+            </select>
+          </span>
+        </div>
       </div>
     </section>
 
     <section class="pref-section" aria-labelledby="pref-preview-title">
       <h3 id="pref-preview-title" class="pref-section-title">Náhled Markdownu</h3>
+      <div class="pref-group">
+        <div class="pref-row">
+          <div class="pref-text">
+            <label class="pref-label" for="preview-theme-setting">Styl náhledu</label>
+            <p id="preview-theme-hint" class="pref-hint">Platí jen pro náhled, nezávisle na stylu rozhraní.</p>
+          </div>
+          <span class="select">
+            <select id="preview-theme-setting" aria-describedby="preview-theme-hint">
+              <option value="github">GitHub</option>
+              <option value="vscode">VS Code</option>
+              <option value="reading">Čtení</option>
+              <option value="nord">Nord</option>
+            </select>
+          </span>
+        </div>
 
-      <div class="pref-row">
-        <label class="pref-label" for="preview-theme-setting">Styl náhledu</label>
-        <span class="select">
-          <select id="preview-theme-setting" aria-describedby="preview-theme-hint">
-            <option value="github">GitHub</option>
-            <option value="vscode">VS Code</option>
-            <option value="reading">Čtení</option>
-          </select>
-        </span>
-        <p id="preview-theme-hint" class="pref-hint">Platí jen pro náhled, nezávisle na stylu rozhraní.</p>
-      </div>
-
-      <div class="pref-row">
-        <label class="pref-label" for="preview-font-setting">Písmo<span class="sr-only"> náhledu</span></label>
-        <span class="select">
-          <select id="preview-font-setting">
-            <option value="default">Podle stylu</option>
-            <option value="sans">Bezpatkové</option>
-            <option value="serif">Patkové</option>
-            <option value="mono">Neproporcionální</option>
-          </select>
-        </span>
-      </div>
-
-      <div class="pref-row">
-        <label class="pref-label" for="preview-size-setting">Velikost<span class="sr-only"> písma náhledu</span></label>
-        <span class="select">
-          <select id="preview-size-setting">
-            <option value="default">Podle stylu</option>
-            <option value="14">14 px</option>
-            <option value="16">16 px</option>
-            <option value="18">18 px</option>
-            <option value="20">20 px</option>
-            <option value="22">22 px</option>
-            <option value="24">24 px</option>
-          </select>
-        </span>
+        <div class="pref-row pref-pair">
+          <div class="pref-field">
+            <label class="pref-label" for="preview-font-setting">Písmo<span class="sr-only"> náhledu</span></label>
+            <span class="select">
+              <select id="preview-font-setting">
+                <option value="default">Podle stylu</option>
+                <option value="sans">Bezpatkové</option>
+                <option value="serif">Patkové</option>
+                <option value="mono">Neproporcionální</option>
+              </select>
+            </span>
+          </div>
+          <div class="pref-field">
+            <label class="pref-label" for="preview-size-setting">Velikost<span class="sr-only"> písma náhledu</span></label>
+            <span class="select">
+              <select id="preview-size-setting">
+                <option value="default">Podle stylu</option>
+                <option value="14">14 px</option>
+                <option value="16">16 px</option>
+                <option value="18">18 px</option>
+                <option value="20">20 px</option>
+                <option value="22">22 px</option>
+                <option value="24">24 px</option>
+              </select>
+            </span>
+          </div>
+        </div>
       </div>
     </section>
 
     <section class="pref-section" aria-labelledby="pref-editor-title">
       <h3 id="pref-editor-title" class="pref-section-title">Editor</h3>
-
-      <div class="pref-row">
-        <label class="pref-label" for="editor-font-setting">Písmo<span class="sr-only"> editoru</span></label>
-        <span class="select">
-          <select id="editor-font-setting">
-            <option value="system">Systémové</option>
-            <option value="cascadia">Cascadia</option>
-            <option value="consolas">Consolas</option>
-          </select>
-        </span>
-      </div>
-
-      <div class="pref-row">
-        <label class="pref-label" for="editor-size-setting">Velikost<span class="sr-only"> písma editoru</span></label>
-        <span class="select">
-          <select id="editor-size-setting">
-            <option value="12">12 px</option>
-            <option value="13">13 px</option>
-            <option value="14">14 px</option>
-            <option value="15">15 px</option>
-            <option value="16">16 px</option>
-            <option value="18">18 px</option>
-            <option value="20">20 px</option>
-          </select>
-        </span>
+      <div class="pref-group">
+        <div class="pref-row pref-pair">
+          <div class="pref-field">
+            <label class="pref-label" for="editor-font-setting">Písmo<span class="sr-only"> editoru</span></label>
+            <span class="select">
+              <select id="editor-font-setting">
+                <option value="system">Systémové</option>
+                <option value="cascadia">Cascadia</option>
+                <option value="consolas">Consolas</option>
+              </select>
+            </span>
+          </div>
+          <div class="pref-field">
+            <label class="pref-label" for="editor-size-setting">Velikost<span class="sr-only"> písma editoru</span></label>
+            <span class="select">
+              <select id="editor-size-setting">
+                <option value="12">12 px</option>
+                <option value="13">13 px</option>
+                <option value="14">14 px</option>
+                <option value="15">15 px</option>
+                <option value="16">16 px</option>
+                <option value="18">18 px</option>
+                <option value="20">20 px</option>
+              </select>
+            </span>
+          </div>
+        </div>
       </div>
     </section>
 

@@ -8,7 +8,8 @@ test('extension editing, safe rendering and file-save regressions', { timeout: 6
   const context = await chromium.launchPersistentContext('', {
     channel: 'chromium', headless: true,
     args: [`--disable-extensions-except=${extension}`, `--load-extension=${extension}`],
-    viewport: { width: 1440, height: 900 },
+    // Keep the complete sample mounted while testing persisted editor typography.
+    viewport: { width: 1440, height: 1200 },
   });
   try {
     const worker = context.serviceWorkers()[0] ?? await context.waitForEvent('serviceworker');
@@ -74,11 +75,19 @@ test('extension editing, safe rendering and file-save regressions', { timeout: 6
     for (const [control, value] of [[previewTheme, 'vscode'], [previewFont, 'serif'], [previewSize, '18'], [editorFont, 'cascadia'], [editorSize, '16']] as const) {
       assert.equal(await control.inputValue(), value);
     }
-    for (const value of ['reading', 'github']) {
+    for (const value of ['reading', 'nord', 'github']) {
       await previewTheme.selectOption(value);
       assert.equal(await page.locator('html').getAttribute('data-preview-theme'), value);
       assert.equal(await page.locator('html').getAttribute('data-theme'), 'dark');
       assert.equal(await page.locator('html').getAttribute('data-surface'), 'minimal');
+      if (value === 'nord') {
+        assert.equal(await page.evaluate(() => localStorage.getItem('margin.previewTheme')), 'nord');
+        await page.reload();
+        await openPreferences();
+        assert.equal(await previewTheme.inputValue(), 'nord');
+        assert.equal(await page.locator('html').getAttribute('data-preview-theme'), 'nord');
+        assert.equal(await page.locator('.cm-content').innerText(), sampleText);
+      }
     }
     await previewFont.selectOption('default');
     await previewSize.selectOption('default');
@@ -125,7 +134,7 @@ test('extension editing, safe rendering and file-save regressions', { timeout: 6
     await openPreferences();
     assert.equal(await theme.inputValue(), 'system');
     assert.equal(await page.locator('html').getAttribute('data-theme'), 'dark');
-    for (const value of ['glass', 'material', 'minimal']) {
+    for (const value of ['glass', 'material', 'fluent', 'nord', 'minimal']) {
       await surface.selectOption(value);
       assert.equal(await page.locator('html').getAttribute('data-surface'), value);
       assert.equal(await page.evaluate(() => localStorage.getItem('margin.surface')), value);
@@ -138,6 +147,7 @@ test('extension editing, safe rendering and file-save regressions', { timeout: 6
       assert.equal(await page.locator('.cm-content').innerText(), sampleText);
     }
     await page.locator('#preferences-close').click();
+    await page.setViewportSize({ width: 1440, height: 900 });
     await page.emulateMedia({ reducedMotion: 'no-preference' });
     await page.evaluate(() => {
       const root = document.documentElement;
@@ -219,12 +229,12 @@ test('extension editing, safe rendering and file-save regressions', { timeout: 6
     await editor.fill('# Changed');
     await page.waitForFunction(() => document.querySelector('#preview h1')?.textContent === 'Changed');
     await openPreferences();
-    for (const value of ['glass', 'material', 'minimal']) {
+    for (const value of ['glass', 'material', 'fluent', 'nord', 'minimal']) {
       await surface.selectOption(value);
       assert.equal(await editor.innerText(), '# Changed');
       assert.equal(await page.locator('#dirty-state').innerText(), 'Neuložené změny');
     }
-    await previewTheme.selectOption('reading');
+    await previewTheme.selectOption('nord');
     await previewFont.selectOption('mono');
     await previewSize.selectOption('20');
     await editorFont.selectOption('consolas');

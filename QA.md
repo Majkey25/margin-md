@@ -1,5 +1,46 @@
 # Validation
 
+## Modern window and Nord | 1.2.0
+
+Checked on 1 November 2026 in Chromium 156.0.8078.4 on Windows. `npm test` passed all 16 file tests. `npm run test:browser` passed TypeScript, the production build and the loaded-extension scenario, including persistence of Fluent/Nord and the Nord preview. `npm audit --omit=dev` reported zero vulnerabilities. Impeccable's static scan of the shell and both stylesheets returned no findings.
+
+Claude Opus 5.5 authored the refreshed shell, application styles, Markdown styles and design document. Astra independently reviewed the rendered Fluent/Nord windows and settings and found no material visual defect. The primary agent tested the result and corrected image-policy incompatibilities, clipped font selection text and source/error contrast. File-handling code and permissions are unchanged.
+
+The new checkbox images initially violated `img-src 'self'`. CSS border check marks replaced them, and the optional blocked-image glyph was removed. The existing image policy remains intact. No browser error or document-triggered HTTP(S) request was observed in the repaired build.
+
+### Rendered checks
+
+Eighty-two ordinary-color axe and layout checks passed with zero violations and no outer horizontal overflow. They cover all five application styles in light/dark at 1440 × 900 and 390 × 844, their settings, all four Markdown presets, new-style discard dialogs and save validation in every application style. Layout checks also cover 320, 560, 700, 701, 960, 961, 1024 and 1920 px, large fonts, and short settings windows. Wide table/code fixtures have scrollable widths of 4,033/7,493 px while staying within their pane.
+
+All seven settings are keyboard reachable. Escape closes settings and restores focus to its opening button. At 390 × 460, the settings body scrolls and both the close button and focused last select remain visible. The 390 px font field now has 110 px of text space for its measured 108.2 px longest option. Font and size stack below 360 px. Source size 20 px uses matching 33 px code and gutter line heights; typing and undo restore the clean document state.
+
+Numerical checks of 104 preview syntax/background pairs have a minimum ratio of 4.71:1. All 40 source syntax colors pass against their active-line backgrounds, with a minimum of 4.66:1. Checkbox outline and check pairs exceed 3:1 in all eight preview palettes. These measurements supplement fixture-based audits; they are not a certification for every document or assistive technology.
+
+A separate forced-colors capture uses native disabled checkboxes and a readable browser-forced black/white palette. Axe reported author text colors against the forced white background, so this case is not counted as an automated contrast pass. The screenshot was inspected directly. The distinction between computed author colors and forced used colors is described by the [CSS Color Adjustment specification](https://drafts.csswg.org/css-color-adjust/#forced-colors-mode). Physical Windows high-contrast mode was not changed or tested.
+
+The persistence test starts at 1200 px height while comparing the complete sample at larger source fonts, then returns to 900 px. This avoids mistaking CodeMirror's unmounted offscreen rows for changed document content.
+
+### Local performance
+
+The extracted 1.1.0 release and 1.2.0 build ran on the same machine and browser at 1440 × 900 with light appearance and reduced motion, without throttling. Both imported the same 102,400-byte Markdown fixture five times. Timings include browser automation and two animation frames after insertion.
+
+| Check | 1.1.0 | 1.2.0 |
+| :--- | ---: | ---: |
+| Local load event | 584.1 ms | 285.1 ms |
+| Largest contentful paint | 648 ms | 468 ms |
+| Cumulative layout shift | 0 | 0 |
+| Import and preview, median of 5 | 484.5 ms | 524.3 ms |
+| Main JavaScript bytes | 616,833 | 619,429 |
+| Main JavaScript gzip bytes, Node zlib defaults | 218,508 | 219,309 |
+
+New import runs: 507.9, 426.0, 572.8, 524.3 and 652.5 ms. The interface adds no runtime dependency or font download. These few local runs do not establish a statistically significant startup improvement or universal latency guarantee. Field INP, physical mobile GPU behavior and worst-case 5 MiB rendering remain unmeasured. Native Windows file/folder chooser automation was not repeated; the earlier real-disk evidence and its limits remain below.
+
+### Release archive
+
+The 250,648-byte ZIP was extracted into a separate folder and loaded as an unpacked extension. Its manifest reports 1.2.0 and its JavaScript matches the production build byte for byte. The extracted build opened the disk Markdown fixture, applied Nord to both application and preview, rendered syntax colors and four disabled tasks, and passed an additional axe audit without browser errors. The archive includes the Nord MIT notice and contains no source workspace or test files.
+
+Archive SHA-256: `092a883ff3c96f5c5a075bd57329c451b3a8be750fa0182d0a190c6bd31fa685`.
+
 ## Preview and typography | 1.1.0
 
 Checked on 31 October 2026 in Chromium 156.0.8078.4 on Windows. `npm test` passed all 16 file tests. `npm run test:browser` passed the TypeScript check, production build and loaded-extension regression scenario. `npm audit --omit=dev` reported zero vulnerabilities.

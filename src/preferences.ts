@@ -1,5 +1,5 @@
 type Theme = 'system' | 'light' | 'dark';
-type Surface = 'minimal' | 'glass' | 'material';
+type Surface = 'minimal' | 'glass' | 'material' | 'fluent' | 'nord';
 
 export function setupPreferences(onStorageError: () => void, onEditorTypographyChange: () => void): HTMLDialogElement {
   const root = document.documentElement;
@@ -17,7 +17,7 @@ export function setupPreferences(onStorageError: () => void, onEditorTypographyC
     const savedTheme = localStorage.getItem('margin.theme');
     const savedSurface = localStorage.getItem('margin.surface');
     if (savedTheme === 'light' || savedTheme === 'dark') appearance = savedTheme;
-    if (savedSurface === 'glass' || savedSurface === 'material') surface = savedSurface;
+    if (savedSurface === 'glass' || savedSurface === 'material' || savedSurface === 'fluent' || savedSurface === 'nord') surface = savedSurface;
   } catch { /* Default settings remain usable without storage. */ }
 
   const effectiveTheme = (): 'light' | 'dark' => appearance === 'system'
@@ -70,7 +70,7 @@ export function setupPreferences(onStorageError: () => void, onEditorTypographyC
     cascadia: '"Cascadia Code", "Cascadia Mono", Consolas, monospace',
     consolas: 'Consolas, "Courier New", monospace',
   };
-  setting('preview-theme-setting', 'margin.previewTheme', ['github', 'vscode', 'reading'] as const, 'github',
+  setting('preview-theme-setting', 'margin.previewTheme', ['github', 'vscode', 'reading', 'nord'] as const, 'github',
     (value) => { root.dataset.previewTheme = value; });
   setting('preview-font-setting', 'margin.previewFont', ['default', 'sans', 'serif', 'mono'] as const, 'default',
     (value) => {
@@ -102,7 +102,7 @@ export function setupPreferences(onStorageError: () => void, onEditorTypographyC
   });
   surfaceSetting.addEventListener('change', () => {
     const value = surfaceSetting.value;
-    if (value !== 'minimal' && value !== 'glass' && value !== 'material') return;
+    if (value !== 'minimal' && value !== 'glass' && value !== 'material' && value !== 'fluent' && value !== 'nord') return;
     surface = value;
     root.dataset.surface = surface;
     save('margin.surface', surface);

@@ -1,14 +1,18 @@
 /* Margin: Markdown preview presets.
    Loaded after styles.css. The single home for how rendered Markdown looks.
 
-   html[data-preview-theme] = github (default) | vscode | reading
+   html[data-preview-theme] = github (default) | vscode | reading | nord
    html[data-theme]         = light | dark
 
-   Presets are inspired by GitHub's README rendering (primer/css) and the
-   VS Code built-in Markdown preview. They reproduce scale and character,
-   not the original stylesheets. Every token is scoped to #preview-pane, so
-   the toolbar, source, footer and dialogs keep the application palette and
-   the application surface (minimal / glass / material) never reaches here.
+   Presets are inspired by GitHub's README rendering (primer/css), the VS Code
+   built-in Markdown preview and the Nord palette. They reproduce scale and
+   character, not the original stylesheets. Every token is scoped to
+   #preview-pane, so the chrome keeps the application palette and the
+   application style never reaches here.
+
+   Grammar: the first block sets every --pv-* / --tk-* token (GitHub light).
+   Each later block overrides values only; the element rules below read tokens
+   and never branch on the preset.
 
    User overrides are read, never redefined here:
    --preview-font, --preview-size (unset = preset default). */
@@ -16,43 +20,73 @@
 /* ── GitHub-inspired, light (also the fallback before JS runs) ─────── */
 
 #preview-pane {
+  /* Type and measure */
   --pv-font: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
   --pv-code-font: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
-  --pv-measure: calc(52 * var(--preview-size, 16px));
+  --pv-size: 16px;
+  --pv-measure: calc(52 * var(--preview-size, var(--pv-size)));
   --pv-pad: clamp(16px, 4vw, 40px);
   --pv-lh: 1.5;
+  --pv-block: 16px;
+  --pv-list-gap: 0.25em;
 
+  /* Headings */
   --pv-h-weight: 600;
   --pv-h-lh: 1.25;
   --pv-h-mt: 24px;
+  --pv-h-mt-minor: 24px;
   --pv-h-mb: 16px;
+  --pv-h-stack: 24px;
+  --pv-h-track: 0em;
   --pv-h1: 2em;
   --pv-h2: 1.5em;
   --pv-h3: 1.25em;
   --pv-h4: 1em;
   --pv-h5: 0.875em;
   --pv-h6: 0.85em;
-  --pv-h-rule: 1px;
-  --pv-block: 16px;
+  --pv-h1-rule: 1px solid var(--pv-rule-soft);
+  --pv-h2-rule: 1px solid var(--pv-rule-soft);
+  --pv-h-rule-pad: 0.3em;
 
+  /* Code */
   --pv-code-size: 85%;
   --pv-code-pad: 0.2em 0.4em;
   --pv-code-radius: 6px;
+  --pv-code-border: none;
   --pv-pre-size: 85%;
   --pv-pre-lh: 1.45;
   --pv-pre-pad: 16px;
   --pv-pre-radius: 6px;
-  --pv-pre-border-w: 0px;
+  --pv-pre-border: none;
+  --pv-comment-style: normal;
+
+  /* Quotes and rules */
   --pv-quote-w: 0.25em;
   --pv-quote-pad: 0 1em;
   --pv-quote-radius: 0px;
+  --pv-hr-size: 0.25em;
+  --pv-hr-margin: 24px;
+  --pv-hr-color: var(--pv-rule);
 
+  /* Tables */
+  --pv-table-size: 1em;
+  --pv-cell-pad: 6px 13px;
+  --pv-cell-edge: 13px;
+  --pv-cell-border: 1px solid var(--pv-rule);
+  --pv-row-rule: 1px solid var(--pv-rule);
+  --pv-head-rule: 1px solid var(--pv-rule);
+  --pv-table-foot: 1px solid var(--pv-rule);
+
+  /* Colour */
   --pv-bg: #ffffff;
   --pv-fg: #1f2328;
   --pv-heading: #1f2328;
+  --pv-h3-color: var(--pv-heading);
+  --pv-h6-color: var(--pv-muted);
   --pv-muted: #59636e;
+  --pv-del: inherit;
   --pv-rule: #d1d9e0;
-  --pv-rule-soft: #dfe4e9;
+  --pv-rule-soft: #d1d9e0;
   --pv-rule-strong: #d1d9e0;
   --pv-link: #0969da;
   --pv-focus: #0969da;
@@ -60,12 +94,16 @@
   --pv-code-fg: #1f2328;
   --pv-pre-bg: #f6f8fa;
   --pv-pre-fg: #1f2328;
-  --pv-pre-border: transparent;
+  --pv-pre-line: transparent;
   --pv-quote-bar: #d1d9e0;
   --pv-quote-bg: transparent;
   --pv-quote-fg: #59636e;
+  --pv-th-bg: transparent;
   --pv-row-alt: #f6f8fa;
   --pv-selection: rgba(9, 105, 218, 0.2);
+  --pv-check-line: #59636e;
+  --pv-check-bg: #0969da;
+  --pv-check-ink: #ffffff;
 
   --tk-keyword: #cf222e;
   --tk-atom: #0550ae;
@@ -87,9 +125,12 @@
   --pv-bg: #0d1117;
   --pv-fg: #e6edf3;
   --pv-heading: #f0f6fc;
+  --pv-h3-color: var(--pv-heading);
+  --pv-h6-color: var(--pv-muted);
   --pv-muted: #9198a1;
+  --pv-del: inherit;
   --pv-rule: #3d444d;
-  --pv-rule-soft: #2f353d;
+  --pv-rule-soft: #3d444d;
   --pv-rule-strong: #3d444d;
   --pv-link: #4493f8;
   --pv-focus: #4493f8;
@@ -97,12 +138,16 @@
   --pv-code-fg: #e6edf3;
   --pv-pre-bg: #151b23;
   --pv-pre-fg: #e6edf3;
-  --pv-pre-border: transparent;
+  --pv-pre-line: transparent;
   --pv-quote-bar: #3d444d;
   --pv-quote-bg: transparent;
   --pv-quote-fg: #9198a1;
+  --pv-th-bg: transparent;
   --pv-row-alt: #151b23;
   --pv-selection: rgba(68, 147, 248, 0.3);
+  --pv-check-line: #9198a1;
+  --pv-check-bg: #4493f8;
+  --pv-check-ink: #0d1117;
 
   --tk-keyword: #ff7b72;
   --tk-atom: #79c0ff;
@@ -119,44 +164,52 @@
   --tk-invalid: #ffa198;
 }
 
-/* ── VS Code-inspired, light ───────────────────────────────────────── */
+/* ── VS Code-inspired, light: compact, open tables ─────────────────── */
 
 :root[data-preview-theme="vscode"] #preview-pane {
   --pv-font: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", system-ui, Ubuntu, "Droid Sans", sans-serif;
   --pv-code-font: "SF Mono", Monaco, Menlo, Consolas, "Ubuntu Mono", "Liberation Mono", "DejaVu Sans Mono", "Courier New", monospace;
-  --pv-measure: calc(60 * var(--preview-size, 14px));
+  --pv-size: 14px;
+  --pv-measure: calc(60 * var(--preview-size, var(--pv-size)));
   --pv-pad: clamp(16px, 3vw, 26px);
   --pv-lh: 1.572; /* 22px at 14px */
-
-  --pv-h-weight: 600;
-  --pv-h-lh: 1.25;
-  --pv-h-mt: 24px;
-  --pv-h-mb: 16px;
-  --pv-h1: 2em;
-  --pv-h2: 1.5em;
-  --pv-h3: 1.25em;
-  --pv-h4: 1em;
-  --pv-h5: 0.875em;
-  --pv-h6: 0.85em;
-  --pv-h-rule: 1px;
   --pv-block: 16px;
+  --pv-list-gap: 0.2em;
+
+  --pv-h-mt: 24px;
+  --pv-h-mt-minor: 24px;
+  --pv-h-mb: 16px;
+  --pv-h-stack: 24px;
 
   --pv-code-size: 1em;
   --pv-code-pad: 0.1em 0.3em;
   --pv-code-radius: 3px;
+  --pv-code-border: none;
   --pv-pre-size: 1em;
   --pv-pre-lh: 1.357;
   --pv-pre-pad: 16px;
   --pv-pre-radius: 3px;
-  --pv-pre-border-w: 1px;
+  --pv-pre-border: 1px solid var(--pv-pre-line);
+
   --pv-quote-w: 5px;
   --pv-quote-pad: 8px 16px 8px 10px;
   --pv-quote-radius: 2px;
+  --pv-hr-size: 1px;
+
+  --pv-cell-pad: 5px 10px;
+  --pv-cell-edge: 10px;
+  --pv-cell-border: none;
+  --pv-row-rule: 1px solid var(--pv-rule);
+  --pv-head-rule: 1px solid var(--pv-rule-strong);
+  --pv-table-foot: none;
 
   --pv-bg: #ffffff;
   --pv-fg: #3b3b3b;
   --pv-heading: #1f1f1f;
+  --pv-h3-color: var(--pv-heading);
+  --pv-h6-color: var(--pv-heading);
   --pv-muted: #616161;
+  --pv-del: inherit;
   --pv-rule: #d1d1d1;
   --pv-rule-soft: #d1d1d1;
   --pv-rule-strong: #5a5a5a;
@@ -166,12 +219,16 @@
   --pv-code-fg: #3b3b3b;
   --pv-pre-bg: #f5f5f5;
   --pv-pre-fg: #1f1f1f;
-  --pv-pre-border: #e5e5e5;
+  --pv-pre-line: #e5e5e5;
   --pv-quote-bar: #d5d5d5;
   --pv-quote-bg: #f5f5f5;
   --pv-quote-fg: #3b3b3b;
+  --pv-th-bg: transparent;
   --pv-row-alt: transparent;
   --pv-selection: rgba(0, 95, 184, 0.2);
+  --pv-check-line: #616161;
+  --pv-check-bg: #005fb8;
+  --pv-check-ink: #ffffff;
 
   --tk-keyword: #0000ff;
   --tk-atom: #0000ff;
@@ -203,12 +260,14 @@
   --pv-code-fg: #d7d7d7;
   --pv-pre-bg: #2b2b2b;
   --pv-pre-fg: #d4d4d4;
-  --pv-pre-border: #3c3c3c;
+  --pv-pre-line: #3c3c3c;
   --pv-quote-bar: #616161;
   --pv-quote-bg: #2b2b2b;
   --pv-quote-fg: #cccccc;
-  --pv-row-alt: transparent;
   --pv-selection: rgba(77, 170, 252, 0.28);
+  --pv-check-line: #9d9d9d;
+  --pv-check-bg: #4daafc;
+  --pv-check-ink: #1f1f1f;
 
   --tk-keyword: #569cd6;
   --tk-atom: #569cd6;
@@ -230,39 +289,63 @@
 :root[data-preview-theme="reading"] #preview-pane {
   --pv-font: var(--font-read);
   --pv-code-font: var(--font-mono);
-  --pv-measure: calc(38 * var(--preview-size, 17px));
+  --pv-size: 17px;
+  --pv-measure: calc(38 * var(--preview-size, var(--pv-size)));
   --pv-pad: clamp(20px, 4vw, 48px);
   --pv-lh: 1.65;
+  --pv-block: 1em;
+  --pv-list-gap: 0.3em;
 
   --pv-h-weight: 700;
   --pv-h-lh: 1.25;
   --pv-h-mt: 1.75em;
+  --pv-h-mt-minor: 1.45em;
   --pv-h-mb: 0.5em;
+  --pv-h-stack: 0.6em;
+  --pv-h-track: -0.012em;
   --pv-h1: 1.85em;
   --pv-h2: 1.4em;
   --pv-h3: 1.17em;
   --pv-h4: 1em;
   --pv-h5: 0.94em;
   --pv-h6: 0.94em;
-  --pv-h-rule: 0px;
-  --pv-block: 1em;
+  --pv-h1-rule: none;
+  --pv-h2-rule: none;
+  --pv-h-rule-pad: 0em;
 
   --pv-code-size: 0.84em;
   --pv-code-pad: 0.12em 0.36em;
   --pv-code-radius: 4px;
+  --pv-code-border: none;
   --pv-pre-size: 0.8em;
   --pv-pre-lh: 1.6;
   --pv-pre-pad: 14px 16px;
   --pv-pre-radius: 6px;
-  --pv-pre-border-w: 1px;
+  --pv-pre-border: 1px solid var(--pv-pre-line);
+  --pv-comment-style: italic;
+
   --pv-quote-w: 2px;
   --pv-quote-pad: 0.1em 0 0.1em 1.1em;
   --pv-quote-radius: 0px;
+  --pv-hr-size: 1px;
+  --pv-hr-margin: 2.2em;
+  --pv-hr-color: var(--pv-rule-strong);
+
+  --pv-table-size: 0.88em;
+  --pv-cell-pad: 9px 14px;
+  --pv-cell-edge: 0px;
+  --pv-cell-border: none;
+  --pv-row-rule: 1px solid var(--pv-rule);
+  --pv-head-rule: 1px solid var(--pv-rule-strong);
+  --pv-table-foot: 1px solid var(--pv-rule);
 
   --pv-bg: #fbfbfa;
   --pv-fg: #1d1d1b;
   --pv-heading: #111110;
+  --pv-h3-color: var(--pv-heading);
+  --pv-h6-color: var(--pv-muted);
   --pv-muted: #5d5c57;
+  --pv-del: #5d5c57;
   --pv-rule: #e2e1dc;
   --pv-rule-soft: #e2e1dc;
   --pv-rule-strong: #c9c8c2;
@@ -272,12 +355,16 @@
   --pv-code-fg: #1d1d1b;
   --pv-pre-bg: #f2f2ef;
   --pv-pre-fg: #1d1d1b;
-  --pv-pre-border: #e2e1dc;
+  --pv-pre-line: #e2e1dc;
   --pv-quote-bar: #c9c8c2;
   --pv-quote-bg: transparent;
   --pv-quote-fg: #5d5c57;
+  --pv-th-bg: transparent;
   --pv-row-alt: transparent;
   --pv-selection: rgba(0, 0, 0, 0.12);
+  --pv-check-line: #5d5c57;
+  --pv-check-bg: #1d1d1b;
+  --pv-check-ink: #fbfbfa;
 
   --tk-keyword: #7a2e57;
   --tk-atom: #8a4a00;
@@ -300,6 +387,7 @@
   --pv-fg: #e4e3df;
   --pv-heading: #f3f2ee;
   --pv-muted: #a5a49e;
+  --pv-del: #a5a49e;
   --pv-rule: #2f2f2c;
   --pv-rule-soft: #2f2f2c;
   --pv-rule-strong: #46453f;
@@ -309,12 +397,13 @@
   --pv-code-fg: #e4e3df;
   --pv-pre-bg: #21211f;
   --pv-pre-fg: #e4e3df;
-  --pv-pre-border: #2f2f2c;
+  --pv-pre-line: #2f2f2c;
   --pv-quote-bar: #46453f;
-  --pv-quote-bg: transparent;
   --pv-quote-fg: #a5a49e;
-  --pv-row-alt: transparent;
   --pv-selection: rgba(255, 255, 255, 0.2);
+  --pv-check-line: #a5a49e;
+  --pv-check-bg: #e4e3df;
+  --pv-check-ink: #161615;
 
   --tk-keyword: #e3a3c4;
   --tk-atom: #e0b273;
@@ -329,6 +418,132 @@
   --tk-attr: #e0b273;
   --tk-meta: #9a998f;
   --tk-invalid: #ff9b8f;
+}
+
+/* ── Nord, light: Snow Storm page, Polar Night code, Frost accents ─── */
+
+:root[data-preview-theme="nord"] #preview-pane {
+  --pv-font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --pv-code-font: ui-monospace, "Cascadia Code", "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  --pv-size: 16px;
+  --pv-measure: calc(44 * var(--preview-size, var(--pv-size)));
+  --pv-pad: clamp(20px, 4vw, 48px);
+  --pv-lh: 1.7;
+  --pv-block: 1.1em;
+  --pv-list-gap: 0.3em;
+
+  --pv-h-weight: 600;
+  --pv-h-lh: 1.2;
+  --pv-h-mt: 2em;
+  --pv-h-mt-minor: 1.6em;
+  --pv-h-mb: 0.6em;
+  --pv-h-stack: 0.5em;
+  --pv-h-track: -0.015em;
+  --pv-h1: 2.1em;
+  --pv-h2: 1.5em;
+  --pv-h3: 1.2em;
+  --pv-h4: 1.05em;
+  --pv-h5: 0.95em;
+  --pv-h6: 0.9em;
+  --pv-h1-rule: none;
+  --pv-h2-rule: 1px solid var(--pv-rule);
+  --pv-h-rule-pad: 0.35em;
+
+  --pv-code-size: 0.875em;
+  --pv-code-pad: 0.15em 0.4em;
+  --pv-code-radius: 4px;
+  --pv-code-border: 1px solid var(--pv-rule);
+  --pv-pre-size: 0.875em;
+  --pv-pre-lh: 1.65;
+  --pv-pre-pad: 16px 18px;
+  --pv-pre-radius: 8px;
+  --pv-pre-border: 1px solid var(--pv-pre-line);
+  --pv-comment-style: italic;
+
+  --pv-quote-w: 3px;
+  --pv-quote-pad: 0.6em 1.1em;
+  --pv-quote-radius: 0 6px 6px 0;
+  --pv-hr-size: 1px;
+  --pv-hr-margin: 2.2em;
+  --pv-hr-color: var(--pv-rule-strong);
+
+  --pv-table-size: 0.94em;
+  --pv-cell-pad: 8px 14px;
+  --pv-cell-edge: 14px;
+  --pv-cell-border: none;
+  --pv-row-rule: 1px solid var(--pv-rule);
+  --pv-head-rule: 1px solid var(--pv-rule-strong);
+  --pv-table-foot: 1px solid var(--pv-rule);
+
+  --pv-bg: #eceff4;
+  --pv-fg: #2e3440;
+  --pv-heading: #2e3440;
+  --pv-h3-color: #3e6a9b;
+  --pv-h6-color: var(--pv-muted);
+  --pv-muted: #4c566a;
+  --pv-del: #4c566a;
+  --pv-rule: #d8dee9;
+  --pv-rule-soft: #d8dee9;
+  --pv-rule-strong: #b8c2d3;
+  --pv-link: #3e6a9b;
+  --pv-focus: #3e6a9b;
+  --pv-code-bg: #e5e9f0;
+  --pv-code-fg: #2e3440;
+  --pv-pre-bg: #292e39;
+  --pv-pre-fg: #d8dee9;
+  --pv-pre-line: transparent;
+  --pv-quote-bar: #5e81ac;
+  --pv-quote-bg: #e5e9f0;
+  --pv-quote-fg: #434c5e;
+  --pv-th-bg: #e5e9f0;
+  --pv-row-alt: transparent;
+  --pv-selection: rgba(94, 129, 172, 0.25);
+  --pv-check-line: #4c566a;
+  --pv-check-bg: #3e6a9b;
+  --pv-check-ink: #eceff4;
+
+  /* Code is Polar Night in both modes; calm Frost-led syntax, ≥4.5:1 on #292e39. */
+  --tk-keyword: #81a1c1;
+  --tk-atom: #b48ead;
+  --tk-string: #a3be8c;
+  --tk-comment: #9099ad;
+  --tk-variable: #d8dee9;
+  --tk-property: #88c0d0;
+  --tk-type: #8fbcbb;
+  --tk-operator: #81a1c1;
+  --tk-punct: #c2cad7;
+  --tk-tag: #81a1c1;
+  --tk-attr: #8fbcbb;
+  --tk-meta: #a0aabd;
+  --tk-invalid: #dc8f96;
+}
+
+/* Nord, dark: Polar Night page, a deeper code well, Frost links. */
+:root[data-preview-theme="nord"][data-theme="dark"] #preview-pane {
+  --pv-bg: #2e3440;
+  --pv-fg: #d8dee9;
+  --pv-heading: #eceff4;
+  --pv-h3-color: #88c0d0;
+  --pv-muted: #aab4c4;
+  --pv-del: #aab4c4;
+  --pv-rule: #3b4252;
+  --pv-rule-soft: #3b4252;
+  --pv-rule-strong: #4c566a;
+  --pv-link: #88c0d0;
+  --pv-focus: #88c0d0;
+  --pv-code-bg: #3b4252;
+  --pv-code-fg: #e5e9f0;
+  --pv-pre-bg: #292e39;
+  --pv-pre-fg: #d8dee9;
+  --pv-pre-line: #3b4252;
+  --pv-quote-bar: #88c0d0;
+  --pv-quote-bg: rgba(59, 66, 82, 0.55);
+  --pv-quote-fg: #d8dee9;
+  --pv-th-bg: #3b4252;
+  --pv-selection: rgba(136, 192, 208, 0.25);
+  --pv-check-line: #aab4c4;
+  --pv-check-bg: #88c0d0;
+  --pv-check-ink: #2e3440;
 }
 
 /* ── Pane: the preset fills the whole pane, no inner card ──────────── */
@@ -347,21 +562,17 @@
   background: var(--pv-bg);
 }
 
-#preview-pane .pane-title {
+#preview-pane .pane-title,
+#preview-pane .pane-head-inner > .icon {
   color: var(--pv-muted);
-}
-
-#preview-pane .pane-title::before {
-  box-shadow: inset 0 0 0 1.5px var(--pv-rule-strong);
 }
 
 #preview-pane:focus-visible .pane-title {
   color: var(--pv-heading);
 }
 
-#preview-pane:focus-visible .pane-title::before {
-  background: var(--pv-focus);
-  box-shadow: none;
+#preview-pane:focus-visible .pane-head-inner > .icon {
+  color: var(--pv-focus);
 }
 
 #preview-pane ::selection {
@@ -377,20 +588,12 @@
   margin: 0 auto;
   padding: 28px var(--pv-pad) 96px;
   font-family: var(--preview-font, var(--pv-font));
-  font-size: var(--preview-size, 16px);
+  font-size: var(--preview-size, var(--pv-size));
   line-height: var(--pv-lh);
   color: var(--pv-fg);
   overflow-wrap: break-word;
   font-kerning: normal;
   text-rendering: optimizeLegibility;
-}
-
-:root[data-preview-theme="vscode"] .preview {
-  font-size: var(--preview-size, 14px);
-}
-
-:root[data-preview-theme="reading"] .preview {
-  font-size: var(--preview-size, 17px);
 }
 
 .preview:empty::before {
@@ -414,6 +617,10 @@
   margin-bottom: var(--pv-block);
 }
 
+.preview p {
+  text-wrap: pretty;
+}
+
 /* Headings */
 
 .preview :is(h1, h2, h3, h4, h5, h6) {
@@ -421,25 +628,35 @@
   font-family: inherit;
   font-weight: var(--pv-h-weight);
   line-height: var(--pv-h-lh);
+  letter-spacing: var(--pv-h-track);
   color: var(--pv-heading);
   text-wrap: balance;
 }
 
+.preview :is(h4, h5, h6) {
+  margin-top: var(--pv-h-mt-minor);
+  letter-spacing: 0;
+}
+
+.preview :is(h1, h2, h3, h4, h5, h6) + :is(h1, h2, h3, h4, h5, h6) {
+  margin-top: var(--pv-h-stack);
+}
+
 .preview h1 {
+  padding-bottom: var(--pv-h-rule-pad);
+  border-bottom: var(--pv-h1-rule);
   font-size: var(--pv-h1);
 }
 
 .preview h2 {
+  padding-bottom: var(--pv-h-rule-pad);
+  border-bottom: var(--pv-h2-rule);
   font-size: var(--pv-h2);
-}
-
-.preview :is(h1, h2) {
-  padding-bottom: 0.3em;
-  border-bottom: var(--pv-h-rule) solid var(--pv-rule-soft);
 }
 
 .preview h3 {
   font-size: var(--pv-h3);
+  color: var(--pv-h3-color);
 }
 
 .preview h4 {
@@ -452,41 +669,12 @@
 
 .preview h6 {
   font-size: var(--pv-h6);
-  color: var(--pv-muted);
+  color: var(--pv-h6-color);
 }
 
 .preview :is(h1, h2, h3, h4, h5, h6) code {
   padding: 0 0.2em;
   font-size: inherit;
-}
-
-/* Reading keeps its own tighter heading rhythm. */
-:root[data-preview-theme="reading"] .preview h1 {
-  margin-bottom: 0.55em;
-  padding-bottom: 0;
-  line-height: 1.15;
-  letter-spacing: -0.015em;
-}
-
-:root[data-preview-theme="reading"] .preview h2 {
-  padding-bottom: 0;
-  letter-spacing: -0.01em;
-}
-
-:root[data-preview-theme="reading"] .preview h4 {
-  margin-top: 1.5em;
-}
-
-:root[data-preview-theme="reading"] .preview :is(h5, h6) {
-  margin-top: 1.4em;
-}
-
-:root[data-preview-theme="reading"] .preview :is(h1, h2, h3, h4, h5, h6) + :is(h1, h2, h3, h4, h5, h6) {
-  margin-top: 0.6em;
-}
-
-:root[data-preview-theme="reading"] .preview p {
-  text-wrap: pretty;
 }
 
 /* Inline */
@@ -495,7 +683,7 @@
   color: var(--pv-link);
   text-decoration-line: underline;
   text-decoration-thickness: 1px;
-  text-decoration-color: color-mix(in srgb, var(--pv-link) 40%, transparent);
+  text-decoration-color: color-mix(in srgb, var(--pv-link) 45%, transparent);
   text-underline-offset: 0.2em;
   overflow-wrap: anywhere;
   cursor: pointer;
@@ -522,15 +710,13 @@
 }
 
 .preview s {
+  color: var(--pv-del);
   text-decoration-thickness: 1px;
-}
-
-:root[data-preview-theme="reading"] .preview s {
-  color: var(--pv-muted);
 }
 
 .preview code {
   padding: var(--pv-code-pad);
+  border: var(--pv-code-border);
   border-radius: var(--pv-code-radius);
   background: var(--pv-code-bg);
   color: var(--pv-code-fg);
@@ -571,11 +757,11 @@
 }
 
 .preview li + li {
-  margin-top: 0.25em;
+  margin-top: var(--pv-list-gap);
 }
 
 .preview li > :is(ul, ol) {
-  margin-top: 0.25em;
+  margin-top: var(--pv-list-gap);
   margin-bottom: 0;
 }
 
@@ -596,22 +782,51 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* GitHub task lists, when the renderer emits them: the box takes the bullet's place. */
+/* Task lists: the box takes the bullet's place, in tight lists and inside a
+   loose item's first paragraph alike. It stays disabled; it is drawn so its
+   outline and check hold at least 3:1 instead of the browser's grey. */
 .preview .task-list-item {
   list-style-type: none;
 }
 
 .preview .task-list-checkbox {
+  appearance: none;
+  position: relative;
+  display: inline-block;
   width: 1em;
   height: 1em;
-  margin: 0 0.35em 0.2em -1.4em;
-  vertical-align: middle;
-  accent-color: var(--pv-link);
+  margin: 0 0.4em 0 -1.4em;
+  vertical-align: -0.15em;
+  border: 1.5px solid var(--pv-check-line);
+  border-radius: 0.22em;
+  background: var(--pv-bg);
+  cursor: default;
+}
+
+.preview .task-list-checkbox:checked {
+  border-color: var(--pv-check-bg);
+  background-color: var(--pv-check-bg);
+}
+
+.preview .task-list-checkbox:checked::after {
+  content: "";
+  position: absolute;
+  top: 8%;
+  left: 30%;
+  width: 32%;
+  height: 62%;
+  border: solid var(--pv-check-ink);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
 }
 
 .preview .task-list-checkbox:disabled {
   opacity: 1;
-  cursor: default;
+}
+
+@media (forced-colors: active) {
+  .preview .task-list-checkbox { appearance: auto; }
+  .preview .task-list-checkbox::after { display: none; }
 }
 
 /* Blocks */
@@ -634,23 +849,18 @@
 }
 
 .preview hr {
-  height: 1px;
-  margin: 24px 0;
+  height: var(--pv-hr-size);
+  margin: var(--pv-hr-margin) 0;
   padding: 0;
   border: 0;
-  background: var(--pv-rule);
-}
-
-:root[data-preview-theme="reading"] .preview hr {
-  margin: 2.2em 0;
-  background: var(--pv-rule-strong);
+  background: var(--pv-hr-color);
 }
 
 .preview pre {
   max-width: 100%;
   padding: var(--pv-pre-pad);
   overflow-x: auto;
-  border: var(--pv-pre-border-w) solid var(--pv-pre-border);
+  border: var(--pv-pre-border);
   border-radius: var(--pv-pre-radius);
   background: var(--pv-pre-bg);
   color: var(--pv-pre-fg);
@@ -664,6 +874,7 @@
 .preview pre code {
   display: block;
   padding: 0;
+  border: 0;
   border-radius: 0;
   background: none;
   color: inherit;
@@ -681,7 +892,7 @@
 .preview pre .tok-keyword { color: var(--tk-keyword); }
 .preview pre :is(.tok-atom, .tok-bool, .tok-number, .tok-literal) { color: var(--tk-atom); }
 .preview pre :is(.tok-string, .tok-string2) { color: var(--tk-string); }
-.preview pre .tok-comment { color: var(--tk-comment); font-style: italic; }
+.preview pre .tok-comment { color: var(--tk-comment); font-style: var(--pv-comment-style); }
 .preview pre :is(.tok-variableName, .tok-variableName2, .tok-definition, .tok-local, .tok-labelName) { color: var(--tk-variable); }
 .preview pre .tok-propertyName { color: var(--tk-property); }
 .preview pre .tok-typeName { color: var(--tk-type); }
@@ -692,10 +903,6 @@
 .preview pre .tok-meta { color: var(--tk-meta); }
 .preview pre .tok-invalid { color: var(--tk-invalid); }
 
-:root:not([data-preview-theme="reading"]) .preview pre .tok-comment {
-  font-style: normal;
-}
-
 /* Tables size to content and scroll inside themselves, never the pane. */
 .preview table {
   display: block;
@@ -704,62 +911,43 @@
   overflow-x: auto;
   border-collapse: collapse;
   border-spacing: 0;
+  font-size: var(--pv-table-size);
   font-variant-numeric: tabular-nums;
   scrollbar-width: thin;
 }
 
 .preview :is(th, td) {
-  padding: 6px 13px;
-  border: 1px solid var(--pv-rule);
+  padding: var(--pv-cell-pad);
+  border: var(--pv-cell-border);
   text-align: start;
   vertical-align: top;
 }
 
+.preview :is(th, td):first-child {
+  padding-left: var(--pv-cell-edge);
+}
+
+.preview :is(th, td):last-child {
+  padding-right: var(--pv-cell-edge);
+}
+
 .preview th {
+  border-bottom: var(--pv-head-rule);
+  background: var(--pv-th-bg);
   font-weight: var(--pv-h-weight);
   color: var(--pv-heading);
 }
 
+.preview tbody tr + tr > td {
+  border-top: var(--pv-row-rule);
+}
+
+.preview tbody tr:last-child > td {
+  border-bottom: var(--pv-table-foot);
+}
+
 .preview tbody tr:nth-child(2n) {
   background: var(--pv-row-alt);
-}
-
-/* VS Code: open table, strong header rule, light row rules. */
-:root[data-preview-theme="vscode"] .preview :is(th, td) {
-  padding: 5px 10px;
-  border: 0;
-}
-
-:root[data-preview-theme="vscode"] .preview th {
-  border-bottom: 1px solid var(--pv-rule-strong);
-}
-
-:root[data-preview-theme="vscode"] .preview tbody tr + tr > td {
-  border-top: 1px solid var(--pv-rule);
-}
-
-/* Reading: horizontal rules only, quieter UI figures. */
-:root[data-preview-theme="reading"] .preview table {
-  font-size: 0.88em;
-  line-height: 1.45;
-}
-
-:root[data-preview-theme="reading"] .preview :is(th, td) {
-  padding: 9px 14px;
-  border: 0;
-  border-bottom: 1px solid var(--pv-rule);
-}
-
-:root[data-preview-theme="reading"] .preview th {
-  border-bottom-color: var(--pv-rule-strong);
-}
-
-:root[data-preview-theme="reading"] .preview :is(th, td):first-child {
-  padding-left: 0;
-}
-
-:root[data-preview-theme="reading"] .preview :is(th, td):last-child {
-  padding-right: 0;
 }
 
 .preview .align-left {
@@ -774,14 +962,14 @@
   text-align: right;
 }
 
-/* Images stay blocked; the placeholder names what was skipped. */
+/* Images stay blocked; the chip names what was skipped. */
 .preview .blocked-image {
   display: inline-block;
   max-width: 100%;
-  padding: 0.15em 0.6em;
+  padding: 0.2em 0.65em;
   border: 1px dashed var(--pv-rule-strong);
   border-radius: 6px;
-  background: var(--pv-pre-bg);
+  background: var(--pv-code-bg);
   color: var(--pv-muted);
   font: 500 var(--fs-sm) / 1.45 var(--font-ui);
   vertical-align: baseline;

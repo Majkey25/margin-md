@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.2.0 | 2026-11-01
+
+* Refresh the whole window with an inset writing surface, clearer document identity and consistent command icons.
+* Add Fluent and Nord application styles, each with light and dark palettes and distinct controls.
+* Add a Nord Markdown preset and refine headings, tables, quotes, code and task styling across all four presets.
+* Pair font and size controls in grouped settings while keeping the close control visible in short windows.
+* Draw readable task marks with CSS and use native checkboxes in forced colors, preserving the existing image policy.
+* Improve Nord source and error-state contrast while retaining device appearance, font preferences, undo and safe saving.
+
 ## 1.1.0 | 2026-10-31
 
 * Add independent GitHub, VS Code and reading presets for the Markdown preview, each in light and dark mode.
