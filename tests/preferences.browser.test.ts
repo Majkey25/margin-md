@@ -4,7 +4,7 @@ import { resolve } from 'node:path';
 import { chromium, type Page } from 'playwright';
 import { isMessageKey } from '../src/i18n';
 
-test('language settings follow device preferences and preserve documents', { timeout: 120000 }, async () => {
+test('language defaults to English, preserves choices and keeps documents intact', { timeout: 120000 }, async () => {
   const extension = resolve('dist');
   const context = await chromium.launchPersistentContext('', {
     channel: 'chromium', headless: true,
@@ -22,16 +22,17 @@ test('language settings follow device preferences and preserve documents', { tim
       await page.goto(url);
       return page;
     };
-    for (const [languages, locale, label] of [
-      [['en-US'], 'en', 'Open'],
-      [['cs-CZ'], 'cs', 'Otevřít'],
-      [['de-AT'], 'de', 'Öffnen'],
-      [['fr-FR'], 'en', 'Open'],
-      [['fr-FR', 'de-AT'], 'de', 'Öffnen'],
-    ] as const) {
-      const page = await pageWithLanguages([...languages]);
-      assert.equal(await page.locator('html').getAttribute('lang'), locale);
-      assert.equal(await page.locator('#open-file span').innerText(), label);
+    for (const languages of [['en-US'], ['cs-CZ'], ['de-AT'], ['fr-FR'], ['fr-FR', 'de-AT'], []]) {
+      const page = await pageWithLanguages(languages);
+      assert.equal(await page.locator('html').getAttribute('lang'), 'en');
+      assert.equal(await page.locator('#open-file span').innerText(), 'Open');
+      assert.equal(await page.locator('#language-setting').inputValue(), 'en');
+      assert.equal(await page.locator('#doc-name').innerText(), 'Welcome.md');
+      await page.evaluate(() => {
+        Object.defineProperty(navigator, 'languages', { configurable: true, value: ['cs-CZ'] });
+        window.dispatchEvent(new Event('languagechange'));
+      });
+      assert.equal(await page.locator('html').getAttribute('lang'), 'en');
       await page.close();
     }
 
@@ -64,6 +65,10 @@ test('language settings follow device preferences and preserve documents', { tim
     await openSettings();
     await page.locator('#language-setting').selectOption('system');
     assert.equal(await page.locator('html').getAttribute('lang'), 'en');
+    await page.locator('#preferences-close').click();
+    await page.reload();
+    await openSettings();
+    assert.equal(await page.locator('#language-setting').inputValue(), 'system');
     await page.evaluate(() => {
       Object.defineProperty(navigator, 'languages', { configurable: true, value: ['de-AT'] });
       window.dispatchEvent(new Event('languagechange'));
@@ -77,10 +82,13 @@ test('language settings follow device preferences and preserve documents', { tim
     assert.equal(await page.locator('html').getAttribute('lang'), 'cs');
     await page.locator('#preferences-close').click();
     await page.evaluate(() => localStorage.setItem('margin.language', 'invalid'));
+    await page.addInitScript(() => {
+      Object.defineProperty(navigator, 'languages', { configurable: true, value: ['cs-CZ'] });
+    });
     await page.reload();
     assert.equal(await page.locator('html').getAttribute('lang'), 'en');
     await openSettings();
-    assert.equal(await page.locator('#language-setting').inputValue(), 'system');
+    assert.equal(await page.locator('#language-setting').inputValue(), 'en');
     await page.locator('#language-setting').selectOption('en');
     await page.locator('#preferences-close').click();
 
@@ -154,6 +162,7 @@ test('settings cards stay in sync and preserve an edited document', { timeout: 1
     const page = await context.newPage();
     const errors: string[] = [];
     page.on('pageerror', (error) => errors.push(error.message));
+    await page.addInitScript(() => localStorage.setItem('margin.language', 'cs'));
     await page.emulateMedia({ colorScheme: 'light', reducedMotion: 'reduce' });
     await page.goto(`chrome-extension://${new URL(worker.url()).host}/index.html`);
     await page.locator('#file-input').setInputFiles({

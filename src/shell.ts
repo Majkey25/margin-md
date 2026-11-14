@@ -183,7 +183,7 @@ export const shell = String.raw`
         <div class="pref-row">
           <div class="pref-text">
             <label class="pref-label" for="language-setting" data-i18n="Jazyk">Jazyk</label>
-            <p class="pref-hint" data-i18n="Jazyk rozhraní se řídí předvolbami prohlížeče.">Jazyk rozhraní se řídí předvolbami prohlížeče.</p>
+            <p class="pref-hint" data-i18n="Výchozí jazyk je angličtina. Podle zařízení sleduje předvolby prohlížeče.">Výchozí jazyk je angličtina. Podle zařízení sleduje předvolby prohlížeče.</p>
           </div>
           <span class="select"><select id="language-setting">
             <option value="system" data-i18n="Podle zařízení">Podle zařízení</option>

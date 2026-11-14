@@ -2,12 +2,15 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { messages, resolveLocale, translate, type MessageKey } from '../src/i18n';
 
-test('resolves device languages, unsupported languages and explicit choices', () => {
+test('defaults to English and follows device languages only when selected', () => {
   assert.equal(resolveLocale('system', ['fr-FR', 'de-AT', 'en-US']), 'de');
-  assert.equal(resolveLocale(null, ['cs-CZ']), 'cs');
-  assert.equal(resolveLocale('invalid', ['fr-FR', 'en-US']), 'en');
+  assert.equal(resolveLocale(null, ['cs-CZ']), 'en');
+  assert.equal(resolveLocale(null, ['de-DE']), 'en');
+  assert.equal(resolveLocale('invalid', ['cs-CZ']), 'en');
+  assert.equal(resolveLocale('system', ['cs-CZ']), 'cs');
   assert.equal(resolveLocale('system', ['ja-JP']), 'en');
   assert.equal(resolveLocale('system', []), 'en');
+  assert.equal(resolveLocale('en', ['cs-CZ']), 'en');
   assert.equal(resolveLocale('cs', ['de-DE']), 'cs');
   assert.equal(resolveLocale('de', ['cs-CZ']), 'de');
 });

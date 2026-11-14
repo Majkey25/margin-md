@@ -25,7 +25,7 @@ const english = {
   'Čtení': 'Reading', 'Písmo': 'Font', 'Velikost': 'Size', ' náhledu': ' of preview', ' písma náhledu': ' of preview font', ' editoru': ' of editor', ' písma editoru': ' of editor font',
   'Podle stylu': 'Use style default', 'Bezpatkové': 'Sans serif', 'Patkové': 'Serif', 'Neproporcionální': 'Monospace', 'Editor': 'Editor', 'Systémové': 'System',
   'Používají se písma nainstalovaná v zařízení; chybějící nahradí podobné dostupné písmo. Nastavení se ukládá jen v tomto prohlížeči.': 'Fonts installed on this device are used; an available fallback replaces a missing font. Settings are stored only in this browser.',
-  'Jazyk': 'Language', 'Jazyk rozhraní se řídí předvolbami prohlížeče.': 'The interface language follows browser preferences.',
+  'Jazyk': 'Language', 'Výchozí jazyk je angličtina. Podle zařízení sleduje předvolby prohlížeče.': 'English is the default. Select Use device settings to follow browser preferences.',
   'Typ editoru': 'Editor type', 'Kód': 'Code', 'Psaní': 'Writing', 'Prostý text': 'Plain text', 'Papír': 'Paper', 'Terminál': 'Terminal', 'Vybrat': 'Select',
   'Čísla řádků a zvýraznění syntaxe.': 'Line numbers and syntax highlighting.', 'Klidné psaní bez čísel řádků.': 'Quiet writing without line numbers.', 'Prostý text bez zvýraznění syntaxe.': 'Plain text without syntax highlighting.',
   'Zdrojový Markdown': 'Markdown source', 'Ukázkový dokument': 'Sample document', 'Lokální soubor': 'Local file', 'Vítejte.md': 'Welcome.md', 'Bez názvu.md': 'Untitled.md',
@@ -96,7 +96,7 @@ const german: Record<MessageKey, string> = {
   'Čtení': 'Lesen', 'Písmo': 'Schrift', 'Velikost': 'Größe', ' náhledu': ' der Vorschau', ' písma náhledu': ' der Vorschau-Schrift', ' editoru': ' des Editors', ' písma editoru': ' der Editor-Schrift',
   'Podle stylu': 'Stilvorgabe', 'Bezpatkové': 'Serifenlos', 'Patkové': 'Serifenschrift', 'Neproporcionální': 'Monospace', 'Editor': 'Editor', 'Systémové': 'System',
   'Používají se písma nainstalovaná v zařízení; chybějící nahradí podobné dostupné písmo. Nastavení se ukládá jen v tomto prohlížeči.': 'Es werden lokal installierte Schriften verwendet; fehlende Schriften werden durch verfügbare ersetzt. Einstellungen werden nur in diesem Browser gespeichert.',
-  'Jazyk': 'Sprache', 'Jazyk rozhraní se řídí předvolbami prohlížeče.': 'Die Sprache der Oberfläche folgt den Browsereinstellungen.',
+  'Jazyk': 'Sprache', 'Výchozí jazyk je angličtina. Podle zařízení sleduje předvolby prohlížeče.': 'Englisch ist die Standardsprache. Die Geräteeinstellung folgt den Browsereinstellungen.',
   'Typ editoru': 'Editortyp', 'Kód': 'Code', 'Psaní': 'Schreiben', 'Prostý text': 'Klartext', 'Papír': 'Papier', 'Terminál': 'Terminal', 'Vybrat': 'Auswählen',
   'Čísla řádků a zvýraznění syntaxe.': 'Zeilennummern und Syntaxhervorhebung.', 'Klidné psaní bez čísel řádků.': 'Ruhiges Schreiben ohne Zeilennummern.', 'Prostý text bez zvýraznění syntaxe.': 'Klartext ohne Syntaxhervorhebung.',
   'Zdrojový Markdown': 'Markdown-Quelltext', 'Ukázkový dokument': 'Beispieldokument', 'Lokální soubor': 'Lokale Datei', 'Vítejte.md': 'Willkommen.md', 'Bez názvu.md': 'Unbenannt.md',
@@ -139,6 +139,7 @@ const german: Record<MessageKey, string> = {
 export const messages = { en: english, de: german };
 export function resolveLocale(setting: string | null, languages: readonly string[]): Locale {
   if (setting === 'cs' || setting === 'en' || setting === 'de') return setting;
+  if (setting !== 'system') return 'en';
   for (const language of languages) {
     const base = language.toLowerCase().split(/[-_]/, 1)[0];
     if (base === 'cs' || base === 'en' || base === 'de') return base;
@@ -158,11 +159,11 @@ export const isMessageKey = (value: string): value is MessageKey => Object.hasOw
 
 export function setupLanguage(onChange: () => void, onStorageError: () => void): void {
   const select = document.getElementById('language-setting') as HTMLSelectElement;
-  let setting: LanguageSetting = 'system';
+  let setting: LanguageSetting = 'en';
   try {
     const saved = localStorage.getItem('margin.language');
-    if (saved === 'cs' || saved === 'en' || saved === 'de') setting = saved;
-  } catch { /* Device language remains available without storage. */ }
+    if (saved === 'system' || saved === 'cs' || saved === 'en' || saved === 'de') setting = saved;
+  } catch { /* English remains available without storage. */ }
   const apply = (): void => {
     locale = resolveLocale(setting, navigator.languages);
     document.documentElement.lang = locale;

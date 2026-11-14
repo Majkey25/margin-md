@@ -3,7 +3,7 @@
 A local Markdown editor for Chrome. Write the source, see a live preview, and save the file on your computer.
 
 [![Checks](https://github.com/Majkey25/margin-md/actions/workflows/ci.yml/badge.svg)](https://github.com/Majkey25/margin-md/actions/workflows/ci.yml)
-[![Stable release](https://img.shields.io/badge/release-v1.5.0-black?style=flat-square&logo=github&logoColor=white)](https://github.com/Majkey25/margin-md/releases/latest)
+[![Stable release](https://img.shields.io/badge/release-v1.5.1-black?style=flat-square&logo=github&logoColor=white)](https://github.com/Majkey25/margin-md/releases/latest)
 ![Chrome Manifest V3](https://img.shields.io/badge/Chrome-Manifest_V3-black?style=flat-square&logo=googlechrome&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-strict-black?style=flat-square&logo=typescript&logoColor=white)
 ![Local files](https://img.shields.io/badge/files-local_only-black?style=flat-square)
@@ -29,7 +29,7 @@ Updates are manual. Save open documents, replace the extracted extension files w
 
 ## Read and edit
 
-The interface follows your device's preferred browser language. English, Czech and German are available; unsupported languages fall back to English. Choose an explicit language in **Appearance → Language** to override the device setting. Changing language preserves the open file, text and undo history.
+The interface and welcome document default to English. Choose Czech, German or **Use device settings** in **Appearance → Language** to change the language. Device mode follows your browser's preferred languages and falls back to English for unsupported languages. Saved language choices survive updates; users without a saved choice now start in English. Changing language preserves the open file, text and undo history.
 
 Open a `.md` or `.markdown` file with **Open**, or drop it into the editor. Choose **Text**, **Side by side**, or **Preview**. Preview-only mode gives the document the full application area, and the fullscreen control expands the browser view.
 
@@ -61,7 +61,7 @@ Choose the Markdown preview separately in **Markdown preview**:
 | :--- | :--- | :--- |
 | **GitHub** | System sans, 16 px | README-style headings, blue links, code chips and striped tables |
 | **VS Code** | System sans, 14 px | Compact editor preview, bordered code and open tables |
-| **Čtení** | Serif, 17 px | A quiet reading column with softer contrast |
+| **Reading** | Serif, 17 px | A quiet reading column with softer contrast |
 | **Nord** | System sans, 16 px | Arctic reading surfaces, Frost accents and dark code blocks in both modes |
 | **Paper** | Serif, 18 px | Editorial measure, varied heading styles, old-style numerals and warm paper surfaces |
 | **Terminal** | Monospace, 14 px | Technical rhythm, heading-level markers, square task boxes and restrained green accents |
@@ -80,7 +80,7 @@ Markdown supports headings, emphasis, links, quotes, nested lists, tables and di
 | `Ctrl+Shift+S` / `Cmd+Shift+S` | Save As |
 | `Ctrl+Z` / `Cmd+Z` | Undo |
 
-To render Markdown opened directly through a `file:///` URL, enable **Allow access to file URLs** in Margin's extension details. Files opened this way do not provide a writable file handle. Use **Uložit jako** to choose a save destination.
+To render Markdown opened directly through a `file:///` URL, enable **Allow access to file URLs** in Margin's extension details. Files opened this way do not provide a writable file handle. Use **Save as** to choose a save destination.
 
 ## Privacy and permissions
 

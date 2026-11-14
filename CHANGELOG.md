@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.5.1 | 2026-11-14
+
+* Use English for the installed extension description, toolbar tooltip and editor page metadata.
+* Default the interface and welcome document to English, regardless of browser language.
+* Preserve saved language choices, including explicit device-language mode, and explain the default in settings.
+
 ## 1.5.0 | 2026-11-01
 
 * Add Paper and Terminal application themes and Markdown presets, with light and dark palettes.

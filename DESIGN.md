@@ -193,7 +193,7 @@ Sections:
 
 `html[data-editor-type]` shapes the column only; root swaps CodeMirror extensions. **Code** keeps the gutter layout and `--source-max`. **Prose** centres a `--prose-max` (42rem) column with 32 px line padding and 28 px top air. **Plain** removes the max width, using 24 px padding. Phones use 16 px. Pane heads align to each column. Font family and size are never changed by a profile.
 
-Language defaults to browser preferences, with explicit English, Czech and German choices. Profile and language changes preserve the editor state and chosen typography.
+Language defaults to English, with saved English, Czech, German and device-language choices preserved. Device-language mode follows browser preferences only when selected. Profile and language changes preserve the editor state and chosen typography.
 
 ## Behaviour notes
 
