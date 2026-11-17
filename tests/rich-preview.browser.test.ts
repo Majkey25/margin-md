@@ -64,7 +64,10 @@ test('GitHub diagrams and math render offline; Strict keeps literal source', { t
     }
     await page.waitForFunction(() => typeof (window as DelayedDiagramWindow).releaseDiagram === 'function');
     assert.equal(await page.locator('#preview code.language-mermaid').getAttribute('data-rich-state'), 'pending');
+    const nextTheme = await page.locator('html').getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
     await page.locator('#theme-toggle').click();
+    // View Transition applies the theme asynchronously.
+    await page.waitForFunction((theme) => document.documentElement.dataset.theme === theme, nextTheme);
     await page.evaluate(() => (window as DelayedDiagramWindow).releaseDiagram?.());
     await page.waitForFunction(() => document.querySelectorAll('#preview [data-rich-state="ready"]').length === 5);
     await page.waitForFunction(() => !!document.querySelector<HTMLImageElement>('#preview .markdown-diagram img')?.naturalWidth);
